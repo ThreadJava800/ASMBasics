@@ -1,4 +1,4 @@
-Turbo Assembler	 Version 4.1	    02/11/23 19:49:00	    Page 1
+Turbo Assembler	 Version 4.1	    02/11/23 23:04:30	    Page 1
 colortxt.asm
 
 
@@ -10,7 +10,7 @@ colortxt.asm
       5
       6	0100			     Start:
       7	0100  B4 09			     mov ah, 09h
-      8	0102  BA 0129r			     mov dx, offset String
+      8	0102  BA 012Br			     mov dx, offset String
       9	0105  CD 21			     int 21h
      10
      11	0107  BB B800			     mov bx, 0b800h
@@ -28,21 +28,22 @@ colortxt.asm
      23	011B			     PrintSymb:
      24	011B  FE C5			     inc ch
      25
-     26	011D  26: C6 07	00r		     mov byte ptr es:[bx], [offset String]
-**Error** colortxt.asm(26) Constant too	large
-     27	0121  83 C3 02			     add bx, 2
-     28
-     29	0124  3A E9			     cmp ch, cl
-     30	0126  7C F3			     jl	PrintSymb
-     31
-     32	0128  C3			     ret
-     33
+     26	011D  A1 012Br			     mov ax, word ptr String
+     27	0120  26: 89 07			     mov [es:[bx]], ax
+     28	0123  83 C3 02			     add bx, 2
+     29
+     30	0126  3A E9			     cmp ch, cl
+     31	0128  7C F1			     jl	PrintSymb
+     32
+     33	012A  C3			     ret
      34
-     35	0129  41 42 43 44 45 46	24   String: db	'ABCDEF$'
-     36
-     37
-     38				     end     Start
-Turbo Assembler	 Version 4.1	    02/11/23 19:49:00	    Page 2
+     35
+     36	012B  54 45 53 54 2C 20	48+  String: db	'TEST, HELLO$'
+     37	      45 4C 4C 4F 24
+     38
+     39
+     40				     end     Start
+Turbo Assembler	 Version 4.1	    02/11/23 23:04:30	    Page 2
 Symbol Table
 
 
@@ -52,7 +53,7 @@ Symbol Name			  Type	 Value
 
 ??DATE				  Text	 "02/11/23"
 ??FILENAME			  Text	 "colortxt"
-??TIME				  Text	 "19:49:00"
+??TIME				  Text	 "23:04:30"
 ??VERSION			  Number 040A
 @32BIT				  Text	 0
 @CODE				  Text	 DGROUP
@@ -68,17 +69,11 @@ Symbol Name			  Type	 Value
 @WORDSIZE			  Text	 2
 PRINTSYMB			  Near	 DGROUP:011B
 START				  Near	 DGROUP:0100
-STRING				  Near	 DGROUP:0129
+STRING				  Near	 DGROUP:012B
 
 Groups & Segments		  Bit Size Align  Combine Class
 
 DGROUP				  Group
   _DATA				  16  0000 Word	  Public  DATA
-  _TEXT				  16  0130 Word	  Public  CODE
-Turbo Assembler	 Version 4.1	    02/11/23 19:49:00	    Page 3
-Error Summary
-
-
-
-**Error** colortxt.asm(26) Constant too	large
+  _TEXT				  16  0137 Word	  Public  CODE
 

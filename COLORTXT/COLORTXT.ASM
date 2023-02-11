@@ -21,9 +21,10 @@ Start:
 
 
 PrintSymb:
-	inc ch
-
-	mov byte ptr es:[bx], [offset String]
+	inc ch	
+	
+	mov ax, word ptr String
+	mov [es:[bx]], ax
 	add bx, 2 
 	
 	cmp ch, cl
@@ -32,7 +33,7 @@ PrintSymb:
 	ret
 
 	
-String: db 'ABCDEF$'
+String: db 'TEST, HELLO$'
 
 
 end	Start
