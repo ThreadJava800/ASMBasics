@@ -1,0 +1,88 @@
+Turbo Assembler	 Version 4.1	    02/13/23 18:40:16	    Page 1
+function.asm
+
+
+
+      1	0000			     .model tiny
+      2	0000			     .code
+      3
+      4				     org 100h
+      5
+      6				     locals @@
+      7
+      8	0100			     Start:
+      9	0100  BB B800			     mov bx, 0b800h
+     10	0103  8E C3			     mov es, bx
+     11	0105  BB 0370			     mov bx, 160d * 5d + 80d
+     12	0108  B9 0542			     mov cx, 0542h
+     13	010B  E8 0002			     call PutChar
+     14
+     15	010E  C3			     ret		     ; exit(0)
+     16
+     17
+     18
+     19				     ;-----------------------------------------------------------
+     20				     ; Print binary of value
+     21				     ;-----------------------------------------------------------
+     22				     ; Entry:	     AX	= value	to convert to
+     23				     ; Exit:	     None
+     24				     ; Expects:	     ES	-> videomem (b800h)
+     25				     ; Destroys:     AX
+     26				     ;-----------------------------------------------------------
+     27	010F			     ToBin   proc
+     28
+     29	010F  C3			     ret
+     30	0110				     endp
+     31
+     32				     ;-----------------------------------------------------------
+     33				     ; Put symbol with given ascii to videomem
+     34				     ;-----------------------------------------------------------
+     35				     ; Entry:	     BX	= coordinates where to print symbol
+     36				     ;		     CX	= symbol itself
+     37				     ; Exit:	     None
+     38				     ; Expects:	     ES	-> videomem (b800h)
+     39				     ; Destroys:     None
+     40				     ;-----------------------------------------------------------
+     41	0110			     PutChar proc
+     42
+     43	0110  26: 89 0F			     mov es:[bx], cx		     ; put symbol to videomem
+     44
+     45	0113  C3			     ret
+     46	0114				     endp
+     47
+     48
+     49				     end     Start
+Turbo Assembler	 Version 4.1	    02/13/23 18:40:16	    Page 2
+Symbol Table
+
+
+
+
+Symbol Name			  Type	 Value
+
+??DATE				  Text	 "02/13/23"
+??FILENAME			  Text	 "function"
+??TIME				  Text	 "18:40:16"
+??VERSION			  Number 040A
+@32BIT				  Text	 0
+@CODE				  Text	 DGROUP
+@CODESIZE			  Text	 0
+@CPU				  Text	 0101H
+@CURSEG				  Text	 _TEXT
+@DATA				  Text	 DGROUP
+@DATASIZE			  Text	 0
+@FILENAME			  Text	 FUNCTION
+@INTERFACE			  Text	 000H
+@MODEL				  Text	 1
+@STACK				  Text	 DGROUP
+@WORDSIZE			  Text	 2
+PUTCHAR				  Near	 DGROUP:0110
+START				  Near	 DGROUP:0100
+TOBIN				  Near	 DGROUP:010F
+
+Groups & Segments		  Bit Size Align  Combine Class
+
+DGROUP				  Group
+  _DATA				  16  0000 Word	  Public  DATA
+  _TEXT				  16  0114 Word	  Public  CODE
+

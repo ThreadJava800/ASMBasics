@@ -1,4 +1,4 @@
-Turbo Assembler	 Version 4.1	    02/11/23 25:21:05	    Page 1
+Turbo Assembler	 Version 4.1	    02/13/23 15:09:27	    Page 1
 colortxt.asm
 
 
@@ -11,49 +11,51 @@ colortxt.asm
       6	0100			     Start:
       7	0100  BB B800			     mov bx, 0b800h
       8	0103  8E C3			     mov es, bx
-      9	0105  BF 02CE			     mov di, 160d * 4d + 78d	     ; setting place of	string (line 5)
+      9	0105  BB 02CE			     mov bx, 160d * 4d + 78d	     ; setting place of	string (line 5)
      10
-     11	0108  BE 012Dr			     mov si, offset String	     ; setting string to print
+     11	0108  BE 0128r			     mov si, offset String	     ; setting string to print
      12	010B  B4 00			     mov ah, 00h		     ; setting color
      13
-     14	010D  E8 0004			     call PrintString
+     14	010D  E8 0001			     call PrintString
      15	0110  C3			     ret
      16
-     17
-     18	0111			     ChangeColor:
-     19	0111  8A E0			     mov ah, al			     ; setting color attribute for letter
-     20	0113  C3			     ret
-     21
-     22
-     23	0114			     PrintString:
-     24	0114  AC			     lodsb			     ; getting letter to al
-     25	0115  E8 000B			     call CheckIfExit
-     26	0118  E8 FFF6			     call ChangeColor
-     27
-     28	011B  AC			     lodsb			     ; getting letter to al
-     29	011C  E8 0004			     call CheckIfExit
-     30	011F  AB			     stosw			     ; printing	letter
-     31
-     32	0120  EB F2			     jmp PrintString
-     33	0122  C3			     ret
-     34
-     35	0123			     CheckIfExit:
-     36	0123  3C 24			     cmp al, '$'
-     37	0125  74 01			     je	Exit			     ; compare letter with '$' and jumping
-     38	0127  C3			     ret
-     39
-     40	0128			     Exit:
-     41	0128  B8 4C00			     mov ax, 4c00h		     ; exit(0)
-     42	012B  CD 21			     int 21h
-     43
-     44
-     45	012D  05 41 07 42 08 43	09+  String: db	05h, 41h, 07h, 42h, 08h, 43h, 09h, 44h,	10h, 45h, 24h
-     46	      44 10 45 24
-     47					     ; ABCDE (colored) every even letter is a color for	the following ascii
-     48
-     49
-     50				     end     Start
-Turbo Assembler	 Version 4.1	    02/11/23 25:21:05	    Page 2
+     17				     ;----------------------------------------------------------------------------
+     18				     ; Function	that prints string (first code is color, second	is ascii letter)
+     19				     ;----------------------------------------------------------------------------
+     20				     ; Entry:	     BX	- place	where to print letter
+     21				     ;		     SI	- pointer to string
+     22				     ; Exit:	     None
+     23				     ; Expects:	     ES	-> video register (b800h)
+     24				     ; Destroys:     AX, BX, SI
+     25				     ;---------------------------------------------------------------------------
+     26
+     27	0111			     PrintString:
+     28	0111  8A 04			     mov al, [si]
+     29	0113  8A E0			     mov ah, al			     ; setting color of	letter
+     30
+     31	0115  8A 04			     mov al, [si]
+     32	0117  46			     inc si		     ; getting letter to al
+     33	0118  3C 24			     cmp al, '$'
+     34	011A  74 07			     je	Exit
+     35
+     36	011C  26: 89 07			     mov word ptr es:[bx], ax
+     37	011F  43			     inc bx			     ; printing	letter
+     38					     ;inc si
+     39	0120  EB EF			     jmp PrintString
+     40	0122  C3			     ret
+     41
+     42	0123			     Exit:
+     43	0123  B8 4C00			     mov ax, 4c00h		     ; exit(0)
+     44	0126  CD 21			     int 21h
+     45
+     46
+     47	0128  41 05 42 05 43 06	44+  String: db	41h, 05h, 42h, 05h, 43h, 06h, 44h, 05h,	45h, 06h, 00h, '$'
+     48	      05 45 06 00 24
+     49					     ; ABCDE (colored) every even letter is a color for	the following ascii
+     50
+     51
+     52				     end     Start
+Turbo Assembler	 Version 4.1	    02/13/23 15:09:27	    Page 2
 Symbol Table
 
 
@@ -61,9 +63,9 @@ Symbol Table
 
 Symbol Name			  Type	 Value
 
-??DATE				  Text	 "02/11/23"
+??DATE				  Text	 "02/13/23"
 ??FILENAME			  Text	 "colortxt"
-??TIME				  Text	 "25:21:05"
+??TIME				  Text	 "15:09:27"
 ??VERSION			  Number 040A
 @32BIT				  Text	 0
 @CODE				  Text	 DGROUP
@@ -77,16 +79,14 @@ Symbol Name			  Type	 Value
 @MODEL				  Text	 1
 @STACK				  Text	 DGROUP
 @WORDSIZE			  Text	 2
-CHANGECOLOR			  Near	 DGROUP:0111
-CHECKIFEXIT			  Near	 DGROUP:0123
-EXIT				  Near	 DGROUP:0128
-PRINTSTRING			  Near	 DGROUP:0114
+EXIT				  Near	 DGROUP:0123
+PRINTSTRING			  Near	 DGROUP:0111
 START				  Near	 DGROUP:0100
-STRING				  Near	 DGROUP:012D
+STRING				  Near	 DGROUP:0128
 
 Groups & Segments		  Bit Size Align  Combine Class
 
 DGROUP				  Group
   _DATA				  16  0000 Word	  Public  DATA
-  _TEXT				  16  0138 Word	  Public  CODE
+  _TEXT				  16  0134 Word	  Public  CODE
 

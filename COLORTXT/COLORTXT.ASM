@@ -6,7 +6,7 @@ org 100h
 Start:	
 	mov bx, 0b800h
 	mov es, bx
-	mov di, 160d * 4d + 78d 	; setting place of string (line 5)
+	mov bx, 160d * 4d + 78d 	; setting place of string (line 5)
 
 	mov si, offset String		; setting string to print
 	mov ah, 00h			; setting color
@@ -14,27 +14,32 @@ Start:
 	call PrintString
 	ret
 
-
-ChangeColor:
-	mov ah, al			; setting color attribute for letter
-	ret
-
+;----------------------------------------------------------------------------
+; Prints string 
+; String format: sym1 - attr1, sym2 - attr2, sym3 = ...
+; Example: 41h, 05h, 24h - A
+;----------------------------------------------------------------------------
+; Entry:	BX - place where to print letter
+;		SI - pointer to string
+; Exit:		None
+; Expects:	ES -> video register (b800h)
+; Destroys:	AX, BX, SI
+;---------------------------------------------------------------------------
 
 PrintString:
-	lodsb				; getting letter to al
-	call CheckIfExit
-	call ChangeColor
+	mov al, [si]
+	mov ah, al			; setting color of letter	
 
-	lodsb				; getting letter to al
-	call CheckIfExit
-	stosw				; printing letter
+	mov al, [si]			; getting letter to al
+	cmp al, '$'
+	je Exit	
 
+	inc si
+	; flag
+	mov word ptr es:[bx], ax
+	inc bx				; printing letter
+	;inc si
 	jmp PrintString
-	ret
-
-CheckIfExit:
-	cmp al, '$'			
-	je Exit				; compare letter with '$' and jumping
 	ret
 
 Exit:
@@ -42,7 +47,7 @@ Exit:
 	int 21h
 
 	
-String: db 05h, 41h, 07h, 42h, 08h, 43h, 09h, 44h, 10h, 45h, 24h
+String: db 41h, 05h, 42h, 05h, 43h, 06h, 44h, 05h, 45h, 06h, 00h, '$'
 	; ABCDE (colored) every even letter is a color for the following ascii
 
 

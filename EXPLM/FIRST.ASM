@@ -4,6 +4,7 @@
 org 100h
 
 Start:
+
 	mov ah, 09h
 	mov dx, offset Message1
 	int 21h
