@@ -9,10 +9,11 @@ Start:
 	mov bx, 0b800h
 	mov es, bx
 	mov bx, 160d * 5d + 80d ; middle of 5 line
-	mov si, 1000d
-	call ToDec
-
-	ret			; exit(0)
+	mov si, 160h
+	call ToHex
+	
+	mov ax, 4c00h
+	int 21h			; exit(0)
 
 
 
@@ -27,7 +28,7 @@ Start:
 ;-----------------------------------------------------------
 ToBin	proc
 	
-	mov dx, 100h		; dx = 256d
+	mov dx, 8000h		; dx = 2 ** 15
 	jmp @@NewByte
 
 @@Print1:
@@ -56,6 +57,63 @@ ToBin	proc
 	jmp @@NewByte
 
 @@Exit:	ret
+	endp
+
+;-----------------------------------------------------------
+; Print hex of value
+;-----------------------------------------------------------
+; Entry: 	SI = value to convert to
+;		BX = coordinates to print in cmd 
+; Exit:		None
+; Expects:  	ES -> videomem (b800h)
+; Destroys: 	AX, BX, CX, DX, DI, BP, SP
+;----------------------------------------------------------
+ToHex	proc
+
+	mov dx, 8000h
+	mov cx, 0004h		; cx = 0
+	mov di, 0000h	
+
+@@ReadBytes:
+	inc ch
+	cmp ch, 05h
+	je @@Exit
+	jmp @@Proceed4bit
+
+@@Proceed4bit:
+	mov ax, si
+	and ax, dx
+	
+	cmp ax, 00h
+ 	je @@SkipMul
+	
+	mov al, 01h
+	mov ah, 00h
+	sub cl, 1
+	shl al, cl
+	add cl, 1
+	add di, ax
+
+@@SkipMul:
+	sub cl, 1
+	shr dx, 1
+	
+	cmp cl, 00h
+	je @@PrintSymbol
+	jmp @@Proceed4bit
+	
+@@PrintSymbol:
+	mov ax, di
+	mov ah, 05h
+	add al, 30h
+	mov es:[bx], ax
+	add bx, 2
+	mov di, 00h
+	mov cl, 04h
+	jmp @@ReadBytes 
+
+@@Exit:
+	ret
 	endp
 
 
