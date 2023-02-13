@@ -9,8 +9,8 @@ Start:
 	mov bx, 0b800h
 	mov es, bx
 	mov bx, 160d * 5d + 80d ; middle of 5 line
-	mov ax, 150d
-	call ToHex
+	mov si, 1000d
+	call ToDec
 
 	ret			; exit(0)
 
@@ -60,62 +60,59 @@ ToBin	proc
 
 
 ;-----------------------------------------------------------
-; Print hex of value
+; Print dec of value
 ;-----------------------------------------------------------
-; Entry: 	AX = value to convert to
+; Entry: 	SI = value to convert to
 ;		BX = coordinates to print on string 
 ; Exit:		None
 ; Expects:  	ES -> videomem (b800h)
-; Destroys: 	BX, CX, DX, SI
+; Destroys: 	AX, BX, CX, DX, DI
 ;-----------------------------------------------------------
-ToHex	proc		
-	mov dx, 0100h		; dx = 256
-	jmp @@NewByte
+ToDec	proc
+	
+	mov dx, 0100h		; dx = 256d
+	mov cx, si		; cx = si
+	mov di, 00h		; di = 0	
 
-
-@@Proceed4bit:
-	and cx, dx		; cx && dx
-	cmp cx, 0000h
+@@ParseNewBit:
+	and cx, dx
+	cmp cx, 00h
 	je @@SkipMul
-	
-	push si
-	push ax
-	mov si, 00h		; si = 0
-	mov ax, 01h		; ax = 1
-	
-@@CountPow:
-	mov cx, 2
-	mul cx			; ax = ax * 2
 
-	inc si
-	cmp si, 04h		; if si == 4: CountPow()
-	jne @@CountPow
-
-	pop cx
-	add ax, cx
-					
+	add di, dx
 	
+
 @@SkipMul:
-	pop si	
+	cmp dx, 01h
+	je @@Print
 
-	cmp si, 04h		; if si == 4: @@Continue() else: Proceed4bit()
-	je  @@Continue
-	
 	shr dx, 1
-	inc si
-	jmp @@Proceed4bit			
+	mov cx, si
+	jmp @@ParseNewBit		
 
-@@NewByte:
-	mov cx, ax		; cx = ax
-	mov si, 00h		; si = 0
-	jmp @@Proceed4bit	
-
-@@Continue:
-	cmp dl, 01h		; if dl == 1: exit(0)
-	je @@Exit
+@@Print:
+	add bx, 10
+	mov ax, di
+	mov di, 5
 	
-	jmp @@NewByte
-			
+@@PrintSymb:
+	mov cl, 10d		; cl = 10
+	div cl			; al = ax / 10, ah = ax % 10
+		
+	mov dh, 05h
+	mov dl, ah
+	add dl, 30h
+
+	mov es:[bx], dx  
+	mov ah, 00h
+	
+	sub bx, 2
+	sub di, 1
+
+	cmp di, 0
+	je @@Exit
+
+	jmp @@PrintSymb
 
 @@Exit:	ret
 	endp
