@@ -9,7 +9,7 @@ Start:
 	mov bx, 0b800h
 	mov es, bx
 	mov bx, 160d * 5d + 80d ; middle of 5 line
-	mov si, 160h
+	mov si, 16Bh
 	call ToHex
 	
 	mov ax, 4c00h
@@ -105,7 +105,18 @@ ToHex	proc
 @@PrintSymbol:
 	mov ax, di
 	mov ah, 05h
+
+	cmp al, 10d
+	jae @@LetterPrint
+
 	add al, 30h
+	jmp @@ContinuePrint
+
+@@LetterPrint:
+	add al, 37h
+	jmp @@ContinuePrint	
+
+@@ContinuePrint:
 	mov es:[bx], ax
 	add bx, 2
 	mov di, 00h

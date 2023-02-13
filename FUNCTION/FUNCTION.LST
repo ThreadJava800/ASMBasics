@@ -1,4 +1,4 @@
-Turbo Assembler	 Version 4.1	    02/14/23 01:24:18	    Page 1
+Turbo Assembler	 Version 4.1	    02/14/23 01:38:04	    Page 1
 function.asm
 
 
@@ -14,7 +14,7 @@ function.asm
       9	0100  BB B800			     mov bx, 0b800h
      10	0103  8E C3			     mov es, bx
      11	0105  BB 0370			     mov bx, 160d * 5d + 80d ; middle of 5 line
-     12	0108  BE 0160			     mov si, 160h
+     12	0108  BE 016B			     mov si, 16Bh
      13	010B  E8 0036			     call ToHex
      14
      15	010E  B8 4C00			     mov ax, 4c00h
@@ -60,7 +60,7 @@ function.asm
      55
      56	013F  D1 EA			     shr dx, 1		     ; dx >> 1
      57	0141  EB EC			     jmp @@NewByte
-Turbo Assembler	 Version 4.1	    02/14/23 01:24:18	    Page 2
+Turbo Assembler	 Version 4.1	    02/14/23 01:38:04	    Page 2
 function.asm
 
 
@@ -87,7 +87,7 @@ function.asm
      77	014D			     @@ReadBytes:
      78	014D  FE C5			     inc ch
      79	014F  80 FD 05			     cmp ch, 05h
-     80	0152  74 39			     je	@@Exit
+     80	0152  74 45			     je	@@Exit
      81	0154  EB 01 90			     jmp @@Proceed4bit
      82
      83	0157			     @@Proceed4bit:
@@ -115,106 +115,117 @@ function.asm
     105	017A			     @@PrintSymbol:
     106	017A  8B C7			     mov ax, di
     107	017C  B4 05			     mov ah, 05h
-    108	017E  04 30			     add al, 30h
-    109	0180  26: 89 07			     mov es:[bx], ax
-    110	0183  83 C3 02			     add bx, 2
-    111	0186  BF 0000			     mov di, 00h
-    112	0189  B1 04			     mov cl, 04h
-    113	018B  EB C0			     jmp @@ReadBytes
+    108
+    109	017E  3C 0A			     cmp al, 10d
+    110	0180  73 05			     jae @@LetterPrint
+    111
+    112	0182  04 30			     add al, 30h
+    113	0184  EB 06 90			     jmp @@ContinuePrint
     114
-Turbo Assembler	 Version 4.1	    02/14/23 01:24:18	    Page 3
+Turbo Assembler	 Version 4.1	    02/14/23 01:38:04	    Page 3
 function.asm
 
 
 
-    115	018D			     @@Exit:
-    116	018D  C3			     ret
-    117	018E				     endp
+    115	0187			     @@LetterPrint:
+    116	0187  04 37			     add al, 37h
+    117	0189  EB 01 90			     jmp @@ContinuePrint
     118
-    119
-    120				     ;-----------------------------------------------------------
-    121				     ; Print dec of value
-    122				     ;-----------------------------------------------------------
-    123				     ; Entry:	     SI	= value	to convert to
-    124				     ;		     BX	= coordinates to print on string
-    125				     ; Exit:	     None
-    126				     ; Expects:	     ES	-> videomem (b800h)
-    127				     ; Destroys:     AX, BX, CX, DX, DI
-    128				     ;-----------------------------------------------------------
-    129	018E			     ToDec   proc
+    119	018C			     @@ContinuePrint:
+    120	018C  26: 89 07			     mov es:[bx], ax
+    121	018F  83 C3 02			     add bx, 2
+    122	0192  BF 0000			     mov di, 00h
+    123	0195  B1 04			     mov cl, 04h
+    124	0197  EB B4			     jmp @@ReadBytes
+    125
+    126	0199			     @@Exit:
+    127	0199  C3			     ret
+    128	019A				     endp
+    129
     130
-    131	018E  BA 0100			     mov dx, 0100h	     ; dx = 256d
-    132	0191  8B CE			     mov cx, si		     ; cx = si
-    133	0193  BF 0000			     mov di, 00h	     ; di = 0
-    134
-    135	0196			     @@ParseNewBit:
-    136	0196  23 CA			     and cx, dx
-    137	0198  83 F9 00			     cmp cx, 00h
-    138	019B  74 02			     je	@@SkipMul
-    139
-    140	019D  03 FA			     add di, dx
+    131				     ;-----------------------------------------------------------
+    132				     ; Print dec of value
+    133				     ;-----------------------------------------------------------
+    134				     ; Entry:	     SI	= value	to convert to
+    135				     ;		     BX	= coordinates to print on string
+    136				     ; Exit:	     None
+    137				     ; Expects:	     ES	-> videomem (b800h)
+    138				     ; Destroys:     AX, BX, CX, DX, DI
+    139				     ;-----------------------------------------------------------
+    140	019A			     ToDec   proc
     141
-    142
-    143	019F			     @@SkipMul:
-    144	019F  83 FA 01			     cmp dx, 01h
-    145	01A2  74 06			     je	@@Print
-    146
-    147	01A4  D1 EA			     shr dx, 1
-    148	01A6  8B CE			     mov cx, si
-    149	01A8  EB EC			     jmp @@ParseNewBit
+    142	019A  BA 0100			     mov dx, 0100h	     ; dx = 256d
+    143	019D  8B CE			     mov cx, si		     ; cx = si
+    144	019F  BF 0000			     mov di, 00h	     ; di = 0
+    145
+    146	01A2			     @@ParseNewBit:
+    147	01A2  23 CA			     and cx, dx
+    148	01A4  83 F9 00			     cmp cx, 00h
+    149	01A7  74 02			     je	@@SkipMul
     150
-    151	01AA			     @@Print:
-    152	01AA  83 C3 0A			     add bx, 10
-    153	01AD  BA 0000			     mov dx, 0000h
-    154	01B0  8B C6			     mov ax, si
-    155	01B2  BF 0005			     mov di, 5
-    156
-    157	01B5			     @@PrintSymb:
-    158	01B5  B9 000A			     mov cx, 000Ah	     ; cx = 10
-    159	01B8  F7 F1			     div cx		     ; ax = ax / 10, dx	= ax % 10
-    160
-    161	01BA  80 C2 30			     add dl, 30h
-    162	01BD  B6 05			     mov dh, 05h
-    163
-    164	01BF  26: 89 17			     mov es:[bx], dx
-    165	01C2  BA 0000			     mov dx, 0000h
-    166
-    167	01C5  83 EB 02			     sub bx, 2
-    168	01C8  83 EF 01			     sub di, 1
-    169
-    170	01CB  83 FF 00			     cmp di, 0
-    171	01CE  74 02			     je	@@Exit
-Turbo Assembler	 Version 4.1	    02/14/23 01:24:18	    Page 4
+    151	01A9  03 FA			     add di, dx
+    152
+    153
+    154	01AB			     @@SkipMul:
+    155	01AB  83 FA 01			     cmp dx, 01h
+    156	01AE  74 06			     je	@@Print
+    157
+    158	01B0  D1 EA			     shr dx, 1
+    159	01B2  8B CE			     mov cx, si
+    160	01B4  EB EC			     jmp @@ParseNewBit
+    161
+    162	01B6			     @@Print:
+    163	01B6  83 C3 0A			     add bx, 10
+    164	01B9  BA 0000			     mov dx, 0000h
+    165	01BC  8B C6			     mov ax, si
+    166	01BE  BF 0005			     mov di, 5
+    167
+    168	01C1			     @@PrintSymb:
+    169	01C1  B9 000A			     mov cx, 000Ah	     ; cx = 10
+    170	01C4  F7 F1			     div cx		     ; ax = ax / 10, dx	= ax % 10
+    171
+Turbo Assembler	 Version 4.1	    02/14/23 01:38:04	    Page 4
 function.asm
 
 
 
-    172
-    173	01D0  EB E3			     jmp @@PrintSymb
+    172	01C6  80 C2 30			     add dl, 30h
+    173	01C9  B6 05			     mov dh, 05h
     174
-    175	01D2  C3		     @@Exit: ret
-    176	01D3				     endp
+    175	01CB  26: 89 17			     mov es:[bx], dx
+    176	01CE  BA 0000			     mov dx, 0000h
     177
-    178
-    179				     ;-----------------------------------------------------------
-    180				     ; Put symbol with given ascii to videomem
-    181				     ;-----------------------------------------------------------
-    182				     ; Entry:	     BX	= coordinates where to print symbol
-    183				     ;		     CX	= symbol itself
-    184				     ; Exit:	     None
-    185				     ; Expects:	     ES	-> videomem (b800h)
-    186				     ; Destroys:     None
-    187				     ;-----------------------------------------------------------
-    188	01D3			     PutChar proc
+    178	01D1  83 EB 02			     sub bx, 2
+    179	01D4  83 EF 01			     sub di, 1
+    180
+    181	01D7  83 FF 00			     cmp di, 0
+    182	01DA  74 02			     je	@@Exit
+    183
+    184	01DC  EB E3			     jmp @@PrintSymb
+    185
+    186	01DE  C3		     @@Exit: ret
+    187	01DF				     endp
+    188
     189
-    190	01D3  26: 89 0F			     mov es:[bx], cx	     ; put symbol to videomem
-    191
-    192	01D6  C3			     ret
-    193	01D7				     endp
-    194
-    195
-    196				     end     Start
-Turbo Assembler	 Version 4.1	    02/14/23 01:24:18	    Page 5
+    190				     ;-----------------------------------------------------------
+    191				     ; Put symbol with given ascii to videomem
+    192				     ;-----------------------------------------------------------
+    193				     ; Entry:	     BX	= coordinates where to print symbol
+    194				     ;		     CX	= symbol itself
+    195				     ; Exit:	     None
+    196				     ; Expects:	     ES	-> videomem (b800h)
+    197				     ; Destroys:     None
+    198				     ;-----------------------------------------------------------
+    199	01DF			     PutChar proc
+    200
+    201	01DF  26: 89 0F			     mov es:[bx], cx	     ; put symbol to videomem
+    202
+    203	01E2  C3			     ret
+    204	01E3				     endp
+    205
+    206
+    207				     end     Start
+Turbo Assembler	 Version 4.1	    02/14/23 01:38:04	    Page 5
 Symbol Table
 
 
@@ -224,24 +235,26 @@ Symbol Name			  Type	 Value
 
 ??DATE				  Text	 "02/14/23"
 ??FILENAME			  Text	 "function"
-??TIME				  Text	 "01:24:18"
+??TIME				  Text	 "01:38:04"
 ??VERSION			  Number 040A
 @32BIT				  Text	 0
+@@CONTINUEPRINT			  Near	 DGROUP:018C
 @@EXIT				  Near	 DGROUP:0143
-@@EXIT				  Near	 DGROUP:018D
-@@EXIT				  Near	 DGROUP:01D2
+@@EXIT				  Near	 DGROUP:0199
+@@EXIT				  Near	 DGROUP:01DE
+@@LETTERPRINT			  Near	 DGROUP:0187
 @@NEWBYTE			  Near	 DGROUP:012F
 @@NEXT				  Near	 DGROUP:013A
-@@PARSENEWBIT			  Near	 DGROUP:0196
-@@PRINT				  Near	 DGROUP:01AA
+@@PARSENEWBIT			  Near	 DGROUP:01A2
+@@PRINT				  Near	 DGROUP:01B6
 @@PRINT0			  Near	 DGROUP:0124
 @@PRINT1			  Near	 DGROUP:0119
-@@PRINTSYMB			  Near	 DGROUP:01B5
+@@PRINTSYMB			  Near	 DGROUP:01C1
 @@PRINTSYMBOL			  Near	 DGROUP:017A
 @@PROCEED4BIT			  Near	 DGROUP:0157
 @@READBYTES			  Near	 DGROUP:014D
 @@SKIPMUL			  Near	 DGROUP:016E
-@@SKIPMUL			  Near	 DGROUP:019F
+@@SKIPMUL			  Near	 DGROUP:01AB
 @CODE				  Text	 DGROUP
 @CODESIZE			  Text	 0
 @CPU				  Text	 0101H
@@ -253,15 +266,15 @@ Symbol Name			  Type	 Value
 @MODEL				  Text	 1
 @STACK				  Text	 DGROUP
 @WORDSIZE			  Text	 2
-PUTCHAR				  Near	 DGROUP:01D3
+PUTCHAR				  Near	 DGROUP:01DF
 START				  Near	 DGROUP:0100
 TOBIN				  Near	 DGROUP:0113
-TODEC				  Near	 DGROUP:018E
+TODEC				  Near	 DGROUP:019A
 TOHEX				  Near	 DGROUP:0144
 
 Groups & Segments		  Bit Size Align  Combine Class
 
 DGROUP				  Group
   _DATA				  16  0000 Word	  Public  DATA
-  _TEXT				  16  01D7 Word	  Public  CODE
+  _TEXT				  16  01E3 Word	  Public  CODE
 
