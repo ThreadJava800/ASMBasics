@@ -92,19 +92,19 @@ ToDec	proc
 
 @@Print:
 	add bx, 10
-	mov ax, di
+	mov dx, 0000h
+	mov ax, si
 	mov di, 5
 	
 @@PrintSymb:
-	mov cl, 10d		; cl = 10
-	div cl			; al = ax / 10, ah = ax % 10
+	mov cx, 000Ah		; cx = 10
+	div cx			; ax = ax / 10, dx = ax % 10
 		
-	mov dh, 05h
-	mov dl, ah
 	add dl, 30h
+	mov dh, 05h
 
 	mov es:[bx], dx  
-	mov ah, 00h
+	mov dx, 0000h
 	
 	sub bx, 2
 	sub di, 1

@@ -1,4 +1,4 @@
-Turbo Assembler	 Version 4.1	    02/13/23 22:05:23	    Page 1
+Turbo Assembler	 Version 4.1	    02/13/23 22:41:39	    Page 1
 function.asm
 
 
@@ -60,7 +60,7 @@ function.asm
      55	013B  D1 EA			     shr dx, 1		     ; dx >> 1
      56	013D  EB EC			     jmp @@NewByte
      57
-Turbo Assembler	 Version 4.1	    02/13/23 22:05:23	    Page 2
+Turbo Assembler	 Version 4.1	    02/13/23 22:41:39	    Page 2
 function.asm
 
 
@@ -102,35 +102,35 @@ function.asm
      92
      93	015C			     @@Print:
      94	015C  83 C3 0A			     add bx, 10
-     95	015F  8B C7			     mov ax, di
-     96	0161  BF 0005			     mov di, 5
-     97
-     98	0164			     @@PrintSymb:
-     99	0164  B1 0A			     mov cl, 10d	     ; cl = 10
-    100	0166  F6 F1			     div cl		     ; al = ax / 10, ah	= ax % 10
-    101
-    102	0168  B6 05			     mov dh, 05h
-    103	016A  8A D4			     mov dl, ah
-    104	016C  80 C2 30			     add dl, 30h
+     95	015F  BA 0000			     mov dx, 0000h
+     96	0162  8B C6			     mov ax, si
+     97	0164  BF 0005			     mov di, 5
+     98
+     99	0167			     @@PrintSymb:
+    100	0167  B9 000A			     mov cx, 000Ah	     ; cx = 10
+    101	016A  F7 F1			     div cx		     ; ax = ax / 10, dx	= ax % 10
+    102
+    103	016C  80 C2 30			     add dl, 30h
+    104	016F  B6 05			     mov dh, 05h
     105
-    106	016F  26: 89 17			     mov es:[bx], dx
-    107	0172  B4 00			     mov ah, 00h
+    106	0171  26: 89 17			     mov es:[bx], dx
+    107	0174  BA 0000			     mov dx, 0000h
     108
-    109	0174  83 EB 02			     sub bx, 2
-    110	0177  83 EF 01			     sub di, 1
+    109	0177  83 EB 02			     sub bx, 2
+    110	017A  83 EF 01			     sub di, 1
     111
-    112	017A  83 FF 00			     cmp di, 0
-    113	017D  74 02			     je	@@Exit
+    112	017D  83 FF 00			     cmp di, 0
+    113	0180  74 02			     je	@@Exit
     114
-Turbo Assembler	 Version 4.1	    02/13/23 22:05:23	    Page 3
+Turbo Assembler	 Version 4.1	    02/13/23 22:41:39	    Page 3
 function.asm
 
 
 
-    115	017F  EB E3			     jmp @@PrintSymb
+    115	0182  EB E3			     jmp @@PrintSymb
     116
-    117	0181  C3		     @@Exit: ret
-    118	0182				     endp
+    117	0184  C3		     @@Exit: ret
+    118	0185				     endp
     119
     120
     121				     ;-----------------------------------------------------------
@@ -142,16 +142,16 @@ function.asm
     127				     ; Expects:	     ES	-> videomem (b800h)
     128				     ; Destroys:     None
     129				     ;-----------------------------------------------------------
-    130	0182			     PutChar proc
+    130	0185			     PutChar proc
     131
-    132	0182  26: 89 0F			     mov es:[bx], cx	     ; put symbol to videomem
+    132	0185  26: 89 0F			     mov es:[bx], cx	     ; put symbol to videomem
     133
-    134	0185  C3			     ret
-    135	0186				     endp
+    134	0188  C3			     ret
+    135	0189				     endp
     136
     137
     138				     end     Start
-Turbo Assembler	 Version 4.1	    02/13/23 22:05:23	    Page 4
+Turbo Assembler	 Version 4.1	    02/13/23 22:41:39	    Page 4
 Symbol Table
 
 
@@ -161,18 +161,18 @@ Symbol Name			  Type	 Value
 
 ??DATE				  Text	 "02/13/23"
 ??FILENAME			  Text	 "function"
-??TIME				  Text	 "22:05:23"
+??TIME				  Text	 "22:41:39"
 ??VERSION			  Number 040A
 @32BIT				  Text	 0
 @@EXIT				  Near	 DGROUP:013F
-@@EXIT				  Near	 DGROUP:0181
+@@EXIT				  Near	 DGROUP:0184
 @@NEWBYTE			  Near	 DGROUP:012B
 @@NEXT				  Near	 DGROUP:0136
 @@PARSENEWBIT			  Near	 DGROUP:0148
 @@PRINT				  Near	 DGROUP:015C
 @@PRINT0			  Near	 DGROUP:0120
 @@PRINT1			  Near	 DGROUP:0115
-@@PRINTSYMB			  Near	 DGROUP:0164
+@@PRINTSYMB			  Near	 DGROUP:0167
 @@SKIPMUL			  Near	 DGROUP:0151
 @CODE				  Text	 DGROUP
 @CODESIZE			  Text	 0
@@ -185,7 +185,7 @@ Symbol Name			  Type	 Value
 @MODEL				  Text	 1
 @STACK				  Text	 DGROUP
 @WORDSIZE			  Text	 2
-PUTCHAR				  Near	 DGROUP:0182
+PUTCHAR				  Near	 DGROUP:0185
 START				  Near	 DGROUP:0100
 TOBIN				  Near	 DGROUP:010F
 TODEC				  Near	 DGROUP:0140
@@ -194,5 +194,5 @@ Groups & Segments		  Bit Size Align  Combine Class
 
 DGROUP				  Group
   _DATA				  16  0000 Word	  Public  DATA
-  _TEXT				  16  0186 Word	  Public  CODE
+  _TEXT				  16  0189 Word	  Public  CODE
 
