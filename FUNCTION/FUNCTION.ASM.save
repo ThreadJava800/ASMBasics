@@ -59,67 +59,7 @@ ToBin	proc
 	endp
 
 
-;-----------------------------------------------------------
-; Print hex of value
-;-----------------------------------------------------------
-; Entry: 	AX = value to convert to
-;		BX = coordinates to print on string 
-; Exit:		None
-; Expects:  	ES -> videomem (b800h)
-; Destroys: 	BX, CX, DX, SI
-;-----------------------------------------------------------
-ToHex	proc		
-	mov dx, 0100h		; dx = 256
-	jmp @@NewByte
-
-
-@@Proceed4bit:
-	and cx, dx		; cx && dx
-	cmp cx, 0000h
-	je @@SkipMul
-	
-	push si
-	push ax
-	mov si, 00h		; si = 0
-	mov ax, 01h		; ax = 1
-	
-@@CountPow:
-	mov cx, 2
-	mul cx			; ax = ax * 2
-
-	inc si
-	cmp si, 04h		; if si == 4: CountPow()
-	jne @@CountPow
-
-	pop cx
-	add ax, cx
-					
-	
-@@SkipMul:
-	pop si	
-
-	cmp si, 04h		; if si == 4: @@Continue() else: Proceed4bit()
-	je  @@Continue
-	
-	shr dx, 1
-	inc si
-	jmp @@Proceed4bit			
-
-@@NewByte:
-	mov cx, ax		; cx = ax
-	mov si, 00h		; si = 0
-	jmp @@Proceed4bit	
-
-@@Continue:
-	cmp dl, 01h		; if dl == 1: exit(0)
-	je @@Exit
-	
-	jmp @@NewByte
-			
-
-@@Exit:	ret
-	endp
-
+ 
 	
 ;-----------------------------------------------------------
 ; Put symbol with given ascii to videomem
