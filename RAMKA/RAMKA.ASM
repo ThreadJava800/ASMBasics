@@ -11,7 +11,7 @@ Start:
 	
 	mov bx, 0b800h
 	mov es, bx
-	mov bx, 160d * 15d + 40d
+	mov bx, 160d * 11d + 40d
 	
 	mov cx, 30d
 	mov di, 10d

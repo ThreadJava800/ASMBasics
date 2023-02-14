@@ -56,57 +56,57 @@ ToBin	proc
 ;----------------------------------------------------------
 ToHex	proc
 
-	mov dx, 8000h
-	mov cx, 0004h		; cx = 0
-	mov di, 0000h	
+	mov dx, 8000h		; first byte is 1 others are 0
+	mov cx, 0004h		; cx = 0 
+	mov di, 0000h		
 
 @@ReadBytes:
-	inc ch
-	cmp ch, 05h
+	inc ch			; ch++ (byte counter in 4th)
+	cmp ch, 05h		; if ch == 5: exit else: continue
 	je @@Exit
 	jmp @@Proceed4bit
 
 @@Proceed4bit:
-	mov ax, si
-	and ax, dx
+	mov ax, si		; ax = si (given value)
+	and ax, dx		; ax && ax
 	
-	cmp ax, 00h
+	cmp ax, 00h		; if ax == 0: SkipMul()
  	je @@SkipMul
 	
-	mov al, 01h
-	mov ah, 00h
-	sub cl, 1
-	shl al, cl
-	add cl, 1
-	add di, ax
+	mov al, 01h		; al = 1 (value to add)
+	mov ah, 00h		; ah = 0 (needed not to brake ax)
+	sub cl, 1		; cl-- (bit num)
+	shl al, cl		; al = 2^cl
+	add cl, 1		; cl++
+	add di, ax		; di += ax (di - result to print)
 
 @@SkipMul:
-	sub cl, 1
-	shr dx, 1
+	sub cl, 1		; cl--
+	shr dx, 1		; dx /= 2
 	
-	cmp cl, 00h
+	cmp cl, 00h	
 	je @@PrintSymbol
-	jmp @@Proceed4bit
+	jmp @@Proceed4bit	; if cl == 0: Print else continue reading byte
 	
 @@PrintSymbol:
-	mov ax, di
-	mov ah, 05h
+	mov ax, di		; ax = di
+	mov ah, 05h		; ah = 05h (COLOR)
 
-	cmp al, 10d
+	cmp al, 10d		; if al >= 10: PrintAsLetter
 	jae @@LetterPrint
 
-	add al, 30h
+	add al, 30h		; else: al += 30h -> print as ASCII
 	jmp @@ContinuePrint
 
 @@LetterPrint:
-	add al, 37h
+	add al, 37h		; al += 37 -> add letter as ASCII
 	jmp @@ContinuePrint	
 
 @@ContinuePrint:
-	mov es:[bx], ax
-	add bx, 2
-	mov di, 00h
-	mov cl, 04h
+	mov es:[bx], ax		; put ax to videomem
+	add bx, 2		; bx += 2
+	mov di, 00h		; di = 0
+	mov cl, 04h		; cl = 4 (byte count)
 	jmp @@ReadBytes 
 
 @@Exit:
@@ -125,21 +125,21 @@ ToHex	proc
 ;-----------------------------------------------------------
 ToDec	proc
 	
-	mov ax, si
-	mov di, 06h
+	mov ax, si		; ax = si
+	mov di, 06h		; amount of digits
 	
 @@PrintSymb:
 	mov cx, 000Ah		; cx = 10
 	div cx			; ax = ax / 10, dx = ax % 10
 		
-	add dl, 30h
-	mov dh, 05h
+	add dl, 30h		; dl += 30 (symb ascii)
+	mov dh, 05h		; dh = 5   (color)
 
 	mov es:[bx], dx  
-	mov dx, 0000h
+	mov dx, 0000h		; print on screen
 	
-	sub bx, 2
-	sub di, 1
+	sub bx, 2		; bx -= 2
+	sub di, 1		; di -- 
 
 	cmp di, 0
 	je @@Exit
@@ -154,7 +154,7 @@ ToDec	proc
 ; Reads dec number
 ;------------------------------------------------------------
 ; Entry:	None
-; Exit:		DX - dec value
+; Exit:		DI - dec value
 ; Expects:	None
 ; Destroys:	AX, CX, DI, SI
 ;------------------------------------------------------------
@@ -166,7 +166,7 @@ IntInput	proc
 @@OnError:
 		mov dx, offset ErrorMsg
 		mov ah, 09h
-		int 21h
+		int 21h			; print Error message
 		
 		jmp @@Exit
 
@@ -177,13 +177,13 @@ IntInput	proc
 		je @@Exit		
 
 		cmp al, 13h
-		je @@Exit
+		je @@Exit		; if al == '\n' || '\r': retunr
 
 		cmp al, 30h
 		jb @@OnError
 
 		cmp al, 40h
-		ja @@OnError
+		ja @@OnError		; if !alnum(al): OnError()
 
 		sub al, 30h		; al -= 30 (ascii -> number)
 		mov ah, 00h

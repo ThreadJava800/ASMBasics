@@ -1,4 +1,4 @@
-Turbo Assembler	 Version 4.1	    02/14/23 24:00:03	    Page 1
+Turbo Assembler	 Version 4.1	    02/14/23 24:12:49	    Page 1
 ramka.asm
 
 
@@ -16,7 +16,7 @@ ramka.asm
      11
      12	0106  BB B800			     mov bx, 0b800h
      13	0109  8E C3			     mov es, bx
-     14	010B  BB 0988			     mov bx, 160d * 15d	+ 40d
+     14	010B  BB 0708			     mov bx, 160d * 11d	+ 40d
      15
      16	010E  B9 001E			     mov cx, 30d
      17	0111  BF 000A			     mov di, 10d
@@ -60,7 +60,7 @@ ramka.asm
      55	0138  74 2A				     je	@@Exit		     ; if i == 0: exit(0)
      56
      57	013A  83 FD 00		     @@SecondCycle:  cmp bp, 00h
-Turbo Assembler	 Version 4.1	    02/14/23 24:00:03	    Page 2
+Turbo Assembler	 Version 4.1	    02/14/23 24:12:49	    Page 2
 ramka.asm
 
 
@@ -94,7 +94,7 @@ ramka.asm
      84	0165					     endp
      85
      86				     end     Start
-Turbo Assembler	 Version 4.1	    02/14/23 24:00:03	    Page 3
+Turbo Assembler	 Version 4.1	    02/14/23 24:12:49	    Page 3
 Symbol Table
 
 
@@ -104,7 +104,7 @@ Symbol Name			  Type	 Value
 
 ??DATE				  Text	 "02/14/23"
 ??FILENAME			  Text	 "ramka	  "
-??TIME				  Text	 "24:00:03"
+??TIME				  Text	 "24:12:49"
 ??VERSION			  Number 040A
 @32BIT				  Text	 0
 @@CONTINUEMAIN			  Near	 DGROUP:0132
