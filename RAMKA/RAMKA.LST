@@ -1,0 +1,124 @@
+Turbo Assembler	 Version 4.1	    02/14/23 22:57:22	    Page 1
+ramka.asm
+
+
+
+      1	0000			     .model tiny
+      2	0000			     .code
+      3
+      4				     org 100h
+      5
+      6				     locals @@
+      7
+      8	0100			     Start:
+      9	0100  B8 05B3			     mov ax, 05b3h
+     10	0103  BA 05C4			     mov dx, 05c4h
+     11
+     12	0106  BB B800			     mov bx, 0b800h
+     13	0109  8E C3			     mov es, bx
+     14	010B  BB 0334			     mov bx, 80d * 10d + 20d
+     15
+     16	010E  B9 001E			     mov cx, 30d
+     17	0111  BF 0005			     mov di, 5d
+     18
+     19	0114  E8 0001			     call DrawRect
+     20
+     21	0117  C3			     ret
+     22
+     23				     ;-------------------------------------------------------------
+     24				     ; Draws rectangle on screen with given borders
+     25				     ;-------------------------------------------------------------
+     26				     ; Entry:	     AX	- horizontal border
+     27				     ;		     DX	- vertical   border
+     28				     ;		     BX	- left highest point
+     29				     ;		     CX	- horizontal size
+     30				     ;		     DI	- vertical   size
+     31				     ; Exit:	     None
+     32				     ; Expects:	     ES	-> videomem (0b800h)
+     33				     ; Destroys:     CL, SI, DI
+     34				     ;-------------------------------------------------------------
+     35	0118			     DrawRect	     proc
+     36
+     37	0118  83 FF 00		     @@MainCycle:    cmp di, 00h
+     38	011B  74 26				     je	@@Exit
+     39
+     40	011D  26: 89 17				     mov es:[bx], dx
+     41
+     42	0120  8B F1		     @@ContinueMain: mov si, cx
+     43	0122  83 EF 01				     sub di, 1		     ; i--
+     44	0125			     @@SecondCycle:
+     45	0125  83 FE 00				     cmp si, 00h
+     46	0128  EB 15 90				     jmp @@DrawH
+     47
+     48	012B  3B F1				     cmp si, cx
+     49	012D  EB 10 90				     jmp @@DrawH
+     50
+     51
+     52	0130  83 FE 00		     @@Continue:     cmp si, 00h	     ; if j == 0: goto MainCycle
+     53	0133  74 E3				     je	@@MainCycle
+     54
+     55	0135  83 EE 01				     sub si, 1		     ; j--
+     56	0138  EB EB				     jmp @@SecondCycle
+     57
+Turbo Assembler	 Version 4.1	    02/14/23 22:57:22	    Page 2
+ramka.asm
+
+
+
+     58	013A  26: 89 17		     @@DrawV:	     mov es:[bx], dx
+     59	013D  EB E1				     jmp @@ContinueMain
+     60
+     61	013F  26: 89		     @@DrawH:	     mov es:[bx	+ di * 80d + si], ax
+**Error** ramka.asm(61)	Too many registers in expression
+     62	0141  EB ED				     jmp @@Continue
+     63
+     64	0143  C3		     @@Exit:	     ret
+     65	0144					     endp
+     66
+     67				     end     Start
+Turbo Assembler	 Version 4.1	    02/14/23 22:57:22	    Page 3
+Symbol Table
+
+
+
+
+Symbol Name			  Type	 Value
+
+??DATE				  Text	 "02/14/23"
+??FILENAME			  Text	 "ramka	  "
+??TIME				  Text	 "22:57:22"
+??VERSION			  Number 040A
+@32BIT				  Text	 0
+@@CONTINUE			  Near	 DGROUP:0130
+@@CONTINUEMAIN			  Near	 DGROUP:0120
+@@DRAWH				  Near	 DGROUP:013F
+@@DRAWV				  Near	 DGROUP:013A
+@@EXIT				  Near	 DGROUP:0143
+@@MAINCYCLE			  Near	 DGROUP:0118
+@@SECONDCYCLE			  Near	 DGROUP:0125
+@CODE				  Text	 DGROUP
+@CODESIZE			  Text	 0
+@CPU				  Text	 0101H
+@CURSEG				  Text	 _TEXT
+@DATA				  Text	 DGROUP
+@DATASIZE			  Text	 0
+@FILENAME			  Text	 RAMKA
+@INTERFACE			  Text	 000H
+@MODEL				  Text	 1
+@STACK				  Text	 DGROUP
+@WORDSIZE			  Text	 2
+DRAWRECT			  Near	 DGROUP:0118
+START				  Near	 DGROUP:0100
+
+Groups & Segments		  Bit Size Align  Combine Class
+
+DGROUP				  Group
+  _DATA				  16  0000 Word	  Public  DATA
+  _TEXT				  16  0144 Word	  Public  CODE
+Turbo Assembler	 Version 4.1	    02/14/23 22:57:22	    Page 4
+Error Summary
+
+
+
+**Error** ramka.asm(61)	Too many registers in expression
+
