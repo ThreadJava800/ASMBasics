@@ -125,31 +125,8 @@ ToHex	proc
 ;-----------------------------------------------------------
 ToDec	proc
 	
-	mov dx, 0100h		; dx = 256d
-	mov cx, si		; cx = si
-	mov di, 00h		; di = 0	
-
-@@ParseNewBit:
-	and cx, dx
-	cmp cx, 00h
-	je @@SkipMul
-
-	add di, dx
-	
-
-@@SkipMul:
-	cmp dx, 01h
-	je @@Print
-
-	shr dx, 1
-	mov cx, si
-	jmp @@ParseNewBit		
-
-@@Print:
-	add bx, 10
-	mov dx, 0000h
 	mov ax, si
-	mov di, 5
+	mov di, 06h
 	
 @@PrintSymb:
 	mov cx, 000Ah		; cx = 10

@@ -13,10 +13,13 @@ Start:
 
 	call IntInput
 	mov si, di
-	
+	push si	
+
+	mov di, 00h
 	call IntInput
-	add si, di
-	
+	pop si
+	add si, di 
+
 	mov bx, 0b800h
 	mov es, bx
 	mov bx, 80d * 10d + 40d

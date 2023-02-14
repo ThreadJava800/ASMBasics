@@ -1,7 +1,7 @@
 
  Start  Stop   Length Name               Class
 
- 00000H 00240H 00241H _TEXT              CODE
- 00242H 0025EH 0001DH _DATA              DATA
+ 00000H 00223H 00224H _TEXT              CODE
+ 00224H 00240H 0001DH _DATA              DATA
 
 
