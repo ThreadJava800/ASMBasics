@@ -1,22 +1,3 @@
-.model tiny
-.code
-
-org 100h
-
-locals @@
-
-Start:
-	mov bx, 0b800h
-	mov es, bx
-	mov bx, 160d * 5d + 80d ; middle of 5 line
-	mov si, 16Bh
-	call ToHex
-	
-	mov ax, 4c00h
-	int 21h			; exit(0)
-
-
-
 ;-----------------------------------------------------------
 ; Print binary of value
 ;-----------------------------------------------------------
@@ -202,6 +183,3 @@ PutChar proc
 
 	ret
 	endp
-
-
-end	Start
