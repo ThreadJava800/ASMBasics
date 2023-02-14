@@ -6,12 +6,12 @@ org 100h
 locals @@
 
 Start:
-	mov ax, 05b3h	
-	mov dx, 05c4h
+	mov ax, 0501h	
+	mov dx, 0502h
 	
 	mov bx, 0b800h
 	mov es, bx
-	mov bx, 80d * 10d + 20d
+	mov bx, 160d * 10d + 40d
 	
 	mov cx, 30d
 	mov di, 5d
@@ -30,37 +30,53 @@ Start:
 ;		DI - vertical   size
 ; Exit:		None
 ; Expects:	ES -> videomem (0b800h)
-; Destroys:	CL, SI, DI
+; Destroys:	BP, SI
 ;-------------------------------------------------------------
 DrawRect	proc		
+		
+		mov si, di		; i = di
+		jmp @@MainCycle			
 
-@@MainCycle:	cmp di, 00h
-		je @@Exit
+@@IterateI:	sub si, 1		; i--
+		sub bx, cx		; start vertically
+		sub bx, cx
+		add bx, 160d		; new line
 
-		mov es:[bx], dx		
+@@MainCycle:	mov bp, cx		; j = cx
 
-@@ContinueMain:	mov si, cx		
-		sub di, 1		; i--
-@@SecondCycle:	
+		sub bx, 2		; bx -= 2 (then i += 2 to print)
+		jmp @@DrawV
+
+@@ContinueMain:	add bx, 2		; bx += 2 (watch previous comment)
 		cmp si, 00h
-		jmp @@DrawH
-		
-		cmp si, cx
-		jmp @@DrawH
- 		
-		
-@@Continue:	cmp si, 00h		; if j == 0: goto MainCycle
-		je @@MainCycle		
-		
-		sub si, 1		; j--
+		je @@Exit 		; if i == 0: exit(0)
+
+@@SecondCycle:	cmp bp, 00h
+		je @@DrawRightV		; print left border (WORKS!)
+
+		cmp si, di
+		je @@DrawH		; draw highest border
+
+		cmp si, 01h
+		je @@DrawH		; draw lowest border
+
+@@ContinueSecond:
+		cmp bp, 00h
+		je @@IterateI		; if j == 0: i++
+
+		sub bp, 1		; else: j--
+		add bx, 2		; bx += 2
 		jmp @@SecondCycle
 
-@@DrawV:	mov es:[bx], dx
+@@DrawH:	mov es:[bx], ax
+		jmp @@ContinueSecond
+
+@@DrawV:	mov es:[bx], dx	
 		jmp @@ContinueMain
 
-@@DrawH:	mov es:[bx + di * 80d + si], ax
-		jmp @@Continue
-	
+@@DrawRightV:	mov es:[bx], dx
+		jmp @@ContinueSecond
+
 @@Exit:		ret
 		endp
 
