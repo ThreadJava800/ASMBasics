@@ -40,6 +40,6 @@ Start:
 		
 	ret
 
-include liba.asm
+include ..\liba.asm
 
 end	Start

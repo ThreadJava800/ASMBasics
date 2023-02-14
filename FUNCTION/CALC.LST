@@ -1,4 +1,4 @@
-Turbo Assembler	 Version 4.1	    02/14/23 24:12:27	    Page 1
+Turbo Assembler	 Version 4.1	    02/15/23 00:17:46	    Page 1
 calc.asm
 
 
@@ -45,7 +45,7 @@ calc.asm
      40
      41	0134  C3			     ret
      42
-     43				     include liba.asm
+     43				     include ..\liba.asm
 1    44	0135			     .data
 1    45	0000  0A 54 68 69 73 20	73+	     ErrorMsg: db 0Ah, 'This symbol is not allowed!$'
      46	      79 6D 62 6F 6C 20	69+
@@ -60,7 +60,7 @@ calc.asm
 1    55				     ;-----------------------------------------------------------
 1    56				     ; Entry:	     AX	= value	to convert to
 1    57				     ;		     BX	= coordinates to print on string
-Turbo Assembler	 Version 4.1	    02/14/23 24:12:27	    Page 2
+Turbo Assembler	 Version 4.1	    02/15/23 00:17:46	    Page 2
 calc.asm
 
 
@@ -122,7 +122,7 @@ calc.asm
 1   112	0171  80 FD 05			     cmp ch, 05h	     ; if ch ==	5: exit	else: continue
 1   113	0174  74 45			     je	@@Exit
 1   114	0176  EB 01 90			     jmp @@Proceed4bit
-Turbo Assembler	 Version 4.1	    02/14/23 24:12:27	    Page 3
+Turbo Assembler	 Version 4.1	    02/15/23 00:17:46	    Page 3
 calc.asm
 
 
@@ -184,7 +184,7 @@ calc.asm
 1   169				     ; Exit:	     None
 1   170				     ; Expects:	     ES	-> videomem (b800h)
 1   171				     ; Destroys:     AX, BX, CX, DX, DI
-Turbo Assembler	 Version 4.1	    02/14/23 24:12:27	    Page 4
+Turbo Assembler	 Version 4.1	    02/15/23 00:17:46	    Page 4
 calc.asm
 
 
@@ -246,7 +246,7 @@ calc.asm
 1   226	01FA  3C 13				     cmp al, 13h
 1   227	01FC  74 21				     je	@@Exit		     ; if al ==	'\n' ||	'\r': retunr
 1   228
-Turbo Assembler	 Version 4.1	    02/14/23 24:12:27	    Page 5
+Turbo Assembler	 Version 4.1	    02/15/23 00:17:46	    Page 5
 calc.asm
 
 
@@ -279,25 +279,94 @@ calc.asm
 1   254	0220					     endp
 1   255
 1   256
-1   257				     ;-----------------------------------------------------------
-1   258				     ; Put symbol with given ascii to videomem
-1   259				     ;-----------------------------------------------------------
-1   260				     ; Entry:	     BX	= coordinates where to print symbol
-1   261				     ;		     CX	= symbol itself
-1   262				     ; Exit:	     None
-1   263				     ; Expects:	     ES	-> videomem (b800h)
-1   264				     ; Destroys:     None
-1   265				     ;-----------------------------------------------------------
-1   266	0220			     PutChar proc
-1   267
-1   268	0220  26: 89 0F			     mov es:[bx], cx	     ; put symbol to videomem
-1   269
-1   270	0223  C3			     ret
-1   271	0224				     endp
-1   272
-    273
-    274				     end     Start
-Turbo Assembler	 Version 4.1	    02/14/23 24:12:27	    Page 6
+1   257				     ;-------------------------------------------------------------
+1   258				     ; Draws rectangle on screen with given borders
+1   259				     ;-------------------------------------------------------------
+1   260				     ; Entry:	     AX	- horizontal border
+1   261				     ;		     DX	- vertical   border
+1   262				     ;		     BX	- left highest point
+1   263				     ;		     CX	- horizontal size
+1   264				     ;		     DI	- vertical   size
+1   265				     ; Exit:	     None
+1   266				     ; Expects:	     ES	-> videomem (0b800h)
+1   267				     ; Destroys:     BP, SI
+1   268				     ;-------------------------------------------------------------
+1   269	0220			     DrawRect	     proc
+1   270
+1   271	0220  8B F7				     mov si, di		     ; i = di
+1   272	0222  EB 0C 90				     jmp @@MainCycle
+1   273
+1   274	0225  83 EE 01		     @@IterateI:     sub si, 1		     ; i--
+1   275
+1   276	0228  2B D9				     sub bx, cx		     ; start vertically
+1   277	022A  2B D9				     sub bx, cx
+1   278	022C  81 C3 00A0			     add bx, 160d	     ; new line
+1   279
+1   280	0230  8B E9		     @@MainCycle:    mov bp, cx		     ; j = cx
+1   281
+1   282	0232  83 EB 02				     sub bx, 2		     ; bx -= 2 (then i += 2 to print)
+1   283
+1   284	0235  83 FE 00				     cmp si, 00h
+1   285	0238  75 28				     jne @@DrawV
+Turbo Assembler	 Version 4.1	    02/15/23 00:17:46	    Page 6
+calc.asm
+
+
+
+1   286
+1   287	023A  83 C3 02		     @@ContinueMain: add bx, 2		     ; bx += 2 (watch previous comment)
+1   288	023D  83 FE 00				     cmp si, 00h
+1   289	0240  74 2A				     je	@@Exit		     ; if i == 0: exit(0)
+1   290
+1   291	0242  83 FD 00		     @@SecondCycle:  cmp bp, 00h
+1   292	0245  74 20				     je	@@DrawRightV	     ; print left border (WORKS!)
+1   293
+1   294	0247  3B F7				     cmp si, di
+1   295	0249  74 12				     je	@@DrawH		     ; draw highest border
+1   296
+1   297	024B  83 FE 01				     cmp si, 01h
+1   298	024E  74 0D				     je	@@DrawH		     ; draw lowest border
+1   299
+1   300	0250			     @@ContinueSecond:
+1   301	0250  83 FD 00				     cmp bp, 00h
+1   302	0253  74 D0				     je	@@IterateI	     ; if j == 0: i++
+1   303
+1   304	0255  83 ED 01				     sub bp, 1		     ; else: j--
+1   305	0258  83 C3 02				     add bx, 2		     ; bx += 2
+1   306	025B  EB E5				     jmp @@SecondCycle
+1   307
+1   308	025D  26: 89 07		     @@DrawH:	     mov es:[bx], ax
+1   309	0260  EB EE				     jmp @@ContinueSecond
+1   310
+1   311	0262  26: 89 17		     @@DrawV:	     mov es:[bx], dx
+1   312	0265  EB D3				     jmp @@ContinueMain
+1   313
+1   314	0267  26: 89 17		     @@DrawRightV:   mov es:[bx], dx
+1   315	026A  EB E4				     jmp @@ContinueSecond
+1   316
+1   317	026C  C3		     @@Exit:	     ret
+1   318	026D					     endp
+1   319
+1   320
+1   321				     ;-----------------------------------------------------------
+1   322				     ; Put symbol with given ascii to videomem
+1   323				     ;-----------------------------------------------------------
+1   324				     ; Entry:	     BX	= coordinates where to print symbol
+1   325				     ;		     CX	= symbol itself
+1   326				     ; Exit:	     None
+1   327				     ; Expects:	     ES	-> videomem (b800h)
+1   328				     ; Destroys:     None
+1   329				     ;-----------------------------------------------------------
+1   330	026D			     PutChar proc
+1   331
+1   332	026D  26: 89 0F			     mov es:[bx], cx	     ; put symbol to videomem
+1   333
+1   334	0270  C3			     ret
+1   335	0271				     endp
+1   336
+    337
+    338				     end     Start
+Turbo Assembler	 Version 4.1	    02/15/23 00:17:46	    Page 7
 Symbol Table
 
 
@@ -305,18 +374,26 @@ Symbol Table
 
 Symbol Name			  Type	 Value
 
-??DATE				  Text	 "02/14/23"
+??DATE				  Text	 "02/15/23"
 ??FILENAME			  Text	 "calc	  "
-??TIME				  Text	 "24:12:27"
+??TIME				  Text	 "00:17:46"
 ??VERSION			  Number 040A
 @32BIT				  Text	 0
+@@CONTINUEMAIN			  Near	 DGROUP:023A
 @@CONTINUEPRINT			  Near	 DGROUP:01AE
+@@CONTINUESECOND		  Near	 DGROUP:0250
+@@DRAWH				  Near	 DGROUP:025D
+@@DRAWRIGHTV			  Near	 DGROUP:0267
+@@DRAWV				  Near	 DGROUP:0262
 @@EXIT				  Near	 DGROUP:0165
 @@EXIT				  Near	 DGROUP:01BB
 @@EXIT				  Near	 DGROUP:01DE
 @@EXIT				  Near	 DGROUP:021F
+@@EXIT				  Near	 DGROUP:026C
+@@ITERATEI			  Near	 DGROUP:0225
 @@LETTERPRINT			  Near	 DGROUP:01A9
 @@LOOP				  Near	 DGROUP:01F2
+@@MAINCYCLE			  Near	 DGROUP:0230
 @@NEWBYTE			  Near	 DGROUP:0151
 @@NEXT				  Near	 DGROUP:015C
 @@ONERROR			  Near	 DGROUP:01E8
@@ -326,6 +403,7 @@ Symbol Name			  Type	 Value
 @@PRINTSYMBOL			  Near	 DGROUP:019C
 @@PROCEED4BIT			  Near	 DGROUP:0179
 @@READBYTES			  Near	 DGROUP:016F
+@@SECONDCYCLE			  Near	 DGROUP:0242
 @@SKIPMUL			  Near	 DGROUP:0190
 @CODE				  Text	 DGROUP
 @CODESIZE			  Text	 0
@@ -338,17 +416,23 @@ Symbol Name			  Type	 Value
 @MODEL				  Text	 1
 @STACK				  Text	 DGROUP
 @WORDSIZE			  Text	 2
+DRAWRECT			  Near	 DGROUP:0220
 ERRORMSG			  Near	 DGROUP:0000
 INTINPUT			  Near	 DGROUP:01DF
-PUTCHAR				  Near	 DGROUP:0220
+PUTCHAR				  Near	 DGROUP:026D
 START				  Near	 DGROUP:0100
 TOBIN				  Near	 DGROUP:0135
 TODEC				  Near	 DGROUP:01BC
 TOHEX				  Near	 DGROUP:0166
+Turbo Assembler	 Version 4.1	    02/15/23 00:17:46	    Page 8
+Symbol Table
+
+
+
 
 Groups & Segments		  Bit Size Align  Combine Class
 
 DGROUP				  Group
   _DATA				  16  001D Word	  Public  DATA
-  _TEXT				  16  0224 Word	  Public  CODE
+  _TEXT				  16  0271 Word	  Public  CODE
 
