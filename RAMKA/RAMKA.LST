@@ -1,4 +1,4 @@
-Turbo Assembler	 Version 4.1	    02/14/23 23:56:13	    Page 1
+Turbo Assembler	 Version 4.1	    02/14/23 24:00:03	    Page 1
 ramka.asm
 
 
@@ -16,10 +16,10 @@ ramka.asm
      11
      12	0106  BB B800			     mov bx, 0b800h
      13	0109  8E C3			     mov es, bx
-     14	010B  BB 0668			     mov bx, 160d * 10d	+ 40d
+     14	010B  BB 0988			     mov bx, 160d * 15d	+ 40d
      15
      16	010E  B9 001E			     mov cx, 30d
-     17	0111  BF 0005			     mov di, 5d
+     17	0111  BF 000A			     mov di, 10d
      18
      19	0114  E8 0001			     call DrawRect
      20
@@ -43,55 +43,58 @@ ramka.asm
      38	011A  EB 0C 90				     jmp @@MainCycle
      39
      40	011D  83 EE 01		     @@IterateI:     sub si, 1		     ; i--
-     41	0120  2B D9				     sub bx, cx		     ; start vertically
-     42	0122  2B D9				     sub bx, cx
-     43	0124  81 C3 00A0			     add bx, 160d	     ; new line
-     44
-     45	0128  8B E9		     @@MainCycle:    mov bp, cx		     ; j = cx
-     46
-     47	012A  83 EB 02				     sub bx, 2		     ; bx -= 2 (then i += 2 to print)
-     48	012D  EB 29 90				     jmp @@DrawV
+     41
+     42	0120  2B D9				     sub bx, cx		     ; start vertically
+     43	0122  2B D9				     sub bx, cx
+     44	0124  81 C3 00A0			     add bx, 160d	     ; new line
+     45
+     46	0128  8B E9		     @@MainCycle:    mov bp, cx		     ; j = cx
+     47
+     48	012A  83 EB 02				     sub bx, 2		     ; bx -= 2 (then i += 2 to print)
      49
-     50	0130  83 C3 02		     @@ContinueMain: add bx, 2		     ; bx += 2 (watch previous comment)
-     51	0133  83 FE 00				     cmp si, 00h
-     52	0136  74 2A				     je	@@Exit		     ; if i == 0: exit(0)
-     53
-     54	0138  83 FD 00		     @@SecondCycle:  cmp bp, 00h
-     55	013B  74 20				     je	@@DrawRightV	     ; print left border (WORKS!)
+     50	012D  83 FE 00				     cmp si, 00h
+     51	0130  75 28				     jne @@DrawV
+     52
+     53	0132  83 C3 02		     @@ContinueMain: add bx, 2		     ; bx += 2 (watch previous comment)
+     54	0135  83 FE 00				     cmp si, 00h
+     55	0138  74 2A				     je	@@Exit		     ; if i == 0: exit(0)
      56
-     57	013D  3B F7				     cmp si, di
-Turbo Assembler	 Version 4.1	    02/14/23 23:56:13	    Page 2
+     57	013A  83 FD 00		     @@SecondCycle:  cmp bp, 00h
+Turbo Assembler	 Version 4.1	    02/14/23 24:00:03	    Page 2
 ramka.asm
 
 
 
-     58	013F  74 12				     je	@@DrawH		     ; draw highest border
+     58	013D  74 20				     je	@@DrawRightV	     ; print left border (WORKS!)
      59
-     60	0141  83 FE 01				     cmp si, 01h
-     61	0144  74 0D				     je	@@DrawH		     ; draw lowest border
+     60	013F  3B F7				     cmp si, di
+     61	0141  74 12				     je	@@DrawH		     ; draw highest border
      62
-     63	0146			     @@ContinueSecond:
-     64	0146  83 FD 00				     cmp bp, 00h
-     65	0149  74 D2				     je	@@IterateI	     ; if j == 0: i++
-     66
-     67	014B  83 ED 01				     sub bp, 1		     ; else: j--
-     68	014E  83 C3 02				     add bx, 2		     ; bx += 2
-     69	0151  EB E5				     jmp @@SecondCycle
-     70
-     71	0153  26: 89 07		     @@DrawH:	     mov es:[bx], ax
-     72	0156  EB EE				     jmp @@ContinueSecond
+     63	0143  83 FE 01				     cmp si, 01h
+     64	0146  74 0D				     je	@@DrawH		     ; draw lowest border
+     65
+     66	0148			     @@ContinueSecond:
+     67	0148  83 FD 00				     cmp bp, 00h
+     68	014B  74 D0				     je	@@IterateI	     ; if j == 0: i++
+     69
+     70	014D  83 ED 01				     sub bp, 1		     ; else: j--
+     71	0150  83 C3 02				     add bx, 2		     ; bx += 2
+     72	0153  EB E5				     jmp @@SecondCycle
      73
-     74	0158  26: 89 17		     @@DrawV:	     mov es:[bx], dx
-     75	015B  EB D3				     jmp @@ContinueMain
+     74	0155  26: 89 07		     @@DrawH:	     mov es:[bx], ax
+     75	0158  EB EE				     jmp @@ContinueSecond
      76
-     77	015D  26: 89 17		     @@DrawRightV:   mov es:[bx], dx
-     78	0160  EB E4				     jmp @@ContinueSecond
+     77	015A  26: 89 17		     @@DrawV:	     mov es:[bx], dx
+     78	015D  EB D3				     jmp @@ContinueMain
      79
-     80	0162  C3		     @@Exit:	     ret
-     81	0163					     endp
+     80	015F  26: 89 17		     @@DrawRightV:   mov es:[bx], dx
+     81	0162  EB E4				     jmp @@ContinueSecond
      82
-     83				     end     Start
-Turbo Assembler	 Version 4.1	    02/14/23 23:56:13	    Page 3
+     83	0164  C3		     @@Exit:	     ret
+     84	0165					     endp
+     85
+     86				     end     Start
+Turbo Assembler	 Version 4.1	    02/14/23 24:00:03	    Page 3
 Symbol Table
 
 
@@ -101,18 +104,18 @@ Symbol Name			  Type	 Value
 
 ??DATE				  Text	 "02/14/23"
 ??FILENAME			  Text	 "ramka	  "
-??TIME				  Text	 "23:56:13"
+??TIME				  Text	 "24:00:03"
 ??VERSION			  Number 040A
 @32BIT				  Text	 0
-@@CONTINUEMAIN			  Near	 DGROUP:0130
-@@CONTINUESECOND		  Near	 DGROUP:0146
-@@DRAWH				  Near	 DGROUP:0153
-@@DRAWRIGHTV			  Near	 DGROUP:015D
-@@DRAWV				  Near	 DGROUP:0158
-@@EXIT				  Near	 DGROUP:0162
+@@CONTINUEMAIN			  Near	 DGROUP:0132
+@@CONTINUESECOND		  Near	 DGROUP:0148
+@@DRAWH				  Near	 DGROUP:0155
+@@DRAWRIGHTV			  Near	 DGROUP:015F
+@@DRAWV				  Near	 DGROUP:015A
+@@EXIT				  Near	 DGROUP:0164
 @@ITERATEI			  Near	 DGROUP:011D
 @@MAINCYCLE			  Near	 DGROUP:0128
-@@SECONDCYCLE			  Near	 DGROUP:0138
+@@SECONDCYCLE			  Near	 DGROUP:013A
 @CODE				  Text	 DGROUP
 @CODESIZE			  Text	 0
 @CPU				  Text	 0101H
@@ -131,5 +134,5 @@ Groups & Segments		  Bit Size Align  Combine Class
 
 DGROUP				  Group
   _DATA				  16  0000 Word	  Public  DATA
-  _TEXT				  16  0163 Word	  Public  CODE
+  _TEXT				  16  0165 Word	  Public  CODE
 

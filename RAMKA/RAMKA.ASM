@@ -11,10 +11,10 @@ Start:
 	
 	mov bx, 0b800h
 	mov es, bx
-	mov bx, 160d * 10d + 40d
+	mov bx, 160d * 15d + 40d
 	
 	mov cx, 30d
-	mov di, 5d
+	mov di, 10d
 
 	call DrawRect	
 
@@ -38,6 +38,7 @@ DrawRect	proc
 		jmp @@MainCycle			
 
 @@IterateI:	sub si, 1		; i--
+	
 		sub bx, cx		; start vertically
 		sub bx, cx
 		add bx, 160d		; new line
@@ -45,7 +46,9 @@ DrawRect	proc
 @@MainCycle:	mov bp, cx		; j = cx
 
 		sub bx, 2		; bx -= 2 (then i += 2 to print)
-		jmp @@DrawV
+		
+		cmp si, 00h
+		jne @@DrawV
 
 @@ContinueMain:	add bx, 2		; bx += 2 (watch previous comment)
 		cmp si, 00h
