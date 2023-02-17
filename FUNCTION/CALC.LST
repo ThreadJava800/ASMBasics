@@ -1,4 +1,4 @@
-Turbo Assembler	 Version 4.1	    02/15/23 00:17:46	    Page 1
+Turbo Assembler	 Version 4.1	    02/17/23 02:19:19	    Page 1
 calc.asm
 
 
@@ -16,357 +16,383 @@ calc.asm
      11	0100  BE 0000			     mov si, 00h
      12	0103  BF 0000			     mov di, 00h
      13
-     14	0106  E8 00D6			     call IntInput
+     14	0106  E8 00EF			     call IntInput
      15	0109  8B F7			     mov si, di
      16	010B  56			     push si
      17
      18	010C  BF 0000			     mov di, 00h
-     19	010F  E8 00CD			     call IntInput
-     20	0112  5E			     pop si
-     21	0113  03 F7			     add si, di
-     22
-     23	0115  BB B800			     mov bx, 0b800h
-     24	0118  8E C3			     mov es, bx
-     25	011A  BB 0348			     mov bx, 80d * 10d + 40d
+     19	010F  E8 00E6			     call IntInput
+     20	0112  56			     push si
+     21
+     22					     ;;	DRAWING	FRAME ;;
+     23
+     24	0113  B8 C985			     mov ax, 0C985h
+     25	0116  BA 9C84			     mov dx, 09C84h
      26
-     27	011D  56			     push si
-     28
-     29	011E  8B C6			     mov ax, si
-     30	0120  E8 0012			     call ToBin
-     31	0123  81 C3 00A0		     add bx, 160d
-     32
-     33	0127  5E			     pop si
-     34	0128  56			     push si
-     35	0129  E8 003A			     call ToHex
-     36	012C  81 C3 00A0		     add bx, 160d
+     27	0119  BB B800			     mov bx, 0b800h
+     28	011C  8E C3			     mov es, bx
+     29	011E  BB 07B4			     mov bx, 160d * 12d	+ 52d
+     30
+     31	0121  B9 001E			     mov cx, 30d
+     32	0124  BF 0009			     mov di, 9d
+     33
+     34	0127  E8 010F			     call DrawRect
+     35
+     36					     ;;	PRINTING VALUES	;;
      37
-     38	0130  5E			     pop si
-     39	0131  E8 0088			     call ToDec
-     40
-     41	0134  C3			     ret
-     42
-     43				     include ..\liba.asm
-1    44	0135			     .data
-1    45	0000  0A 54 68 69 73 20	73+	     ErrorMsg: db 0Ah, 'This symbol is not allowed!$'
-     46	      79 6D 62 6F 6C 20	69+
-     47	      73 20 6E 6F 74 20	61+
-     48	      6C 6C 6F 77 65 64	21+
-     49	      24
-1    50
-1    51	001D			     .code
-1    52
-1    53				     ;-----------------------------------------------------------
-1    54				     ; Print binary of value
-1    55				     ;-----------------------------------------------------------
-1    56				     ; Entry:	     AX	= value	to convert to
-1    57				     ;		     BX	= coordinates to print on string
-Turbo Assembler	 Version 4.1	    02/15/23 00:17:46	    Page 2
+     38	012A  5E			     pop si
+     39	012B  5F			     pop di
+     40	012C  03 F7			     add si, di
+     41
+     42	012E  BB B800			     mov bx, 0b800h
+     43	0131  8E C3			     mov es, bx
+     44	0133  BB 09A2			     mov bx, 160d * 15d	+ 66d
+     45
+     46	0136  56			     push si
+     47
+     48	0137  8B C6			     mov ax, si
+     49	0139  E8 0012			     call ToBin
+     50	013C  81 C3 008C		     add bx, 160d - 20d
+     51
+     52	0140  5E			     pop si
+     53	0141  56			     push si
+     54	0142  E8 003A			     call ToHex
+     55	0145  81 C3 00A0		     add bx, 160d
+     56
+     57	0149  5E			     pop si
+Turbo Assembler	 Version 4.1	    02/17/23 02:19:19	    Page 2
 calc.asm
 
 
 
-1    58				     ; Exit:	     None
-1    59				     ; Expects:	     ES	-> videomem (b800h)
-1    60				     ; Destroys:     BX, CX, DL
-1    61				     ;-----------------------------------------------------------
-1    62	0135			     ToBin   proc
-1    63
-1    64	0135  BA 8000			     mov dx, 8000h	     ; dx = 2 ** 15
-1    65	0138  EB 17 90			     jmp @@NewByte
-1    66
-1    67	013B			     @@Print1:
-1    68	013B  26: C7 07	0531		     mov es:[bx], 0531h	     ; put 0 to	videomem
-1    69	0140  83 C3 02			     add bx, 2		     ; bx += 2
-1    70	0143  EB 17 90			     jmp @@Next
+     58	014A  E8 0088			     call ToDec
+     59
+     60	014D  C3			     ret
+     61
+     62				     include ..\liba.asm
+1    63	014E			     .data
+1    64	0000  0A 54 68 69 73 20	73+	     ErrorMsg: db 0Ah, 'This symbol is not allowed!$'
+     65	      79 6D 62 6F 6C 20	69+
+     66	      73 20 6E 6F 74 20	61+
+     67	      6C 6C 6F 77 65 64	21+
+     68	      24
+1    69
+1    70	001D			     .code
 1    71
-1    72	0146			     @@Print0:
-1    73	0146  26: C7 07	0530		     mov es:[bx], 0530h	     ; put 0 to	videomem
-1    74	014B  83 C3 02			     add bx, 2		     ; bx += 2
-1    75	014E  EB 0C 90			     jmp @@Next
-1    76
-1    77	0151			     @@NewByte:
-1    78	0151  8B C8			     mov cx, ax		     ; cx = ax
-1    79	0153  23 CA			     and cx, dx		     ; cx && dx
-1    80
-1    81	0155  83 F9 00			     cmp cx, 0h		     ; if cx ==	0: print(0) else: print(1)
-1    82	0158  74 EC			     je	 @@Print0
-1    83	015A  EB DF			     jmp @@Print1
-1    84
-1    85	015C			     @@Next:
-1    86	015C  83 FA 01			     cmp dx, 1h		     ; if dx ==	1: return
-1    87	015F  74 04			     je	@@Exit
-1    88
-1    89	0161  D1 EA			     shr dx, 1		     ; dx >> 1
-1    90	0163  EB EC			     jmp @@NewByte
-1    91
-1    92	0165  C3		     @@Exit: ret
-1    93	0166				     endp
-1    94
-1    95				     ;-----------------------------------------------------------
-1    96				     ; Print hex of value
-1    97				     ;-----------------------------------------------------------
-1    98				     ; Entry:	     SI	= value	to convert to
-1    99				     ;		     BX	= coordinates to print in cmd
-1   100				     ; Exit:	     None
-1   101				     ; Expects:	     ES	-> videomem (b800h)
-1   102				     ; Destroys:     AX, BX, CX, DX, DI, BP, SP
-1   103				     ;----------------------------------------------------------
-1   104	0166			     ToHex   proc
-1   105
-1   106	0166  BA 8000			     mov dx, 8000h	     ; first byte is 1 others are 0
-1   107	0169  B9 0004			     mov cx, 0004h	     ; cx = 0
-1   108	016C  BF 0000			     mov di, 0000h
-1   109
-1   110	016F			     @@ReadBytes:
-1   111	016F  FE C5			     inc ch		     ; ch++ (byte counter in 4th)
-1   112	0171  80 FD 05			     cmp ch, 05h	     ; if ch ==	5: exit	else: continue
-1   113	0174  74 45			     je	@@Exit
-1   114	0176  EB 01 90			     jmp @@Proceed4bit
-Turbo Assembler	 Version 4.1	    02/15/23 00:17:46	    Page 3
+1    72				     ;-----------------------------------------------------------
+1    73				     ; Print binary of value
+1    74				     ;-----------------------------------------------------------
+1    75				     ; Entry:	     AX	= value	to convert to
+1    76				     ;		     BX	= coordinates to print on string
+1    77				     ; Exit:	     None
+1    78				     ; Expects:	     ES	-> videomem (b800h)
+1    79				     ; Destroys:     BX, CX, DL
+1    80				     ;-----------------------------------------------------------
+1    81	014E			     ToBin   proc
+1    82
+1    83	014E  BA 8000			     mov dx, 8000h	     ; dx = 2 ** 15
+1    84	0151  EB 17 90			     jmp @@NewByte
+1    85
+1    86	0154			     @@Print1:
+1    87	0154  26: C7 07	0531		     mov es:[bx], 0531h	     ; put 0 to	videomem
+1    88	0159  83 C3 02			     add bx, 2		     ; bx += 2
+1    89	015C  EB 17 90			     jmp @@Next
+1    90
+1    91	015F			     @@Print0:
+1    92	015F  26: C7 07	0530		     mov es:[bx], 0530h	     ; put 0 to	videomem
+1    93	0164  83 C3 02			     add bx, 2		     ; bx += 2
+1    94	0167  EB 0C 90			     jmp @@Next
+1    95
+1    96	016A			     @@NewByte:
+1    97	016A  8B C8			     mov cx, ax		     ; cx = ax
+1    98	016C  23 CA			     and cx, dx		     ; cx && dx
+1    99
+1   100	016E  83 F9 00			     cmp cx, 0h		     ; if cx ==	0: print(0) else: print(1)
+1   101	0171  74 EC			     je	 @@Print0
+1   102	0173  EB DF			     jmp @@Print1
+1   103
+1   104	0175			     @@Next:
+1   105	0175  83 FA 01			     cmp dx, 1h		     ; if dx ==	1: return
+1   106	0178  74 04			     je	@@Exit
+1   107
+1   108	017A  D1 EA			     shr dx, 1		     ; dx >> 1
+1   109	017C  EB EC			     jmp @@NewByte
+1   110
+1   111	017E  C3		     @@Exit: ret
+1   112	017F				     endp
+1   113
+1   114				     ;-----------------------------------------------------------
+Turbo Assembler	 Version 4.1	    02/17/23 02:19:19	    Page 3
 calc.asm
 
 
 
-1   115
-1   116	0179			     @@Proceed4bit:
-1   117	0179  8B C6			     mov ax, si		     ; ax = si (given value)
-1   118	017B  23 C2			     and ax, dx		     ; ax && ax
-1   119
-1   120	017D  3D 0000			     cmp ax, 00h	     ; if ax ==	0: SkipMul()
-1   121	0180  74 0E			     je	@@SkipMul
-1   122
-1   123	0182  B0 01			     mov al, 01h	     ; al = 1 (value to	add)
-1   124	0184  B4 00			     mov ah, 00h	     ; ah = 0 (needed not to brake ax)
-1   125	0186  80 E9 01			     sub cl, 1		     ; cl-- (bit num)
-1   126	0189  D2 E0			     shl al, cl		     ; al = 2^cl
-1   127	018B  80 C1 01			     add cl, 1		     ; cl++
-1   128	018E  03 F8			     add di, ax		     ; di += ax	(di - result to	print)
-1   129
-1   130	0190			     @@SkipMul:
-1   131	0190  80 E9 01			     sub cl, 1		     ; cl--
-1   132	0193  D1 EA			     shr dx, 1		     ; dx /= 2
-1   133
-1   134	0195  80 F9 00			     cmp cl, 00h
-1   135	0198  74 02			     je	@@PrintSymbol
-1   136	019A  EB DD			     jmp @@Proceed4bit	     ; if cl ==	0: Print else continue reading byte
-1   137
-1   138	019C			     @@PrintSymbol:
-1   139	019C  8B C7			     mov ax, di		     ; ax = di
-1   140	019E  B4 05			     mov ah, 05h	     ; ah = 05h	(COLOR)
+1   115				     ; Print hex of value
+1   116				     ;-----------------------------------------------------------
+1   117				     ; Entry:	     SI	= value	to convert to
+1   118				     ;		     BX	= coordinates to print in cmd
+1   119				     ; Exit:	     None
+1   120				     ; Expects:	     ES	-> videomem (b800h)
+1   121				     ; Destroys:     AX, BX, CX, DX, DI, BP, SP
+1   122				     ;----------------------------------------------------------
+1   123	017F			     ToHex   proc
+1   124
+1   125	017F  BA 8000			     mov dx, 8000h	     ; first byte is 1 others are 0
+1   126	0182  B9 0004			     mov cx, 0004h	     ; cx = 0
+1   127	0185  BF 0000			     mov di, 0000h
+1   128
+1   129	0188			     @@ReadBytes:
+1   130	0188  FE C5			     inc ch		     ; ch++ (byte counter in 4th)
+1   131	018A  80 FD 05			     cmp ch, 05h	     ; if ch ==	5: exit	else: continue
+1   132	018D  74 45			     je	@@Exit
+1   133	018F  EB 01 90			     jmp @@Proceed4bit
+1   134
+1   135	0192			     @@Proceed4bit:
+1   136	0192  8B C6			     mov ax, si		     ; ax = si (given value)
+1   137	0194  23 C2			     and ax, dx		     ; ax && ax
+1   138
+1   139	0196  3D 0000			     cmp ax, 00h	     ; if ax ==	0: SkipMul()
+1   140	0199  74 0E			     je	@@SkipMul
 1   141
-1   142	01A0  3C 0A			     cmp al, 10d	     ; if al >=	10: PrintAsLetter
-1   143	01A2  73 05			     jae @@LetterPrint
-1   144
-1   145	01A4  04 30			     add al, 30h	     ; else: al	+= 30h -> print	as ASCII
-1   146	01A6  EB 06 90			     jmp @@ContinuePrint
-1   147
-1   148	01A9			     @@LetterPrint:
-1   149	01A9  04 37			     add al, 37h	     ; al += 37	-> add letter as ASCII
-1   150	01AB  EB 01 90			     jmp @@ContinuePrint
-1   151
-1   152	01AE			     @@ContinuePrint:
-1   153	01AE  26: 89 07			     mov es:[bx], ax	     ; put ax to videomem
-1   154	01B1  83 C3 02			     add bx, 2		     ; bx += 2
-1   155	01B4  BF 0000			     mov di, 00h	     ; di = 0
-1   156	01B7  B1 04			     mov cl, 04h	     ; cl = 4 (byte count)
-1   157	01B9  EB B4			     jmp @@ReadBytes
-1   158
-1   159	01BB			     @@Exit:
-1   160	01BB  C3			     ret
-1   161	01BC				     endp
-1   162
+1   142	019B  B0 01			     mov al, 01h	     ; al = 1 (value to	add)
+1   143	019D  B4 00			     mov ah, 00h	     ; ah = 0 (needed not to brake ax)
+1   144	019F  80 E9 01			     sub cl, 1		     ; cl-- (bit num)
+1   145	01A2  D2 E0			     shl al, cl		     ; al = 2^cl
+1   146	01A4  80 C1 01			     add cl, 1		     ; cl++
+1   147	01A7  03 F8			     add di, ax		     ; di += ax	(di - result to	print)
+1   148
+1   149	01A9			     @@SkipMul:
+1   150	01A9  80 E9 01			     sub cl, 1		     ; cl--
+1   151	01AC  D1 EA			     shr dx, 1		     ; dx /= 2
+1   152
+1   153	01AE  80 F9 00			     cmp cl, 00h
+1   154	01B1  74 02			     je	@@PrintSymbol
+1   155	01B3  EB DD			     jmp @@Proceed4bit	     ; if cl ==	0: Print else continue reading byte
+1   156
+1   157	01B5			     @@PrintSymbol:
+1   158	01B5  8B C7			     mov ax, di		     ; ax = di
+1   159	01B7  B4 05			     mov ah, 05h	     ; ah = 05h	(COLOR)
+1   160
+1   161	01B9  3C 0A			     cmp al, 10d	     ; if al >=	10: PrintAsLetter
+1   162	01BB  73 05			     jae @@LetterPrint
 1   163
-1   164				     ;-----------------------------------------------------------
-1   165				     ; Print dec of value
-1   166				     ;-----------------------------------------------------------
-1   167				     ; Entry:	     SI	= value	to convert to
-1   168				     ;		     BX	= coordinates to print on string
-1   169				     ; Exit:	     None
-1   170				     ; Expects:	     ES	-> videomem (b800h)
-1   171				     ; Destroys:     AX, BX, CX, DX, DI
-Turbo Assembler	 Version 4.1	    02/15/23 00:17:46	    Page 4
+1   164	01BD  04 30			     add al, 30h	     ; else: al	+= 30h -> print	as ASCII
+1   165	01BF  EB 06 90			     jmp @@ContinuePrint
+1   166
+1   167	01C2			     @@LetterPrint:
+1   168	01C2  04 37			     add al, 37h	     ; al += 37	-> add letter as ASCII
+1   169	01C4  EB 01 90			     jmp @@ContinuePrint
+1   170
+1   171	01C7			     @@ContinuePrint:
+Turbo Assembler	 Version 4.1	    02/17/23 02:19:19	    Page 4
 calc.asm
 
 
 
-1   172				     ;-----------------------------------------------------------
-1   173	01BC			     ToDec   proc
-1   174
-1   175	01BC  8B C6			     mov ax, si		     ; ax = si
-1   176	01BE  BF 0006			     mov di, 06h	     ; amount of digits
+1   172	01C7  26: 89 07			     mov es:[bx], ax	     ; put ax to videomem
+1   173	01CA  83 C3 02			     add bx, 2		     ; bx += 2
+1   174	01CD  BF 0000			     mov di, 00h	     ; di = 0
+1   175	01D0  B1 04			     mov cl, 04h	     ; cl = 4 (byte count)
+1   176	01D2  EB B4			     jmp @@ReadBytes
 1   177
-1   178	01C1			     @@PrintSymb:
-1   179	01C1  B9 000A			     mov cx, 000Ah	     ; cx = 10
-1   180	01C4  F7 F1			     div cx		     ; ax = ax / 10, dx	= ax % 10
+1   178	01D4			     @@Exit:
+1   179	01D4  C3			     ret
+1   180	01D5				     endp
 1   181
-1   182	01C6  80 C2 30			     add dl, 30h	     ; dl += 30	(symb ascii)
-1   183	01C9  B6 05			     mov dh, 05h	     ; dh = 5	(color)
-1   184
-1   185	01CB  26: 89 17			     mov es:[bx], dx
-1   186	01CE  BA 0000			     mov dx, 0000h	     ; print on	screen
-1   187
-1   188	01D1  83 EB 02			     sub bx, 2		     ; bx -= 2
-1   189	01D4  83 EF 01			     sub di, 1		     ; di --
-1   190
-1   191	01D7  83 FF 00			     cmp di, 0
-1   192	01DA  74 02			     je	@@Exit
+1   182
+1   183				     ;-----------------------------------------------------------
+1   184				     ; Print dec of value
+1   185				     ;-----------------------------------------------------------
+1   186				     ; Entry:	     SI	= value	to convert to
+1   187				     ;		     BX	= coordinates to print on string
+1   188				     ; Exit:	     None
+1   189				     ; Expects:	     ES	-> videomem (b800h)
+1   190				     ; Destroys:     AX, BX, CX, DX, DI
+1   191				     ;-----------------------------------------------------------
+1   192	01D5			     ToDec   proc
 1   193
-1   194	01DC  EB E3			     jmp @@PrintSymb
-1   195
-1   196	01DE  C3		     @@Exit: ret
-1   197	01DF				     endp
-1   198
-1   199
-1   200				     ;------------------------------------------------------------
-1   201				     ; Reads dec number
-1   202				     ;------------------------------------------------------------
-1   203				     ; Entry:	     None
-1   204				     ; Exit:	     DI	- dec value
-1   205				     ; Expects:	     None
-1   206				     ; Destroys:     AX, CX, DI, SI
-1   207				     ;------------------------------------------------------------
-1   208	01DF			     IntInput	     proc
+1   194	01D5  8B C6			     mov ax, si		     ; ax = si
+1   195	01D7  BF 0006			     mov di, 06h	     ; amount of digits
+1   196
+1   197	01DA			     @@PrintSymb:
+1   198	01DA  B9 000A			     mov cx, 000Ah	     ; cx = 10
+1   199	01DD  F7 F1			     div cx		     ; ax = ax / 10, dx	= ax % 10
+1   200
+1   201	01DF  80 C2 30			     add dl, 30h	     ; dl += 30	(symb ascii)
+1   202	01E2  B6 05			     mov dh, 05h	     ; dh = 5	(color)
+1   203
+1   204	01E4  26: 89 17			     mov es:[bx], dx
+1   205	01E7  BA 0000			     mov dx, 0000h	     ; print on	screen
+1   206
+1   207	01EA  83 EB 02			     sub bx, 2		     ; bx -= 2
+1   208	01ED  83 EF 01			     sub di, 1		     ; di --
 1   209
-1   210	01DF  BF 0000				     mov di, 0000h	     ; di = 0
-1   211	01E2  B9 0005				     mov cx, 0005h	     ; cx = 5 (max amount of numbers)
-1   212	01E5  EB 0B 90				     jmp @@Loop
-1   213	01E8			     @@OnError:
-1   214	01E8  BA 0000r				     mov dx, offset ErrorMsg
-1   215	01EB  B4 09				     mov ah, 09h
-1   216	01ED  CD 21				     int 21h		     ; print Error message
+1   210	01F0  83 FF 00			     cmp di, 0
+1   211	01F3  74 02			     je	@@Exit
+1   212
+1   213	01F5  EB E3			     jmp @@PrintSymb
+1   214
+1   215	01F7  C3		     @@Exit: ret
+1   216	01F8				     endp
 1   217
-1   218	01EF  EB 2E 90				     jmp @@Exit
-1   219
-1   220	01F2  B4 01		     @@Loop:	     mov ah, 01h
-1   221	01F4  CD 21				     int 21h		     ; reading char -> al
-1   222
-1   223	01F6  3C 0D				     cmp al, 0Dh
-1   224	01F8  74 25				     je	@@Exit
-1   225
-1   226	01FA  3C 13				     cmp al, 13h
-1   227	01FC  74 21				     je	@@Exit		     ; if al ==	'\n' ||	'\r': retunr
+1   218
+1   219				     ;------------------------------------------------------------
+1   220				     ; Reads dec number
+1   221				     ;------------------------------------------------------------
+1   222				     ; Entry:	     None
+1   223				     ; Exit:	     DI	- dec value
+1   224				     ; Expects:	     None
+1   225				     ; Destroys:     AX, CX, DI, SI
+1   226				     ;------------------------------------------------------------
+1   227	01F8			     IntInput	     proc
 1   228
-Turbo Assembler	 Version 4.1	    02/15/23 00:17:46	    Page 5
+Turbo Assembler	 Version 4.1	    02/17/23 02:19:19	    Page 5
 calc.asm
 
 
 
-1   229	01FE  3C 30				     cmp al, 30h
-1   230	0200  72 E6				     jb	@@OnError
-1   231
-1   232	0202  3C 40				     cmp al, 40h
-1   233	0204  77 E2				     ja	@@OnError	     ; if !alnum(al): OnError()
-1   234
-1   235	0206  2C 30				     sub al, 30h	     ; al -= 30	(ascii -> number)
-1   236	0208  B4 00				     mov ah, 00h
-1   237
-1   238	020A  8B F0				     mov si, ax
-1   239	020C  8B C7				     mov ax, di
-1   240	020E  8B FE				     mov di, si		     ; swap (ax, di)
+1   229	01F8  BF 0000				     mov di, 0000h	     ; di = 0
+1   230	01FB  B9 0005				     mov cx, 0005h	     ; cx = 5 (max amount of numbers)
+1   231	01FE  EB 0B 90				     jmp @@Loop
+1   232	0201			     @@OnError:
+1   233	0201  BA 0000r				     mov dx, offset ErrorMsg
+1   234	0204  B4 09				     mov ah, 09h
+1   235	0206  CD 21				     int 21h		     ; print Error message
+1   236
+1   237	0208  EB 2E 90				     jmp @@Exit
+1   238
+1   239	020B  B4 01		     @@Loop:	     mov ah, 01h
+1   240	020D  CD 21				     int 21h		     ; reading char -> al
 1   241
-1   242	0210  BE 000A				     mov si, 10d
-1   243	0213  F7 E6				     mul si		     ; ax *= 10
+1   242	020F  3C 0D				     cmp al, 0Dh
+1   243	0211  74 25				     je	@@Exit
 1   244
-1   245	0215  03 C7				     add ax, di		     ; ax += di	(last number)
-1   246
-1   247	0217  8B F0				     mov si, ax
-1   248	0219  8B C7				     mov ax, di
-1   249	021B  8B FE				     mov di, si		     ; swap (ax, di)
+1   245	0213  3C 13				     cmp al, 13h
+1   246	0215  74 21				     je	@@Exit		     ; if al ==	'\n' ||	'\r': retunr
+1   247
+1   248	0217  3C 30				     cmp al, 30h
+1   249	0219  72 E6				     jb	@@OnError
 1   250
-1   251	021D  E2 D3				     loop @@Loop
-1   252
-1   253	021F  C3		     @@Exit:	     ret
-1   254	0220					     endp
-1   255
+1   251	021B  3C 40				     cmp al, 40h
+1   252	021D  77 E2				     ja	@@OnError	     ; if !alnum(al): OnError()
+1   253
+1   254	021F  2C 30				     sub al, 30h	     ; al -= 30	(ascii -> number)
+1   255	0221  B4 00				     mov ah, 00h
 1   256
-1   257				     ;-------------------------------------------------------------
-1   258				     ; Draws rectangle on screen with given borders
-1   259				     ;-------------------------------------------------------------
-1   260				     ; Entry:	     AX	- horizontal border
-1   261				     ;		     DX	- vertical   border
-1   262				     ;		     BX	- left highest point
-1   263				     ;		     CX	- horizontal size
-1   264				     ;		     DI	- vertical   size
-1   265				     ; Exit:	     None
-1   266				     ; Expects:	     ES	-> videomem (0b800h)
-1   267				     ; Destroys:     BP, SI
-1   268				     ;-------------------------------------------------------------
-1   269	0220			     DrawRect	     proc
-1   270
-1   271	0220  8B F7				     mov si, di		     ; i = di
-1   272	0222  EB 0C 90				     jmp @@MainCycle
-1   273
-1   274	0225  83 EE 01		     @@IterateI:     sub si, 1		     ; i--
+1   257	0223  8B F0				     mov si, ax
+1   258	0225  8B C7				     mov ax, di
+1   259	0227  8B FE				     mov di, si		     ; swap (ax, di)
+1   260
+1   261	0229  BE 000A				     mov si, 10d
+1   262	022C  F7 E6				     mul si		     ; ax *= 10
+1   263
+1   264	022E  03 C7				     add ax, di		     ; ax += di	(last number)
+1   265
+1   266	0230  8B F0				     mov si, ax
+1   267	0232  8B C7				     mov ax, di
+1   268	0234  8B FE				     mov di, si		     ; swap (ax, di)
+1   269
+1   270	0236  E2 D3				     loop @@Loop
+1   271
+1   272	0238  C3		     @@Exit:	     ret
+1   273	0239					     endp
+1   274
 1   275
-1   276	0228  2B D9				     sub bx, cx		     ; start vertically
-1   277	022A  2B D9				     sub bx, cx
-1   278	022C  81 C3 00A0			     add bx, 160d	     ; new line
-1   279
-1   280	0230  8B E9		     @@MainCycle:    mov bp, cx		     ; j = cx
-1   281
-1   282	0232  83 EB 02				     sub bx, 2		     ; bx -= 2 (then i += 2 to print)
-1   283
-1   284	0235  83 FE 00				     cmp si, 00h
-1   285	0238  75 28				     jne @@DrawV
-Turbo Assembler	 Version 4.1	    02/15/23 00:17:46	    Page 6
+1   276				     ;-------------------------------------------------------------
+1   277				     ; Draws rectangle on screen with given borders
+1   278				     ;-------------------------------------------------------------
+1   279				     ; Entry:	     AX	- horizontal border
+1   280				     ;		     DX	- vertical   border
+1   281				     ;		     BX	- left highest point
+1   282				     ;		     CX	- horizontal size
+1   283				     ;		     DI	- vertical   size
+1   284				     ; Exit:	     None
+1   285				     ; Expects:	     ES	-> videomem (0b800h)
+Turbo Assembler	 Version 4.1	    02/17/23 02:19:19	    Page 6
 calc.asm
 
 
 
-1   286
-1   287	023A  83 C3 02		     @@ContinueMain: add bx, 2		     ; bx += 2 (watch previous comment)
-1   288	023D  83 FE 00				     cmp si, 00h
-1   289	0240  74 2A				     je	@@Exit		     ; if i == 0: exit(0)
-1   290
-1   291	0242  83 FD 00		     @@SecondCycle:  cmp bp, 00h
-1   292	0245  74 20				     je	@@DrawRightV	     ; print left border (WORKS!)
-1   293
-1   294	0247  3B F7				     cmp si, di
-1   295	0249  74 12				     je	@@DrawH		     ; draw highest border
-1   296
-1   297	024B  83 FE 01				     cmp si, 01h
-1   298	024E  74 0D				     je	@@DrawH		     ; draw lowest border
-1   299
-1   300	0250			     @@ContinueSecond:
-1   301	0250  83 FD 00				     cmp bp, 00h
-1   302	0253  74 D0				     je	@@IterateI	     ; if j == 0: i++
-1   303
-1   304	0255  83 ED 01				     sub bp, 1		     ; else: j--
-1   305	0258  83 C3 02				     add bx, 2		     ; bx += 2
-1   306	025B  EB E5				     jmp @@SecondCycle
-1   307
-1   308	025D  26: 89 07		     @@DrawH:	     mov es:[bx], ax
-1   309	0260  EB EE				     jmp @@ContinueSecond
-1   310
-1   311	0262  26: 89 17		     @@DrawV:	     mov es:[bx], dx
-1   312	0265  EB D3				     jmp @@ContinueMain
-1   313
-1   314	0267  26: 89 17		     @@DrawRightV:   mov es:[bx], dx
-1   315	026A  EB E4				     jmp @@ContinueSecond
-1   316
-1   317	026C  C3		     @@Exit:	     ret
-1   318	026D					     endp
-1   319
+1   286				     ; Destroys:     BP, SI
+1   287				     ;-------------------------------------------------------------
+1   288	0239			     DrawRect	     proc
+1   289
+1   290	0239  8B F7				     mov si, di		     ; i = di
+1   291	023B  EB 0C 90				     jmp @@MainCycle
+1   292
+1   293	023E  83 EE 01		     @@IterateI:     sub si, 1		     ; i--
+1   294
+1   295	0241  2B D9				     sub bx, cx		     ; start vertically
+1   296	0243  2B D9				     sub bx, cx
+1   297	0245  81 C3 00A0			     add bx, 160d	     ; new line
+1   298
+1   299	0249  8B E9		     @@MainCycle:    mov bp, cx		     ; j = cx
+1   300
+1   301	024B  83 EB 02				     sub bx, 2		     ; bx -= 2 (then i += 2 to print)
+1   302
+1   303	024E  83 FE 00				     cmp si, 00h
+1   304	0251  75 2D				     jne @@DrawV
+1   305
+1   306	0253  83 C3 02		     @@ContinueMain: add bx, 2		     ; bx += 2 (watch previous comment)
+1   307	0256  83 FE 00				     cmp si, 00h
+1   308	0259  74 2F				     je	@@Exit		     ; if i == 0: exit(0)
+1   309
+1   310	025B  26: C7 07	0520	     @@SecondCycle:  mov es:[bx], 0520h
+1   311
+1   312	0260  83 FD 00				     cmp bp, 00h
+1   313	0263  74 20				     je	@@DrawRightV	     ; print left border (WORKS!)
+1   314
+1   315	0265  3B F7				     cmp si, di
+1   316	0267  74 12				     je	@@DrawH		     ; draw highest border
+1   317
+1   318	0269  83 FE 01				     cmp si, 01h
+1   319	026C  74 0D				     je	@@DrawH		     ; draw lowest border
 1   320
-1   321				     ;-----------------------------------------------------------
-1   322				     ; Put symbol with given ascii to videomem
-1   323				     ;-----------------------------------------------------------
-1   324				     ; Entry:	     BX	= coordinates where to print symbol
-1   325				     ;		     CX	= symbol itself
-1   326				     ; Exit:	     None
-1   327				     ; Expects:	     ES	-> videomem (b800h)
-1   328				     ; Destroys:     None
-1   329				     ;-----------------------------------------------------------
-1   330	026D			     PutChar proc
+1   321	026E			     @@ContinueSecond:
+1   322	026E  83 FD 00				     cmp bp, 00h
+1   323	0271  74 CB				     je	@@IterateI	     ; if j == 0: i++
+1   324
+1   325	0273  83 ED 01				     sub bp, 1		     ; else: j--
+1   326	0276  83 C3 02				     add bx, 2		     ; bx += 2
+1   327	0279  EB E0				     jmp @@SecondCycle
+1   328
+1   329	027B  26: 89 07		     @@DrawH:	     mov es:[bx], ax
+1   330	027E  EB EE				     jmp @@ContinueSecond
 1   331
-1   332	026D  26: 89 0F			     mov es:[bx], cx	     ; put symbol to videomem
-1   333
-1   334	0270  C3			     ret
-1   335	0271				     endp
-1   336
-    337
-    338				     end     Start
-Turbo Assembler	 Version 4.1	    02/15/23 00:17:46	    Page 7
+1   332	0280  26: 89 17		     @@DrawV:	     mov es:[bx], dx
+1   333	0283  EB CE				     jmp @@ContinueMain
+1   334
+1   335	0285  26: 89 17		     @@DrawRightV:   mov es:[bx], dx
+1   336	0288  EB E4				     jmp @@ContinueSecond
+1   337
+1   338	028A  C3		     @@Exit:	     ret
+1   339	028B					     endp
+1   340
+1   341
+1   342				     ;-----------------------------------------------------------
+Turbo Assembler	 Version 4.1	    02/17/23 02:19:19	    Page 7
+calc.asm
+
+
+
+1   343				     ; Put symbol with given ascii to videomem
+1   344				     ;-----------------------------------------------------------
+1   345				     ; Entry:	     BX	= coordinates where to print symbol
+1   346				     ;		     CX	= symbol itself
+1   347				     ; Exit:	     None
+1   348				     ; Expects:	     ES	-> videomem (b800h)
+1   349				     ; Destroys:     None
+1   350				     ;-----------------------------------------------------------
+1   351	028B			     PutChar proc
+1   352
+1   353	028B  26: 89 0F			     mov es:[bx], cx	     ; put symbol to videomem
+1   354
+1   355	028E  C3			     ret
+1   356	028F				     endp
+1   357
+    358
+    359				     end     Start
+Turbo Assembler	 Version 4.1	    02/17/23 02:19:19	    Page 8
 Symbol Table
 
 
@@ -374,37 +400,37 @@ Symbol Table
 
 Symbol Name			  Type	 Value
 
-??DATE				  Text	 "02/15/23"
+??DATE				  Text	 "02/17/23"
 ??FILENAME			  Text	 "calc	  "
-??TIME				  Text	 "00:17:46"
+??TIME				  Text	 "02:19:19"
 ??VERSION			  Number 040A
 @32BIT				  Text	 0
-@@CONTINUEMAIN			  Near	 DGROUP:023A
-@@CONTINUEPRINT			  Near	 DGROUP:01AE
-@@CONTINUESECOND		  Near	 DGROUP:0250
-@@DRAWH				  Near	 DGROUP:025D
-@@DRAWRIGHTV			  Near	 DGROUP:0267
-@@DRAWV				  Near	 DGROUP:0262
-@@EXIT				  Near	 DGROUP:0165
-@@EXIT				  Near	 DGROUP:01BB
-@@EXIT				  Near	 DGROUP:01DE
-@@EXIT				  Near	 DGROUP:021F
-@@EXIT				  Near	 DGROUP:026C
-@@ITERATEI			  Near	 DGROUP:0225
-@@LETTERPRINT			  Near	 DGROUP:01A9
-@@LOOP				  Near	 DGROUP:01F2
-@@MAINCYCLE			  Near	 DGROUP:0230
-@@NEWBYTE			  Near	 DGROUP:0151
-@@NEXT				  Near	 DGROUP:015C
-@@ONERROR			  Near	 DGROUP:01E8
-@@PRINT0			  Near	 DGROUP:0146
-@@PRINT1			  Near	 DGROUP:013B
-@@PRINTSYMB			  Near	 DGROUP:01C1
-@@PRINTSYMBOL			  Near	 DGROUP:019C
-@@PROCEED4BIT			  Near	 DGROUP:0179
-@@READBYTES			  Near	 DGROUP:016F
-@@SECONDCYCLE			  Near	 DGROUP:0242
-@@SKIPMUL			  Near	 DGROUP:0190
+@@CONTINUEMAIN			  Near	 DGROUP:0253
+@@CONTINUEPRINT			  Near	 DGROUP:01C7
+@@CONTINUESECOND		  Near	 DGROUP:026E
+@@DRAWH				  Near	 DGROUP:027B
+@@DRAWRIGHTV			  Near	 DGROUP:0285
+@@DRAWV				  Near	 DGROUP:0280
+@@EXIT				  Near	 DGROUP:017E
+@@EXIT				  Near	 DGROUP:01D4
+@@EXIT				  Near	 DGROUP:01F7
+@@EXIT				  Near	 DGROUP:0238
+@@EXIT				  Near	 DGROUP:028A
+@@ITERATEI			  Near	 DGROUP:023E
+@@LETTERPRINT			  Near	 DGROUP:01C2
+@@LOOP				  Near	 DGROUP:020B
+@@MAINCYCLE			  Near	 DGROUP:0249
+@@NEWBYTE			  Near	 DGROUP:016A
+@@NEXT				  Near	 DGROUP:0175
+@@ONERROR			  Near	 DGROUP:0201
+@@PRINT0			  Near	 DGROUP:015F
+@@PRINT1			  Near	 DGROUP:0154
+@@PRINTSYMB			  Near	 DGROUP:01DA
+@@PRINTSYMBOL			  Near	 DGROUP:01B5
+@@PROCEED4BIT			  Near	 DGROUP:0192
+@@READBYTES			  Near	 DGROUP:0188
+@@SECONDCYCLE			  Near	 DGROUP:025B
+@@SKIPMUL			  Near	 DGROUP:01A9
 @CODE				  Text	 DGROUP
 @CODESIZE			  Text	 0
 @CPU				  Text	 0101H
@@ -416,15 +442,15 @@ Symbol Name			  Type	 Value
 @MODEL				  Text	 1
 @STACK				  Text	 DGROUP
 @WORDSIZE			  Text	 2
-DRAWRECT			  Near	 DGROUP:0220
+DRAWRECT			  Near	 DGROUP:0239
 ERRORMSG			  Near	 DGROUP:0000
-INTINPUT			  Near	 DGROUP:01DF
-PUTCHAR				  Near	 DGROUP:026D
+INTINPUT			  Near	 DGROUP:01F8
+PUTCHAR				  Near	 DGROUP:028B
 START				  Near	 DGROUP:0100
-TOBIN				  Near	 DGROUP:0135
-TODEC				  Near	 DGROUP:01BC
-TOHEX				  Near	 DGROUP:0166
-Turbo Assembler	 Version 4.1	    02/15/23 00:17:46	    Page 8
+TOBIN				  Near	 DGROUP:014E
+TODEC				  Near	 DGROUP:01D5
+TOHEX				  Near	 DGROUP:017F
+Turbo Assembler	 Version 4.1	    02/17/23 02:19:19	    Page 9
 Symbol Table
 
 
@@ -434,5 +460,5 @@ Groups & Segments		  Bit Size Align  Combine Class
 
 DGROUP				  Group
   _DATA				  16  001D Word	  Public  DATA
-  _TEXT				  16  0271 Word	  Public  CODE
+  _TEXT				  16  028F Word	  Public  CODE
 

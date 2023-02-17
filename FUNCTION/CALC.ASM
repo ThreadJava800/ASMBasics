@@ -17,18 +17,37 @@ Start:
 
 	mov di, 00h
 	call IntInput
+	push si
+
+	;; DRAWING FRAME ;;
+	
+	mov ax, 0C985h	
+	mov dx, 09C84h
+	
+	mov bx, 0b800h
+	mov es, bx
+	mov bx, 160d * 12d + 52d
+	
+	mov cx, 30d
+	mov di, 9d
+
+	call DrawRect
+
+	;; PRINTING VALUES ;;
+
 	pop si
+	pop di
 	add si, di 
 
 	mov bx, 0b800h
 	mov es, bx
-	mov bx, 80d * 10d + 40d
+	mov bx, 160d * 15d + 66d
 
 	push si	
 
 	mov ax, si
 	call ToBin
-	add bx, 160d
+	add bx, 160d - 20d
 
 	pop si
 	push si

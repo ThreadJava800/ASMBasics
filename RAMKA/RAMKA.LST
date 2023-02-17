@@ -1,4 +1,4 @@
-Turbo Assembler	 Version 4.1	    02/15/23 00:17:39	    Page 1
+Turbo Assembler	 Version 4.1	    02/17/23 01:45:16	    Page 1
 ramka.asm
 
 
@@ -60,7 +60,7 @@ ramka.asm
 1    55	0131  EB 0C 90			     jmp @@Next
 1    56
 1    57	0134			     @@NewByte:
-Turbo Assembler	 Version 4.1	    02/15/23 00:17:39	    Page 2
+Turbo Assembler	 Version 4.1	    02/17/23 01:45:16	    Page 2
 ramka.asm
 
 
@@ -122,7 +122,7 @@ ramka.asm
 1   112	0176  D1 EA			     shr dx, 1		     ; dx /= 2
 1   113
 1   114	0178  80 F9 00			     cmp cl, 00h
-Turbo Assembler	 Version 4.1	    02/15/23 00:17:39	    Page 3
+Turbo Assembler	 Version 4.1	    02/17/23 01:45:16	    Page 3
 ramka.asm
 
 
@@ -184,7 +184,7 @@ ramka.asm
 1   169	01B7  83 EF 01			     sub di, 1		     ; di --
 1   170
 1   171	01BA  83 FF 00			     cmp di, 0
-Turbo Assembler	 Version 4.1	    02/15/23 00:17:39	    Page 4
+Turbo Assembler	 Version 4.1	    02/17/23 01:45:16	    Page 4
 ramka.asm
 
 
@@ -246,7 +246,7 @@ ramka.asm
 1   226
 1   227	01FA  8B F0				     mov si, ax
 1   228	01FC  8B C7				     mov ax, di
-Turbo Assembler	 Version 4.1	    02/15/23 00:17:39	    Page 5
+Turbo Assembler	 Version 4.1	    02/17/23 01:45:16	    Page 5
 ramka.asm
 
 
@@ -287,66 +287,68 @@ ramka.asm
 1   262	0215  83 EB 02				     sub bx, 2		     ; bx -= 2 (then i += 2 to print)
 1   263
 1   264	0218  83 FE 00				     cmp si, 00h
-1   265	021B  75 28				     jne @@DrawV
+1   265	021B  75 2D				     jne @@DrawV
 1   266
 1   267	021D  83 C3 02		     @@ContinueMain: add bx, 2		     ; bx += 2 (watch previous comment)
 1   268	0220  83 FE 00				     cmp si, 00h
-1   269	0223  74 2A				     je	@@Exit		     ; if i == 0: exit(0)
+1   269	0223  74 2F				     je	@@Exit		     ; if i == 0: exit(0)
 1   270
-1   271	0225  83 FD 00		     @@SecondCycle:  cmp bp, 00h
-1   272	0228  74 20				     je	@@DrawRightV	     ; print left border (WORKS!)
-1   273
-1   274	022A  3B F7				     cmp si, di
-1   275	022C  74 12				     je	@@DrawH		     ; draw highest border
-1   276
-1   277	022E  83 FE 01				     cmp si, 01h
-1   278	0231  74 0D				     je	@@DrawH		     ; draw lowest border
-1   279
-1   280	0233			     @@ContinueSecond:
-1   281	0233  83 FD 00				     cmp bp, 00h
-1   282	0236  74 D0				     je	@@IterateI	     ; if j == 0: i++
-1   283
-1   284	0238  83 ED 01				     sub bp, 1		     ; else: j--
-1   285	023B  83 C3 02				     add bx, 2		     ; bx += 2
-Turbo Assembler	 Version 4.1	    02/15/23 00:17:39	    Page 6
+1   271	0225  26: C7 07	0520	     @@SecondCycle:  mov es:[bx], 0520h
+1   272
+1   273	022A  83 FD 00				     cmp bp, 00h
+1   274	022D  74 20				     je	@@DrawRightV	     ; print left border (WORKS!)
+1   275
+1   276	022F  3B F7				     cmp si, di
+1   277	0231  74 12				     je	@@DrawH		     ; draw highest border
+1   278
+1   279	0233  83 FE 01				     cmp si, 01h
+1   280	0236  74 0D				     je	@@DrawH		     ; draw lowest border
+1   281
+1   282	0238			     @@ContinueSecond:
+1   283	0238  83 FD 00				     cmp bp, 00h
+1   284	023B  74 CB				     je	@@IterateI	     ; if j == 0: i++
+1   285
+Turbo Assembler	 Version 4.1	    02/17/23 01:45:16	    Page 6
 ramka.asm
 
 
 
-1   286	023E  EB E5				     jmp @@SecondCycle
-1   287
-1   288	0240  26: 89 07		     @@DrawH:	     mov es:[bx], ax
-1   289	0243  EB EE				     jmp @@ContinueSecond
-1   290
-1   291	0245  26: 89 17		     @@DrawV:	     mov es:[bx], dx
-1   292	0248  EB D3				     jmp @@ContinueMain
-1   293
-1   294	024A  26: 89 17		     @@DrawRightV:   mov es:[bx], dx
-1   295	024D  EB E4				     jmp @@ContinueSecond
-1   296
-1   297	024F  C3		     @@Exit:	     ret
-1   298	0250					     endp
-1   299
-1   300
-1   301				     ;-----------------------------------------------------------
-1   302				     ; Put symbol with given ascii to videomem
+1   286	023D  83 ED 01				     sub bp, 1		     ; else: j--
+1   287	0240  83 C3 02				     add bx, 2		     ; bx += 2
+1   288	0243  EB E0				     jmp @@SecondCycle
+1   289
+1   290	0245  26: 89 07		     @@DrawH:	     mov es:[bx], ax
+1   291	0248  EB EE				     jmp @@ContinueSecond
+1   292
+1   293	024A  26: 89 17		     @@DrawV:	     mov es:[bx], dx
+1   294	024D  EB CE				     jmp @@ContinueMain
+1   295
+1   296	024F  26: 89 17		     @@DrawRightV:   mov es:[bx], dx
+1   297	0252  EB E4				     jmp @@ContinueSecond
+1   298
+1   299	0254  C3		     @@Exit:	     ret
+1   300	0255					     endp
+1   301
+1   302
 1   303				     ;-----------------------------------------------------------
-1   304				     ; Entry:	     BX	= coordinates where to print symbol
-1   305				     ;		     CX	= symbol itself
-1   306				     ; Exit:	     None
-1   307				     ; Expects:	     ES	-> videomem (b800h)
-1   308				     ; Destroys:     None
-1   309				     ;-----------------------------------------------------------
-1   310	0250			     PutChar proc
-1   311
-1   312	0250  26: 89 0F			     mov es:[bx], cx	     ; put symbol to videomem
+1   304				     ; Put symbol with given ascii to videomem
+1   305				     ;-----------------------------------------------------------
+1   306				     ; Entry:	     BX	= coordinates where to print symbol
+1   307				     ;		     CX	= symbol itself
+1   308				     ; Exit:	     None
+1   309				     ; Expects:	     ES	-> videomem (b800h)
+1   310				     ; Destroys:     None
+1   311				     ;-----------------------------------------------------------
+1   312	0255			     PutChar proc
 1   313
-1   314	0253  C3			     ret
-1   315	0254				     endp
-1   316
-    317
-    318				     end     Start
-Turbo Assembler	 Version 4.1	    02/15/23 00:17:39	    Page 7
+1   314	0255  26: 89 0F			     mov es:[bx], cx	     ; put symbol to videomem
+1   315
+1   316	0258  C3			     ret
+1   317	0259				     endp
+1   318
+    319
+    320				     end     Start
+Turbo Assembler	 Version 4.1	    02/17/23 01:45:16	    Page 7
 Symbol Table
 
 
@@ -354,22 +356,22 @@ Symbol Table
 
 Symbol Name			  Type	 Value
 
-??DATE				  Text	 "02/15/23"
+??DATE				  Text	 "02/17/23"
 ??FILENAME			  Text	 "ramka	  "
-??TIME				  Text	 "00:17:38"
+??TIME				  Text	 "01:45:16"
 ??VERSION			  Number 040A
 @32BIT				  Text	 0
 @@CONTINUEMAIN			  Near	 DGROUP:021D
 @@CONTINUEPRINT			  Near	 DGROUP:0191
-@@CONTINUESECOND		  Near	 DGROUP:0233
-@@DRAWH				  Near	 DGROUP:0240
-@@DRAWRIGHTV			  Near	 DGROUP:024A
-@@DRAWV				  Near	 DGROUP:0245
+@@CONTINUESECOND		  Near	 DGROUP:0238
+@@DRAWH				  Near	 DGROUP:0245
+@@DRAWRIGHTV			  Near	 DGROUP:024F
+@@DRAWV				  Near	 DGROUP:024A
 @@EXIT				  Near	 DGROUP:0148
 @@EXIT				  Near	 DGROUP:019E
 @@EXIT				  Near	 DGROUP:01C1
 @@EXIT				  Near	 DGROUP:0202
-@@EXIT				  Near	 DGROUP:024F
+@@EXIT				  Near	 DGROUP:0254
 @@ITERATEI			  Near	 DGROUP:0208
 @@LETTERPRINT			  Near	 DGROUP:018C
 @@LOOP				  Near	 DGROUP:01D5
@@ -399,12 +401,12 @@ Symbol Name			  Type	 Value
 DRAWRECT			  Near	 DGROUP:0203
 ERRORMSG			  Near	 DGROUP:0000
 INTINPUT			  Near	 DGROUP:01C2
-PUTCHAR				  Near	 DGROUP:0250
+PUTCHAR				  Near	 DGROUP:0255
 START				  Near	 DGROUP:0100
 TOBIN				  Near	 DGROUP:0118
 TODEC				  Near	 DGROUP:019F
 TOHEX				  Near	 DGROUP:0149
-Turbo Assembler	 Version 4.1	    02/15/23 00:17:39	    Page 8
+Turbo Assembler	 Version 4.1	    02/17/23 01:45:16	    Page 8
 Symbol Table
 
 
@@ -414,5 +416,5 @@ Groups & Segments		  Bit Size Align  Combine Class
 
 DGROUP				  Group
   _DATA				  16  001D Word	  Public  DATA
-  _TEXT				  16  0254 Word	  Public  CODE
+  _TEXT				  16  0259 Word	  Public  CODE
 

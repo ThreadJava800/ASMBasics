@@ -1,4 +1,4 @@
-Turbo Assembler	 Version 4.1	    02/13/23 15:09:27	    Page 1
+Turbo Assembler	 Version 4.1	    02/17/23 01:45:50	    Page 1
 colortxt.asm
 
 
@@ -20,42 +20,45 @@ colortxt.asm
      15	0110  C3			     ret
      16
      17				     ;----------------------------------------------------------------------------
-     18				     ; Function	that prints string (first code is color, second	is ascii letter)
-     19				     ;----------------------------------------------------------------------------
-     20				     ; Entry:	     BX	- place	where to print letter
-     21				     ;		     SI	- pointer to string
-     22				     ; Exit:	     None
-     23				     ; Expects:	     ES	-> video register (b800h)
-     24				     ; Destroys:     AX, BX, SI
-     25				     ;---------------------------------------------------------------------------
-     26
-     27	0111			     PrintString:
-     28	0111  8A 04			     mov al, [si]
-     29	0113  8A E0			     mov ah, al			     ; setting color of	letter
-     30
-     31	0115  8A 04			     mov al, [si]
-     32	0117  46			     inc si		     ; getting letter to al
-     33	0118  3C 24			     cmp al, '$'
-     34	011A  74 07			     je	Exit
-     35
-     36	011C  26: 89 07			     mov word ptr es:[bx], ax
-     37	011F  43			     inc bx			     ; printing	letter
-     38					     ;inc si
-     39	0120  EB EF			     jmp PrintString
-     40	0122  C3			     ret
-     41
-     42	0123			     Exit:
-     43	0123  B8 4C00			     mov ax, 4c00h		     ; exit(0)
-     44	0126  CD 21			     int 21h
-     45
-     46
-     47	0128  41 05 42 05 43 06	44+  String: db	41h, 05h, 42h, 05h, 43h, 06h, 44h, 05h,	45h, 06h, 00h, '$'
-     48	      05 45 06 00 24
-     49					     ; ABCDE (colored) every even letter is a color for	the following ascii
-     50
-     51
-     52				     end     Start
-Turbo Assembler	 Version 4.1	    02/13/23 15:09:27	    Page 2
+     18				     ; Prints string
+     19				     ; String format: sym1 - attr1, sym2 - attr2, sym3 = ...
+     20				     ; Example:	41h, 05h, 24h -	A
+     21				     ;----------------------------------------------------------------------------
+     22				     ; Entry:	     BX	- place	where to print letter
+     23				     ;		     SI	- pointer to string
+     24				     ; Exit:	     None
+     25				     ; Expects:	     ES	-> video register (b800h)
+     26				     ; Destroys:     AX, BX, SI
+     27				     ;---------------------------------------------------------------------------
+     28
+     29	0111			     PrintString:
+     30	0111  8A 04			     mov al, [si]
+     31	0113  8A E0			     mov ah, al			     ; setting color of	letter
+     32
+     33	0115  8A 04			     mov al, [si]		     ; getting letter to al
+     34	0117  3C 24			     cmp al, '$'
+     35	0119  74 08			     je	Exit
+     36
+     37	011B  46			     inc si
+     38					     ; flag
+     39	011C  26: 89 07			     mov word ptr es:[bx], ax
+     40	011F  43			     inc bx			     ; printing	letter
+     41					     ;inc si
+     42	0120  EB EF			     jmp PrintString
+     43	0122  C3			     ret
+     44
+     45	0123			     Exit:
+     46	0123  B8 4C00			     mov ax, 4c00h		     ; exit(0)
+     47	0126  CD 21			     int 21h
+     48
+     49
+     50	0128  41 05 42 05 43 06	44+  String: db	41h, 05h, 42h, 05h, 43h, 06h, 44h, 05h,	45h, 06h, 00h, '$'
+     51	      05 45 06 00 24
+     52					     ; ABCDE (colored) every even letter is a color for	the following ascii
+     53
+     54
+     55				     end     Start
+Turbo Assembler	 Version 4.1	    02/17/23 01:45:50	    Page 2
 Symbol Table
 
 
@@ -63,9 +66,9 @@ Symbol Table
 
 Symbol Name			  Type	 Value
 
-??DATE				  Text	 "02/13/23"
+??DATE				  Text	 "02/17/23"
 ??FILENAME			  Text	 "colortxt"
-??TIME				  Text	 "15:09:27"
+??TIME				  Text	 "01:45:50"
 ??VERSION			  Number 040A
 @32BIT				  Text	 0
 @CODE				  Text	 DGROUP

@@ -1,0 +1,114 @@
+Turbo Assembler	 Version 4.1	    02/17/23 12:12:57	    Page 1
+strfun.asm
+
+
+
+      1	0000			     .model tiny
+      2
+      3	0000			     .data
+      4	0000  4C 4F 4F 4C 5F 20	6D+	     hello:  db	'LOOL_ man, no way', 00h
+      5	      61 6E 2C 20 6E 6F	20+
+      6	      77 61 79 00
+      7	0012  57 4F 52 44 20 77	61+	     test2:  db	'WORD was changed$'
+      8	      73 20 63 68 61 6E	67+
+      9	      65 64 24
+     10
+     11	0023			     .code
+     12
+     13				     org 100h
+     14
+     15				     locals @@
+     16
+     17	0100			     Start:
+     18	0100  BE 0000r			     mov si, offset hello
+     19	0103  BF 0012r			     mov di, offset test2
+     20	0106  B9 0004			     mov cx, 04h
+     21	0109  E8 0014			     call Memcpy
+     22
+     23	010C  BA 0012r			     mov dx, offset test2
+     24	010F  B4 09			     mov ah, 09h
+     25	0111  CD 21			     int 21h
+     26	0113  C3			     ret
+     27
+     28				     ;------------------------------------------------------------
+     29				     ; Gets length of string (string must end with '\0'	(0 ascii)
+     30				     ;------------------------------------------------------------
+     31				     ; Entry:	     DS:SI - pointer to	string
+     32				     ; Expects:	     None
+     33				     ; Exit:	     CX	- amount of symbols in string
+     34				     ; Destroys:     CX, SI
+     35				     ;------------------------------------------------------------
+     36	0114			     Strlen	     proc
+     37	0114  B9 0000				     mov cx, 00h
+     38
+     39	0117  AC		     @@Repeat:	     lodsb	     ; DS:SI++ -> AL
+     40	0118  3C 00				     cmp al, 00h
+     41	011A  74 03				     je	 @@Exit
+     42
+     43	011C  41				     inc cx	     ; count++
+     44	011D  EB F8				     jmp @@Repeat    ; if al ==	0: exit() else:	loop
+     45
+     46	011F  C3		     @@Exit:	     ret
+     47	0120					     endp
+     48
+     49				     ;------------------------------------------------------------
+     50				     ; Copies bytes from one side of memory to another one
+     51				     ;------------------------------------------------------------
+     52				     ; Entry:	     ES:DI - destination pointer
+     53				     ;		     DS:SI - from where	pointer
+     54				     ;		     CX	   - amount of bytes to	copy
+     55				     ; Expects:	     None
+     56				     ; Exit:	     None
+     57				     ; Destroys:     CX, DI, SI
+Turbo Assembler	 Version 4.1	    02/17/23 12:12:57	    Page 2
+strfun.asm
+
+
+
+     58				     ;------------------------------------------------------------
+     59	0120			     Memcpy	     proc
+     60
+     61	0120  F3> A4				     rep movsb
+     62
+     63	0122  C3				     ret
+     64	0123					     endp
+     65
+     66				     end     Start
+Turbo Assembler	 Version 4.1	    02/17/23 12:12:57	    Page 3
+Symbol Table
+
+
+
+
+Symbol Name			  Type	 Value
+
+??DATE				  Text	 "02/17/23"
+??FILENAME			  Text	 "strfun  "
+??TIME				  Text	 "12:12:57"
+??VERSION			  Number 040A
+@32BIT				  Text	 0
+@@EXIT				  Near	 DGROUP:011F
+@@REPEAT			  Near	 DGROUP:0117
+@CODE				  Text	 DGROUP
+@CODESIZE			  Text	 0
+@CPU				  Text	 0101H
+@CURSEG				  Text	 _TEXT
+@DATA				  Text	 DGROUP
+@DATASIZE			  Text	 0
+@FILENAME			  Text	 STRFUN
+@INTERFACE			  Text	 000H
+@MODEL				  Text	 1
+@STACK				  Text	 DGROUP
+@WORDSIZE			  Text	 2
+HELLO				  Near	 DGROUP:0000
+MEMCPY				  Near	 DGROUP:0120
+START				  Near	 DGROUP:0100
+STRLEN				  Near	 DGROUP:0114
+TEST2				  Near	 DGROUP:0012
+
+Groups & Segments		  Bit Size Align  Combine Class
+
+DGROUP				  Group
+  _DATA				  16  0023 Word	  Public  DATA
+  _TEXT				  16  0123 Word	  Public  CODE
+

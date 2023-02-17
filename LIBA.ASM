@@ -241,7 +241,9 @@ DrawRect	proc
 		cmp si, 00h
 		je @@Exit 		; if i == 0: exit(0)
 
-@@SecondCycle:	cmp bp, 00h
+@@SecondCycle:	mov es:[bx], 0520h
+
+		cmp bp, 00h
 		je @@DrawRightV		; print left border (WORKS!)
 
 		cmp si, di
