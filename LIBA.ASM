@@ -188,18 +188,14 @@ IntInput	proc
 		sub al, 30h		; al -= 30 (ascii -> number)
 		mov ah, 00h
 
-		mov si, ax
-		mov ax, di
-		mov di, si		; swap (ax, di)
+		xchg ax, di		; swap (ax, di)
 
 		mov si, 10d
 		mul si			; ax *= 10
 
 		add ax, di		; ax += di (last number)
 
-		mov si, ax
-		mov ax, di
-		mov di, si		; swap (ax, di)
+		xchg ax, di		; swap (ax, di)
 
 		loop @@Loop	
 
