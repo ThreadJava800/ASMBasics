@@ -98,22 +98,25 @@ Start:
 		cmp si, 04h
 		je @@Parse4
 
-@@Parse1:	mov cx, 09h
+@@Parse1:	mov cx, 08h
 @@Loop1:	push 0531h		; 1s
 		loop @@Loop1
+		push 0020h		; inside = space
 
 		jmp @@Call
 
-@@Parse2:	mov cx, 09h
+@@Parse2:	mov cx, 08h
 @@Loop2:	push 0532h
 		loop @@Loop2
+		push 0020h		; inside = space
 
 		jmp @@Call
 
-@@Parse3:	mov cx, 09h
-@@Loop3:	push 2ah
+@@Parse3:	mov cx, 08h
+@@Loop3:	push 052ah
 		loop @@Loop3
-		
+		push 0020h		; inside = space		
+
 		jmp @@Call
 
 @@Parse4:	mov ah, 09h
