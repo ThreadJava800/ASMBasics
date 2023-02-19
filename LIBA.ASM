@@ -220,7 +220,15 @@ IntInput	proc
 ; Destroys:	BP, SI
 ;-------------------------------------------------------------
 DrawRect	proc		
+
+		push bp
+		mov bp, sp
+
+		mov bx, [bp + 26d]
+		mov di, [bp + 24d]
+		mov cx, [bp + 22d]
 		
+		sub cx, 2
 		mov si, di		; i = di
 		jmp @@MainCycle			
 
@@ -230,7 +238,7 @@ DrawRect	proc
 		sub bx, cx
 		add bx, 160d		; new line
 
-@@MainCycle:	mov bp, cx		; j = cx
+@@MainCycle:	mov ax, cx		; j = cx
 
 		sub bx, 2		; bx -= 2 (then i += 2 to print)
 		
@@ -241,35 +249,72 @@ DrawRect	proc
 		cmp si, 00h
 		je @@Exit 		; if i == 0: exit(0)
 
-@@SecondCycle:	mov es:[bx], 0520h
+@@SecondCycle:	mov dx, [bp + 4]
+		mov es:[bx], dx
 
-		cmp bp, 00h
+		cmp ax, 00h
 		je @@DrawRightV		; print left border (WORKS!)
 
 		cmp si, di
 		je @@DrawH		; draw highest border
 
 		cmp si, 01h
-		je @@DrawH		; draw lowest border
+		je @@DrawLower		; draw lowest border
 
 @@ContinueSecond:
-		cmp bp, 00h
+		cmp ax, 00h
 		je @@IterateI		; if j == 0: i++
 
-		sub bp, 1		; else: j--
+		sub ax, 1		; else: j--
 		add bx, 2		; bx += 2
 		jmp @@SecondCycle
 
-@@DrawH:	mov es:[bx], ax
+@@DrawH:	mov dx, [bp + 20d]
+		mov es:[bx], dx
 		jmp @@ContinueSecond
 
-@@DrawV:	mov es:[bx], dx	
+@@DrawLower:	mov dx, [bp + 16d]
+		mov es:[bx], dx
+		jmp @@ContinueSecond
+
+@@DrawV:	cmp si, 01h
+		je @@LowLeft
+		cmp si, di
+		je @@HighLeft
+		jmp @@Left
+
+@@HighLeft:	mov dx, [bp + 12d]
+		mov es:[bx], dx
+		jmp @@ContinueMain
+			
+@@LowLeft:	mov dx, [bp + 8d]
+		mov es:[bx], dx
 		jmp @@ContinueMain
 
-@@DrawRightV:	mov es:[bx], dx
+@@Left:		mov dx, [bp + 14d]
+		mov es:[bx], dx
+		jmp @@ContinueMain
+
+@@DrawRightV:	cmp si, 01h
+		je @@LowRight
+		cmp si, di
+		je @@HighRight
+		jmp @@Right
+		
+@@LowRight:	mov dx, [bp + 6d]
+		mov es:[bx], dx
 		jmp @@ContinueSecond
 
-@@Exit:		ret
+@@HighRight:	mov dx, [bp + 10d]
+		mov es:[bx], dx
+		jmp @@ContinueSecond
+		
+@@Right:	mov dx, [bp + 18d]
+		mov es:[bx], dx
+		jmp @@ContinueSecond
+
+@@Exit:		pop bp
+		ret
 		endp
 
 	
