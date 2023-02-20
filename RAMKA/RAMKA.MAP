@@ -2,6 +2,6 @@
  Start  Stop   Length Name               Class
 
  00000H 0035DH 0035EH _TEXT              CODE
- 0035EH 00554H 001F7H _DATA              DATA
+ 0035EH 0037AH 0001DH _DATA              DATA
 
 

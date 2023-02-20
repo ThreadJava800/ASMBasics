@@ -1,25 +1,4 @@
 .model tiny
-
-.data
-	first:	db 'Enter frame line num (max: 25d): $'
-	second: db 'Enter frame col num (max: 80d): $'
-	third:  db 'Enter frame height (max: 25d): $'
-	forth:	db 'Enter frame length (max: 80d): $'
-	fifth:  db 'Enter frame type (1 - ones, 2 - twos, 3 - *, 4 - custom): $'
-	
-	ub:  db 'Enter upper bound char: $' 
-	rs:	db 0Ah, 'Enter right side border char: $'
-	lb:     db 0Ah, 'Enter lower bound char: $'
-	ls:	db 0Ah, 'Enter left side border char: $'
-	
-	lhc:    db 0Ah, 'Enter left higher corner: $'
-	rhc:	db 0Ah, 'Enter right higher corner: $'
-	llc:	db 0Ah, 'Enter left lower corner: $'
-	rlc:	db 0Ah, 'Enter right lower corner: $'
-
-	inside:	db 0Ah, 'Enter inside char: $'
-
-	error_str:  db 'You are mistaken! IDIOT. Aborting...$'
 .code
 
 org 100h
@@ -58,16 +37,16 @@ Start:
 
 
 @@Parse1:		mov cx, 08h
-@@Loop1:		push 0531h		; 1s
+@@Loop1:		push 0531h				; 1s
 				loop @@Loop1
-				push 0020h		; inside = space
+				push 0020h				; inside = space
 
 				jmp @@Call
 
 @@Parse2:		mov cx, 08h
 @@Loop2:		push 0532h
 				loop @@Loop2
-				push 0020h			; inside = space
+				push 0020h				; inside = space
 
 				jmp @@Call
 
@@ -75,51 +54,58 @@ Start:
 @@Parse3:		mov cx, 08h
 @@Loop3:		push 052ah
 				loop @@Loop3
-				push 0020h			; inside = space		
+				push 0020h				; inside = space		
 
 				jmp @@Call
 
 
 @@Parse4:		mov cx, 09h
 
-@@Loop4:		mov byte ptr al, [bx]
+@@Loop4:		mov byte ptr al, [bx]	; al = ascii code
 				inc bl
-				inc bl
+				inc bl					; bl += 2
 				mov ah, 05h
-				push ax		
+				push ax					; ax = ascii to draw (color = 05h)
 
 				loop @@Loop4		
 
 
 @@Call:			mov bx, 0b800h
-				mov es, bx
+				mov es, bx				; es -> 0b800h
 
 				call DrawRect
-				int 20h
+				int 20h					; exit(0)
 				ret
 
-; Destroys:		ax, bx, cx, dx, si
+;-----------------------------------------------------------
+; Reads command line int arguments
+;-----------------------------------------------------------
+; Entry: 		BX = position in command line (starting 80h)
+; Exit:			AX - read value
+; Expects:  	None
+; Destroys: 	AX, BX, CL, DX, SI
+;-----------------------------------------------------------
 ReadNumber		proc
 				mov ax, 00h
-				mov dx, 00h
+				mov dx, 00h					; dx:ax = 0
 
-@@Loop:			mov byte ptr cl, [bx]
+@@Loop:			mov byte ptr cl, [bx]		; cl = arg symb
 				cmp cl, 0Dh
 				je @@Exit
 
 				cmp cl, 20h
-				je @@Exit
+				je @@Exit					; if cl == ' ' or 0D: exit()
 
 				mov si, 10d 
-				mul si 
+				mul si 						; ax *= 10
 
 				add al, cl
-				sub al, 30h
+				sub al, 30h					; ax += read ascii.toChar()
 
-				inc bl
+				inc bl						; bx++
 				jmp @@Loop
 
-@@Exit:			inc bl
+@@Exit:			inc bl						; bx++
 				ret
 				endp
 
