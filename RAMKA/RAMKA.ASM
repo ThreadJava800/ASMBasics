@@ -26,210 +26,43 @@ org 100h
 
 locals @@
 
-Start:		
+Start:	
+		mov bx, 0082h
+		call ReadNumber
+
+		mov si, ax
 		mov bx, 0b800h
 		mov es, bx
-		mov bx, 00h
-
-		; LINE NUMBER ;
-		mov ah, 09h
-		mov dx, offset first
-		int 21h
-
-		call IntInput
-		mov di, 25d
-		call CheckValue
-		mov ax, si
-		mov cx, 160d
-		mul cx
-		mov bx, ax		; bx = line * 160		
-
-		; STRING ID NUM ;
-		mov ah, 09h
-		mov dx, offset second
-		int 21h
-
-		call IntInput
-		mov di, 80d
-		call CheckValue	
-		add si, si 
-		add bx, si		; bx += strintId
-					; position ready
-
-		push bx
-
-		; FRAME HEIGHT ;
-		mov ah, 09h
-		mov dx, offset third
-		int 21h
-
-		call IntInput
-		mov di, 25d
-		call CheckValue
-		push si			; di = height
-
-		; FRAME LENGTH ;
-
-		mov ah, 09h
-		mov dx, offset forth
-		int 21h
-		
-		call IntInput
-		mov di, 80d
-		call CheckValue
-		push si			; cx = length
-					; sizes ready
-
-		; TYPE NUMBER ;
-		mov ah, 09h
-		mov dx, offset fifth
-		int 21h
-
-		call IntInput
-		mov di, 04h
-		call CheckValue		; si = type
-		
-		cmp si, 01h
-		je @@Parse1
-		cmp si, 02h
-		je @@Parse2
-		cmp si, 03h
-		je @@Parse3
-		cmp si, 04h
-		je @@Parse4
-
-@@Parse1:	mov cx, 08h
-@@Loop1:	push 0531h		; 1s
-		loop @@Loop1
-		push 0020h		; inside = space
-
-		jmp @@Call
-
-@@Parse2:	mov cx, 08h
-@@Loop2:	push 0532h
-		loop @@Loop2
-		push 0020h		; inside = space
-
-		jmp @@Call
-
-@@Parse3:	mov cx, 08h
-@@Loop3:	push 052ah
-		loop @@Loop3
-		push 0020h		; inside = space		
-
-		jmp @@Call
-
-@@Parse4:	mov ah, 09h
-		mov dx, offset ub
-		int 21h
-
-		mov ah, 01h
-		int 21h
-
-		mov ah, 05h
-		push ax			; read upper bound
-		
-		mov ah, 09h
-		mov dx, offset rs
-		int 21h
-				
-		mov ah, 01h
-		int 21h
-
-		mov ah, 05h
-		push ax			; read right side
-
-		mov ah, 09h
-		mov dx, offset lb
-		int 21h
-
-		mov ah, 01h
-		int 21h
-
-		mov ah, 05h
-		push ax			; lower bound
-
-		mov ah, 09h
-		mov dx, offset ls
-		int 21h
-
-		mov ah, 01h
-		int 21h
-
-		mov ah, 05h
-		push ax			; left side border
-
-		mov ah, 09h
-		mov dx, offset lhc
-		int 21h
-
-		mov ah, 01h
-		int 21h
-
-		mov ah, 05h
-		push ax			; left higher corner
-
-		mov ah, 09h
-		mov dx, offset rhc
-		int 21h
-
-		mov ah, 01h
-		int 21h
-
-		mov ah, 05h
-		push ax			; right higher corner
-
-		mov ah, 09h
-		mov dx, offset llc
-		int 21h
-
-		mov ah, 01h
-		int 21h
-		
-		mov ah, 05h
-		push ax			; left lower corner
-
-		mov ah, 09h
-		mov dx, offset rlc
-		int 21h
-
-		mov ah, 01h
-		int 21h
-
-		mov ah, 05h
-		push ax			; right lower corner
-
-		mov ah, 09h
-		mov dx, offset inside
-		int 21h
-
-		mov ah, 01h
-		int 21h
-
-		mov ah, 05h
-		push ax			; inside char
-
-
-
-@@Call:		call DrawRect
-		add sp, 26
-		int 20h	
-@@Exit:		ret
-
-
-CheckValue	proc				; compares if si <= di
-		
-		cmp si, di
-		ja @@Error
-		jmp @@Exit
-
-@@Error:	mov ah, 09h
-		mov dx, offset error_str
-		int 21h
-		int 20h		
+		mov bx, 160d * 5d + 40d
+		call ToDec
 
 @@Exit:		ret
-		endp
+
+
+ReadNumber		proc
+				mov ax, 00h
+				mov dx, 00h
+
+@@Loop:			mov byte ptr cl, [bx]
+				cmp cl, 0Dh
+				je @@Exit
+
+				cmp cl, 20h
+				je @@Exit
+
+				mov si, 10d 
+				mul si 
+
+				add al, cl
+				sub al, 30h
+
+				add bl, 1
+				jmp @@Loop
+
+@@Exit:			add bl, 1
+				ret
+				endp
+
 
 include ..\LIBA.ASM
 
