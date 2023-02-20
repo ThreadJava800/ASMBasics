@@ -1,4 +1,4 @@
-Turbo Assembler	 Version 4.1	    02/20/23 14:46:32	    Page 1
+Turbo Assembler	 Version 4.1	    02/20/23 14:50:11	    Page 1
 ramka.asm
 
 
@@ -60,7 +60,7 @@ ramka.asm
      55
      56	0169  EB 2B 90						     jmp @@Call
      57
-Turbo Assembler	 Version 4.1	    02/20/23 14:46:32	    Page 2
+Turbo Assembler	 Version 4.1	    02/20/23 14:50:11	    Page 2
 ramka.asm
 
 
@@ -122,7 +122,7 @@ ramka.asm
     112	01BA  2C 30						     sub al, 30h				     ; ax += read   +
     113				     ascii.toChar()
     114
-Turbo Assembler	 Version 4.1	    02/20/23 14:46:32	    Page 3
+Turbo Assembler	 Version 4.1	    02/20/23 14:50:11	    Page 3
 ramka.asm
 
 
@@ -184,7 +184,7 @@ ramka.asm
 1   169	01EF  D1 EA					     shr dx, 1			     ; dx >> 1
 1   170	01F1  EB EC					     jmp @@NewByte
 1   171
-Turbo Assembler	 Version 4.1	    02/20/23 14:46:32	    Page 4
+Turbo Assembler	 Version 4.1	    02/20/23 14:50:11	    Page 4
 ramka.asm
 
 
@@ -246,7 +246,7 @@ ramka.asm
 1   226	022E  3C 0A						     cmp al, 10d		     ; if al >=	10: PrintAsLetter
 1   227	0230  73 05						     jae @@LetterPrint
 1   228
-Turbo Assembler	 Version 4.1	    02/20/23 14:46:32	    Page 5
+Turbo Assembler	 Version 4.1	    02/20/23 14:50:11	    Page 5
 ramka.asm
 
 
@@ -308,7 +308,7 @@ ramka.asm
 1   283	026D						     endp
 1   284
 1   285
-Turbo Assembler	 Version 4.1	    02/20/23 14:46:32	    Page 6
+Turbo Assembler	 Version 4.1	    02/20/23 14:50:11	    Page 6
 ramka.asm
 
 
@@ -370,7 +370,7 @@ ramka.asm
 1   340	02AE						     endp
 1   341
 1   342
-Turbo Assembler	 Version 4.1	    02/20/23 14:46:32	    Page 7
+Turbo Assembler	 Version 4.1	    02/20/23 14:50:11	    Page 7
 ramka.asm
 
 
@@ -432,7 +432,7 @@ ramka.asm
 1   397
 1   398	02F3			     @@ContinueSecond:
 1   399	02F3  3D 0000						     cmp ax, 00h
-Turbo Assembler	 Version 4.1	    02/20/23 14:46:32	    Page 8
+Turbo Assembler	 Version 4.1	    02/20/23 14:50:11	    Page 8
 ramka.asm
 
 
@@ -494,7 +494,7 @@ ramka.asm
 1   454
 1   455
 1   456				     ;-----------------------------------------------------------
-Turbo Assembler	 Version 4.1	    02/20/23 14:46:32	    Page 9
+Turbo Assembler	 Version 4.1	    02/20/23 14:50:11	    Page 9
 ramka.asm
 
 
@@ -516,7 +516,7 @@ ramka.asm
 1   471
     472
     473				     end     Start
-Turbo Assembler	 Version 4.1	    02/20/23 14:46:32	    Page 10
+Turbo Assembler	 Version 4.1	    02/20/23 14:50:11	    Page 10
 Symbol Table
 
 
@@ -526,7 +526,7 @@ Symbol Name			  Type	 Value
 
 ??DATE				  Text	 "02/20/23"
 ??FILENAME			  Text	 "ramka	  "
-??TIME				  Text	 "14:46:31"
+??TIME				  Text	 "14:50:11"
 ??VERSION			  Number 040A
 @32BIT				  Text	 0
 @@CALL				  Near	 DGROUP:0196
@@ -578,7 +578,7 @@ Symbol Name			  Type	 Value
 @CPU				  Text	 0101H
 @CURSEG				  Text	 _TEXT
 @DATA				  Text	 DGROUP
-Turbo Assembler	 Version 4.1	    02/20/23 14:46:32	    Page 11
+Turbo Assembler	 Version 4.1	    02/20/23 14:50:11	    Page 11
 Symbol Table
 
 
