@@ -36,22 +36,22 @@ include ..\liba.asm
 ; Destroys:	CX, SI
 ;------------------------------------------------------------
 Strlen		proc
-		mov cx, 00h
+			mov cx, 00h
 		
 @@Repeat:	cld
-		lodsb		; DS:SI++ -> AL
-		
-		cmp al, 00h	; ('\0')
-		je  @@Exit
+			lodsb			; DS:SI++ -> AL
+			
+			cmp al, 00h		; ('\0')
+			je  @@Exit
 
-		cmp al, 24h	; ('$')
-		je @@Exit
+			cmp al, 24h		; ('$')
+			je @@Exit
 
-		inc cx		; count++
-		jmp @@Repeat    ; if al == 0 || '$': exit() else: loop
+			inc cx			; count++
+			jmp @@Repeat    ; if al == 0 || '$': exit() else: loop
 		
 @@Exit:		ret
-		endp
+			endp
 
 ;------------------------------------------------------------
 ; Copies bytes from one side of memory to another one
@@ -65,11 +65,11 @@ Strlen		proc
 ;------------------------------------------------------------
 Memcpy		proc
 		
-		cld
-		rep movsb	; while (cx--) DS:SI -> ES:DI
+			cld
+			rep movsb	; while (cx--) DS:SI -> ES:DI
 
-		ret
-		endp
+			ret
+			endp
 
 ;------------------------------------------------------------
 ; Copies strings
@@ -82,23 +82,23 @@ Memcpy		proc
 ;------------------------------------------------------------
 Strcpy		proc
 
-		cld
+			cld
 
-		push si
-		push di
+			push si
+			push di
 
-		call Strlen	; strlen(ds:si) -> cx
-		
-		pop di
-		pop si
+			call Strlen		; strlen(ds:si) -> cx
+			
+			pop di
+			pop si
 
-		call Memcpy		
+			call Memcpy		
 
-		mov al, '$'
-		stosb		; destStr[-1] = '$'
+			mov al, '$'
+			stosb			; destStr[-1] = '$'
 
-		ret
-		endp
+			ret
+			endp
 
 
 ;-------------------------------------------------------------
@@ -113,11 +113,11 @@ Strcpy		proc
 ;-------------------------------------------------------------
 Memset		proc
 		
-		cld
-		rep stosb
+			cld
+			rep stosb
 
-		ret
-		endp
+			ret
+			endp
 
 ;--------------------------------------------------------------
 ; Compares first n bytes in buffers
@@ -130,69 +130,69 @@ Memset		proc
 ; Destroys:	CX, DX, DI, SI
 ;-------------------------------------------------------------
 Memcmp		proc
-		cld
+			cld
 
-		mov dx, 00h
+			mov dx, 00h
 		
 @@Loop:		cmp cx, 00h
-		je @@Exit		
-		dec cx
+			je @@Exit		
+			dec cx
 
-		cmpsb		; rep cmpsb doesn't work???
-		je @@Loop	; if ZF == 1: repeat
+			cmpsb			; rep cmpsb doesn't work???
+			je @@Loop		; if ZF == 1: repeat
 
-		dec di		; else return di - si 
-		dec si
+			dec di			; else return di - si 
+			dec si
 
-		mov dx, es:[di]
-		sub dx, ds:[si]		
+			mov dx, es:[di]
+			sub dx, ds:[si]		
 
 @@Exit:		ret
-		endp
+			endp
 
 
-;-------------------------------------------------------------
+;-----------------------------------------------------------------------
 ; Compares to string
-;-------------------------------------------------------------
+;-----------------------------------------------------------------------
 ; Entry:	ES:DI - buf1
 ;		DS:SI - buf2
 ; Exit:		DX    - 0 if equ, < 0 if buf1 < buf2 && > 0 if buf1 > buf2
 ; Expects:	None
 ; Destroys:	AX, DX, DI, SI
-;-------------------------------------------------------------
-Strcmp		proc
+;-----------------------------------------------------------------------
+Strcmp			proc
 
-		cld
-		mov dx, 00h
+				cld
+				mov dx, 00h
 
-@@Loop:		mov al, es:[di]
-		mov ah, ds:[si]
+@@Loop:			mov al, es:[di]
+				mov ah, ds:[si]
 
-		cmp ah, '$'
-		je @@CheckLenSI
-		
-		cmp al, '$'
-		je @@CheckLenDI		; if al == '$': cmp lens
-		
-		cmpsb
-		je @@Loop		; if zf == 1: repeat
+				cmp ah, '$'
+				je @@CheckLenSI
+				
+				cmp al, '$'
+				je @@CheckLenDI		; if al == '$': cmp lens
+				
+				cmpsb
+				je @@Loop			; if zf == 1: repeat
 
-		dec di
-		dec si
-		mov dx, es:[di]
-		sub dx, ds:[si]
-		jmp @@Exit		; else return *di - *si
+				dec di
+				dec si
+				mov dx, es:[di]
+				sub dx, ds:[si]
+				jmp @@Exit			; else return *di - *si
 
 @@CheckLenSI:	cmp al, '$'
-		je @@Exit		; if al == '$' return 0
+				je @@Exit			; if al == '$' return 0
 
-		mov dx, 01h		; dx = 1
-		jmp @@Exit		
+				mov dx, 01h			; dx = 1
+				jmp @@Exit		
 		
-@@CheckLenDI:				; di ended faster
-		mov dx, 0fffeh		; dx = -1
+@@CheckLenDI:						; di ended faster
+				mov dx, 0fffeh		; dx = -1
 
-@@Exit:		ret
-		endp
+@@Exit:			ret
+				endp
 
-end	Start
+end		Start

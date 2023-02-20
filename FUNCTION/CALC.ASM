@@ -31,7 +31,7 @@ Start:
 	mov cx, 30d
 	mov di, 9d
 
-	call DrawRect
+	; call DrawRect
 
 	;; PRINTING VALUES ;;
 
@@ -57,7 +57,7 @@ Start:
 	pop si
 	call ToDec
 		
-	ret
+	int 20h
 
 include ..\liba.asm
 

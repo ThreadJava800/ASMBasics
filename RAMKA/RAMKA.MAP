@@ -1,7 +1,0 @@
-
- Start  Stop   Length Name               Class
-
- 00000H 0040DH 0040EH _TEXT              CODE
- 0040EH 00604H 001F7H _DATA              DATA
-
-

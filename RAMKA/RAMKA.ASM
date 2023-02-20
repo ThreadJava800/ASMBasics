@@ -1,187 +1,115 @@
 .model tiny
-
-.data
-	first:	db 'Enter frame line num (max: 25d): $'
-	second: db 'Enter frame col num (max: 80d): $'
-	third:  db 'Enter frame height (max: 25d): $'
-	forth:	db 'Enter frame length (max: 80d): $'
-	fifth:  db 'Enter frame type (1 - ones, 2 - twos, 3 - *, 4 - custom): $'
-	
-	ub:  db 'Enter upper bound char: $' 
-	rs:	db 0Ah, 'Enter right side border char: $'
-	lb:     db 0Ah, 'Enter lower bound char: $'
-	ls:	db 0Ah, 'Enter left side border char: $'
-	
-	lhc:    db 0Ah, 'Enter left higher corner: $'
-	rhc:	db 0Ah, 'Enter right higher corner: $'
-	llc:	db 0Ah, 'Enter left lower corner: $'
-	rlc:	db 0Ah, 'Enter right lower corner: $'
-
-	inside:	db 0Ah, 'Enter inside char: $'
-
-	error_str:  db 'You are mistaken! IDIOT. Aborting...$'
 .code
 
 org 100h
 
 locals @@
 
-ask_input	macro
 
-			mov ah, 09h
-			mov dx, bx
-			int 21h
+Start:	
+				mov bx, 0082h
+				call ReadNumber			; ax -> line
 
-			call IntInput
-			call CheckValue
-			push si
+				mov si, 160d 
+				mul si					; ax *= 10
+				mov di, ax 				; si = ax
 
-			endm
+				call ReadNumber
+				add ax, ax
+				add di, ax
+				push di					; coordinates ready
 
+				call ReadNumber
+				push ax					; height
 
-char_input	macro
+				call ReadNumber
+				push ax					; length
 
-			mov ah, 09h
-			int 21h
+				call ReadNumber			; type
 
-			mov ah, 01h
-			int 21h
-
-			mov ah, 05h
-			push ax
-
-			endm
-
-Start:	mov cx, 80h
-
-
-		mov bx, 0b800h
-		mov es, bx
-		mov bx, 00h
-
-		; LINE NUMBER ;
-		mov ah, 09h
-		mov dx, offset first
-		int 21h
-
-		call IntInput
-		mov di, 25d
-		call CheckValue
-		mov ax, si
-		mov cx, 160d
-		mul cx
-		mov bx, ax				; bx = line * 160		
-
-		; STRING ID NUM ;
-		mov ah, 09h
-		mov dx, offset second
-		int 21h
-
-		call IntInput
-		mov di, 80d
-		call CheckValue	
-		add si, si 
-		add bx, si				; bx += strintId
-
-		push bx					; position ready
-
-		; FRAME HEIGHT ;
-		mov bx, offset third
-		mov di, 25d		
-		ask_input				; di = height
-
-		; FRAME LENGTH ;
-		mov bx, offset forth
-		mov di, 80d		
-		ask_input				; cx = length
-								; sizes ready
-
-		; TYPE NUMBER ;
-		mov bx, offset fifth
-		mov di, 04h		
-		ask_input 
-		pop si					; si = type
-		
-		cmp si, 01h
-		je @@Parse1
-		cmp si, 02h
-		je @@Parse2
-		cmp si, 03h
-		je @@Parse3
-		cmp si, 04h
-		je @@Parse4
-
-@@Parse1:	mov cx, 08h
-@@Loop1:	push 0531h			; 1s
-			loop @@Loop1
-			push 0020h			; inside = space
-
-			jmp @@Call
-
-@@Parse2:	mov cx, 08h
-@@Loop2:	push 0532h
-			loop @@Loop2
-			push 0020h				; inside = space
-
-			jmp @@Call
-
-@@Parse3:	mov cx, 08h
-@@Loop3:	push 052ah
-			loop @@Loop3
-			push 0020h				; inside = space		
-
-			jmp @@Call
-
-@@Parse4:	mov dx, offset ub
-			char_input				; read upper bound
-		
-			mov dx, offset rs		; read right side
-			char_input
-
-			mov dx, offset lb
-			char_input				; lower bound
+				cmp ax, 01h
+				je @@Parse1
+				cmp ax, 02h
+				je @@Parse2
+				cmp ax, 03h
+				je @@Parse3
+				cmp ax, 04h
+				je @@Parse4
 
 
-			mov dx, offset ls
-			char_input				; left side border
+@@Parse1:		mov cx, 08h
+@@Loop1:		push 0531h				; 1s
+				loop @@Loop1
+				push 0020h				; inside = space
+
+				jmp @@Call
+
+@@Parse2:		mov cx, 08h
+@@Loop2:		push 0532h
+				loop @@Loop2
+				push 0020h				; inside = space
+
+				jmp @@Call
 
 
-			mov dx, offset lhc
-			char_input				; left higher corner
+@@Parse3:		mov cx, 08h
+@@Loop3:		push 052ah
+				loop @@Loop3
+				push 0020h				; inside = space		
 
-			mov dx, offset rhc
-			char_input				; right higher corner
-
-			mov dx, offset llc
-			char_input				; left lower corner
-
-			mov dx, offset rlc
-			char_input				; right lower corner
-
-			mov dx, offset inside
-			char_input				; inside char
+				jmp @@Call
 
 
+@@Parse4:		mov cx, 09h
 
-@@Call:		call DrawRect
-		add sp, 26
-		int 20h	
-@@Exit:		ret
+@@Loop4:		mov byte ptr al, [bx]	; al = ascii code
+				inc bl
+				inc bl					; bl += 2
+				mov ah, 05h
+				push ax					; ax = ascii to draw (color = 05h)
+
+				loop @@Loop4		
 
 
-CheckValue	proc				; compares if si <= di
-		
-		cmp si, di
-		ja @@Error
-		jmp @@Exit
+@@Call:			mov bx, 0b800h
+				mov es, bx				; es -> 0b800h
 
-@@Error:	mov ah, 09h
-		mov dx, offset error_str
-		int 21h
-		int 20h		
+				call DrawRect
+				int 20h					; exit(0)
+				ret
 
-@@Exit:		ret
-		endp
+;-----------------------------------------------------------
+; Reads command line int arguments
+;-----------------------------------------------------------
+; Entry: 		BX = position in command line (starting 80h)
+; Exit:			AX - read value
+; Expects:  	None
+; Destroys: 	AX, BX, CL, DX, SI
+;-----------------------------------------------------------
+ReadNumber		proc
+				mov ax, 00h
+				mov dx, 00h					; dx:ax = 0
+
+@@Loop:			mov byte ptr cl, [bx]		; cl = arg symb
+				cmp cl, 0Dh
+				je @@Exit
+
+				cmp cl, 20h
+				je @@Exit					; if cl == ' ' or 0D: exit()
+
+				mov si, 10d 
+				mul si 						; ax *= 10
+
+				add al, cl
+				sub al, 30h					; ax += read ascii.toChar()
+
+				inc bl						; bx++
+				jmp @@Loop
+
+@@Exit:			inc bl						; bx++
+				ret
+				endp
+
 
 include ..\LIBA.ASM
 
