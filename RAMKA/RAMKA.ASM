@@ -26,7 +26,35 @@ org 100h
 
 locals @@
 
-Start:		
+ask_input	macro
+
+			mov ah, 09h
+			mov dx, bx
+			int 21h
+
+			call IntInput
+			call CheckValue
+			push si
+
+			endm
+
+
+char_input	macro
+
+			mov ah, 09h
+			int 21h
+
+			mov ah, 01h
+			int 21h
+
+			mov ah, 05h
+			push ax
+
+			endm
+
+Start:	mov cx, 80h
+
+
 		mov bx, 0b800h
 		mov es, bx
 		mov bx, 00h
@@ -42,7 +70,7 @@ Start:
 		mov ax, si
 		mov cx, 160d
 		mul cx
-		mov bx, ax		; bx = line * 160		
+		mov bx, ax				; bx = line * 160		
 
 		; STRING ID NUM ;
 		mov ah, 09h
@@ -53,41 +81,26 @@ Start:
 		mov di, 80d
 		call CheckValue	
 		add si, si 
-		add bx, si		; bx += strintId
-					; position ready
+		add bx, si				; bx += strintId
 
-		push bx
+		push bx					; position ready
 
 		; FRAME HEIGHT ;
-		mov ah, 09h
-		mov dx, offset third
-		int 21h
-
-		call IntInput
-		mov di, 25d
-		call CheckValue
-		push si			; di = height
+		mov bx, offset third
+		mov di, 25d		
+		ask_input				; di = height
 
 		; FRAME LENGTH ;
-
-		mov ah, 09h
-		mov dx, offset forth
-		int 21h
-		
-		call IntInput
-		mov di, 80d
-		call CheckValue
-		push si			; cx = length
-					; sizes ready
+		mov bx, offset forth
+		mov di, 80d		
+		ask_input				; cx = length
+								; sizes ready
 
 		; TYPE NUMBER ;
-		mov ah, 09h
-		mov dx, offset fifth
-		int 21h
-
-		call IntInput
-		mov di, 04h
-		call CheckValue		; si = type
+		mov bx, offset fifth
+		mov di, 04h		
+		ask_input 
+		pop si					; si = type
 		
 		cmp si, 01h
 		je @@Parse1
@@ -99,115 +112,54 @@ Start:
 		je @@Parse4
 
 @@Parse1:	mov cx, 08h
-@@Loop1:	push 0531h		; 1s
-		loop @@Loop1
-		push 0020h		; inside = space
+@@Loop1:	push 0531h			; 1s
+			loop @@Loop1
+			push 0020h			; inside = space
 
-		jmp @@Call
+			jmp @@Call
 
 @@Parse2:	mov cx, 08h
 @@Loop2:	push 0532h
-		loop @@Loop2
-		push 0020h		; inside = space
+			loop @@Loop2
+			push 0020h				; inside = space
 
-		jmp @@Call
+			jmp @@Call
 
 @@Parse3:	mov cx, 08h
 @@Loop3:	push 052ah
-		loop @@Loop3
-		push 0020h		; inside = space		
+			loop @@Loop3
+			push 0020h				; inside = space		
 
-		jmp @@Call
+			jmp @@Call
 
-@@Parse4:	mov ah, 09h
-		mov dx, offset ub
-		int 21h
-
-		mov ah, 01h
-		int 21h
-
-		mov ah, 05h
-		push ax			; read upper bound
+@@Parse4:	mov dx, offset ub
+			char_input				; read upper bound
 		
-		mov ah, 09h
-		mov dx, offset rs
-		int 21h
-				
-		mov ah, 01h
-		int 21h
+			mov dx, offset rs		; read right side
+			char_input
 
-		mov ah, 05h
-		push ax			; read right side
+			mov dx, offset lb
+			char_input				; lower bound
 
-		mov ah, 09h
-		mov dx, offset lb
-		int 21h
 
-		mov ah, 01h
-		int 21h
+			mov dx, offset ls
+			char_input				; left side border
 
-		mov ah, 05h
-		push ax			; lower bound
 
-		mov ah, 09h
-		mov dx, offset ls
-		int 21h
+			mov dx, offset lhc
+			char_input				; left higher corner
 
-		mov ah, 01h
-		int 21h
+			mov dx, offset rhc
+			char_input				; right higher corner
 
-		mov ah, 05h
-		push ax			; left side border
+			mov dx, offset llc
+			char_input				; left lower corner
 
-		mov ah, 09h
-		mov dx, offset lhc
-		int 21h
+			mov dx, offset rlc
+			char_input				; right lower corner
 
-		mov ah, 01h
-		int 21h
-
-		mov ah, 05h
-		push ax			; left higher corner
-
-		mov ah, 09h
-		mov dx, offset rhc
-		int 21h
-
-		mov ah, 01h
-		int 21h
-
-		mov ah, 05h
-		push ax			; right higher corner
-
-		mov ah, 09h
-		mov dx, offset llc
-		int 21h
-
-		mov ah, 01h
-		int 21h
-		
-		mov ah, 05h
-		push ax			; left lower corner
-
-		mov ah, 09h
-		mov dx, offset rlc
-		int 21h
-
-		mov ah, 01h
-		int 21h
-
-		mov ah, 05h
-		push ax			; right lower corner
-
-		mov ah, 09h
-		mov dx, offset inside
-		int 21h
-
-		mov ah, 01h
-		int 21h
-
-		mov ah, 05h
-		push ax			; inside char
+			mov dx, offset inside
+			char_input				; inside char
 
 
 
