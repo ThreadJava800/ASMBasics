@@ -27,18 +27,78 @@ org 100h
 locals @@
 
 Start:	
-		mov bx, 0082h
-		call ReadNumber
+				mov bx, 0082h
+				call ReadNumber			; ax -> line
 
-		mov si, ax
-		mov bx, 0b800h
-		mov es, bx
-		mov bx, 160d * 5d + 40d
-		call ToDec
+				mov si, 160d 
+				mul si					; ax *= 10
+				mov di, ax 				; si = ax
 
-@@Exit:		ret
+				call ReadNumber
+				add ax, ax
+				add di, ax
+				push di					; coordinates ready
+
+				call ReadNumber
+				push ax					; height
+
+				call ReadNumber
+				push ax					; length
+
+				call ReadNumber			; type
+
+				cmp ax, 01h
+				je @@Parse1
+				cmp ax, 02h
+				je @@Parse2
+				cmp ax, 03h
+				je @@Parse3
+				cmp ax, 04h
+				je @@Parse4
 
 
+@@Parse1:		mov cx, 08h
+@@Loop1:		push 0531h		; 1s
+				loop @@Loop1
+				push 0020h		; inside = space
+
+				jmp @@Call
+
+@@Parse2:		mov cx, 08h
+@@Loop2:		push 0532h
+				loop @@Loop2
+				push 0020h			; inside = space
+
+				jmp @@Call
+
+
+@@Parse3:		mov cx, 08h
+@@Loop3:		push 052ah
+				loop @@Loop3
+				push 0020h			; inside = space		
+
+				jmp @@Call
+
+
+@@Parse4:		mov cx, 09h
+
+@@Loop4:		mov byte ptr al, [bx]
+				inc bl
+				inc bl
+				mov ah, 05h
+				push ax		
+
+				loop @@Loop4		
+
+
+@@Call:			mov bx, 0b800h
+				mov es, bx
+
+				call DrawRect
+				int 20h
+				ret
+
+; Destroys:		ax, bx, cx, dx, si
 ReadNumber		proc
 				mov ax, 00h
 				mov dx, 00h
@@ -56,10 +116,10 @@ ReadNumber		proc
 				add al, cl
 				sub al, 30h
 
-				add bl, 1
+				inc bl
 				jmp @@Loop
 
-@@Exit:			add bl, 1
+@@Exit:			inc bl
 				ret
 				endp
 
