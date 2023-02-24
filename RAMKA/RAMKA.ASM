@@ -3,6 +3,7 @@
 .data
 
 	arguments:	dw 9 dup(0)
+	testText:	db 'Hello, world!$'
 
 .code
 
@@ -58,7 +59,7 @@ Start:
 				inc di
 				loop @@Loop1			; symb -> argument x8
 
-				mov di, 0020h			; inside = space
+				mov word ptr [di], 0020h			; inside = space
 				lea di, arguments
 
 				jmp @@Call
@@ -146,7 +147,18 @@ Start:
 				mov es, bx				; es -> 0b800h
 				pop bx					; coordinates
 
+				push bx					; save coords
+				push dx					; save height
+				push cx					; save length
+
 				call DrawRect
+
+				pop cx
+				pop dx
+				pop bx
+				lea si, testText
+				call RectText
+
 				int 20h					; exit(0)
 				ret
 
