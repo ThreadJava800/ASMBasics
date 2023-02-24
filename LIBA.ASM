@@ -6,9 +6,9 @@
 ;-----------------------------------------------------------
 ; Print binary of value
 ;-----------------------------------------------------------
-; Entry: 	AX = value to convert to
-;		BX = coordinates to print on string 
-; Exit:		None
+; Entry: 		AX = value to convert to
+;				BX = coordinates to print on string 
+; Exit:			None
 ; Expects:  	ES -> videomem (b800h)
 ; Destroys: 	BX, CX, DL
 ;-----------------------------------------------------------
@@ -49,7 +49,7 @@ ToBin		proc
 ; Print hex of value
 ;-----------------------------------------------------------
 ; Entry: 	SI = value to convert to
-;		BX = coordinates to print in cmd 
+;			BX = coordinates to print in cmd 
 ; Exit:		None
 ; Expects:  	ES -> videomem (b800h)
 ; Destroys: 	AX, BX, CX, DX, DI, BP, SP
@@ -210,26 +210,18 @@ IntInput	proc
 ;-------------------------------------------------------------
 ; Draws rectangle on screen with given borders
 ;-------------------------------------------------------------
-; Entry:	AX - horizontal border
-;		DX - vertical   border
-;		BX - left highest point
-;		CX - horizontal size
-;		DI - vertical   size
+; Entry:	DI - pointer to array with symbols
+;			BX - coordinates where to print
+;			CX - horizontal size
+;			DX - vertical size
 ; Exit:		None
 ; Expects:	ES -> videomem (0b800h)
-; Destroys:	BP, SI
+; Destroys:	AX, SI
 ;-------------------------------------------------------------
 DrawRect		proc		
-
-				push bp
-				mov bp, sp
-
-				mov bx, [bp + 26d]
-				mov di, [bp + 24d]
-				mov cx, [bp + 22d]
 		
 				sub cx, 2
-				mov si, di				; i = di
+				mov si, dx				; i = dx
 				jmp @@MainCycle			
 
 @@IterateI:		sub si, 1				; i--
@@ -249,13 +241,13 @@ DrawRect		proc
 				cmp si, 00h
 				je @@Exit 				; if i == 0: exit(0)
 
-@@SecondCycle:	mov dx, [bp + 4]
+@@SecondCycle:	mov dx, [di]
 				mov es:[bx], dx
 
 				cmp ax, 00h
 				je @@DrawRightV			; print left border (WORKS!)
 
-				cmp si, di
+				cmp si, dx
 				je @@DrawH				; draw highest border
 
 				cmp si, 01h
@@ -269,53 +261,51 @@ DrawRect		proc
 				add bx, 2				; bx += 2
 				jmp @@SecondCycle
 
-@@DrawH:		mov dx, [bp + 20d]
+@@DrawH:		mov dx, [di + 2]
 				mov es:[bx], dx
 				jmp @@ContinueSecond
 
-@@DrawLower:	mov dx, [bp + 16d]
+@@DrawLower:	mov dx, [di + 4]
 				mov es:[bx], dx
 				jmp @@ContinueSecond
 
 @@DrawV:		cmp si, 01h
 				je @@LowLeft
-				cmp si, di
+				cmp si, dx
 				je @@HighLeft
-				jmp @@Left
+				jmp @@Left                          ; TODO: all labels !!!!! -> functions
 
-@@HighLeft:		mov dx, [bp + 12d]
+@@HighLeft:		mov dx, [di + 6]
 				mov es:[bx], dx
 				jmp @@ContinueMain
 			
-@@LowLeft:		mov dx, [bp + 8d]
+@@LowLeft:		mov dx, [di + 8]
 				mov es:[bx], dx
 				jmp @@ContinueMain
 
-@@Left:			mov dx, [bp + 14d]
+@@Left:			mov dx, [di + 10d]
 				mov es:[bx], dx
 				jmp @@ContinueMain
 
 @@DrawRightV:	cmp si, 01h
 				je @@LowRight
-				cmp si, di
+				cmp si, dx
 				je @@HighRight
 				jmp @@Right
 		
-@@LowRight:		mov dx, [bp + 6d]
+@@LowRight:		mov dx, [di + 12d]
 				mov es:[bx], dx
 				jmp @@ContinueSecond
 
-@@HighRight:	mov dx, [bp + 10d]
+@@HighRight:	mov dx, [di + 14d]
 				mov es:[bx], dx
 				jmp @@ContinueSecond
 		
-@@Right:		mov dx, [bp + 18d]
+@@Right:		mov dx, [di + 16d]
 				mov es:[bx], dx
 				jmp @@ContinueSecond
 
-@@Exit:			pop bp
-
-				ret
+@@Exit:			ret
 				endp
 
 	

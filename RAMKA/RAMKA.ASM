@@ -1,4 +1,9 @@
 .model tiny
+
+.data
+
+	arguments:	dw 9 dup(0)
+
 .code
 
 org 100h
@@ -36,22 +41,48 @@ Start:
 				cmp ax, 04h
 				je @@Parse4
 
+; MODE = 1 ;
+@@Parse1:		
+				mov cx, 08h				; counter for loop
+				lea di, arguments
 
-@@Parse1:		mov cx, 08h
-@@Loop1:		push 0531h				; 1s
+				; READING ASCII ;
+				mov byte ptr al, [bx]	; al = ascii code
+				inc bl
+				inc bl					; bl += 2
+
+				mov ah, 05h
+				mov [di], ax
+				inc di
+				inc di
+
+@@Loop1:		mov [di], ax
+				inc di
+				inc di
+				loop @@Loop1
+
+				mov di, 0020h				; inside = space
+				lea di, arguments
+
+				jmp @@Call
+
+; MODE = 2 ;
+@@Parse2:		
+				mov cx, 08h				; counter for loop
+
+				; READING ASCII ;
+				mov byte ptr al, [bx]	; al = ascii code
+				inc bl
+				inc bl					; bl += 2
+				mov ah, 05h
+
+@@Loop2:		push ax
 				loop @@Loop1
 				push 0020h				; inside = space
 
 				jmp @@Call
 
-@@Parse2:		mov cx, 08h
-@@Loop2:		push 0532h
-				loop @@Loop2
-				push 0020h				; inside = space
-
-				jmp @@Call
-
-
+; MODE = 3 ;
 @@Parse3:		mov cx, 08h
 @@Loop3:		push 052ah
 				loop @@Loop3
@@ -59,7 +90,7 @@ Start:
 
 				jmp @@Call
 
-
+; MODE = 4 ;
 @@Parse4:		mov cx, 09h
 
 @@Loop4:		mov byte ptr al, [bx]	; al = ascii code
@@ -71,8 +102,12 @@ Start:
 				loop @@Loop4		
 
 
-@@Call:			mov bx, 0b800h
+@@Call:			pop cx
+				pop dx
+
+				mov bx, 0b800h
 				mov es, bx				; es -> 0b800h
+				pop bx
 
 				call DrawRect
 				int 20h					; exit(0)

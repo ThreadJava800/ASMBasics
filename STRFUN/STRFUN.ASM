@@ -123,8 +123,8 @@ Memset		proc
 ; Compares first n bytes in buffers
 ;--------------------------------------------------------------
 ; Entry:	ES:DI - buf1
-;		DS:SI - buf2
-;		CX    - byte count
+;			DS:SI - buf2
+;			CX    - byte count
 ; Exit:		DX    - 0 if eq, < 0 if buf1 < buf2 && > 0 if buf1 > buf2
 ; Expects:	None
 ; Destroys:	CX, DX, DI, SI
