@@ -52,9 +52,6 @@ Start:
 				inc bl					; bl += 2
 
 				mov ah, 05h
-				mov [di], ax
-				inc di
-				inc di					; symb -> aruments && di += 2
 
 @@Loop1:		mov [di], ax
 				inc di
@@ -77,9 +74,6 @@ Start:
 				inc bl					; bl += 2
 
 				mov ah, 05h
-				mov [di], ax
-				inc di
-				inc di					; symb -> aruments && di += 2
 
 @@Loop2:		mov [di], ax
 				inc di
@@ -89,7 +83,30 @@ Start:
 				mov word ptr [di], 0020h ; inside = space
 				lea di, arguments
 
-				jmp @@Call
+				pop cx					; length
+				pop dx					; height
+
+				mov bx, 0b800h
+				mov es, bx				; es -> 0b800h
+				pop bx					; coordinates
+
+				push cx					; save len
+				push bx					; save coords
+
+				inc cx
+				inc cx
+				inc dx
+				inc dx
+				sub bx, 162d
+				call DrawRect			; draw bigger frame
+
+				pop bx
+				pop cx
+				dec dx
+				dec dx
+				call DrawRect
+
+				int 20h					; exit(0)
 
 ; MODE = 3 ;
 @@Parse3:		mov cx, 08h

@@ -216,7 +216,7 @@ IntInput	proc
 ;			DX - vertical size
 ; Exit:		None
 ; Expects:	ES -> videomem (0b800h)
-; Destroys:	AX, CX, SI
+; Destroys:	AX, BX, CX, SI
 ;-------------------------------------------------------------
 DrawRect		proc	
 				push bp	
