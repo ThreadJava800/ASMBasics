@@ -216,9 +216,10 @@ IntInput	proc
 ;			DX - vertical size
 ; Exit:		None
 ; Expects:	ES -> videomem (0b800h)
-; Destroys:	AX, SI
+; Destroys:	AX, CX, SI
 ;-------------------------------------------------------------
-DrawRect		proc		
+DrawRect		proc	
+				push bp	
 		
 				sub cx, 2
 				mov si, dx				; i = dx
@@ -241,8 +242,8 @@ DrawRect		proc
 				cmp si, 00h
 				je @@Exit 				; if i == 0: exit(0)
 
-@@SecondCycle:	mov dx, [di]
-				mov es:[bx], dx
+@@SecondCycle:	mov bp, [di + 16d]
+				mov es:[bx], bp
 
 				cmp ax, 00h
 				je @@DrawRightV			; print left border (WORKS!)
@@ -261,12 +262,12 @@ DrawRect		proc
 				add bx, 2				; bx += 2
 				jmp @@SecondCycle
 
-@@DrawH:		mov dx, [di + 2]
-				mov es:[bx], dx
+@@DrawH:		mov bp, [di + 2d]
+				mov es:[bx], bp
 				jmp @@ContinueSecond
 
-@@DrawLower:	mov dx, [di + 4]
-				mov es:[bx], dx
+@@DrawLower:	mov bp, [di + 10d]
+				mov es:[bx], bp
 				jmp @@ContinueSecond
 
 @@DrawV:		cmp si, 01h
@@ -275,16 +276,16 @@ DrawRect		proc
 				je @@HighLeft
 				jmp @@Left                          ; TODO: all labels !!!!! -> functions
 
-@@HighLeft:		mov dx, [di + 6]
-				mov es:[bx], dx
+@@HighLeft:		mov bp, [di]
+				mov es:[bx], bp
 				jmp @@ContinueMain
 			
-@@LowLeft:		mov dx, [di + 8]
-				mov es:[bx], dx
+@@LowLeft:		mov bp, [di + 12d]
+				mov es:[bx], bp
 				jmp @@ContinueMain
 
-@@Left:			mov dx, [di + 10d]
-				mov es:[bx], dx
+@@Left:			mov bp, [di + 14d]
+				mov es:[bx], bp
 				jmp @@ContinueMain
 
 @@DrawRightV:	cmp si, 01h
@@ -293,19 +294,20 @@ DrawRect		proc
 				je @@HighRight
 				jmp @@Right
 		
-@@LowRight:		mov dx, [di + 12d]
-				mov es:[bx], dx
+@@LowRight:		mov bp, [di + 8d]
+				mov es:[bx], bp
 				jmp @@ContinueSecond
 
-@@HighRight:	mov dx, [di + 14d]
-				mov es:[bx], dx
+@@HighRight:	mov bp, [di + 4d]
+				mov es:[bx], bp
 				jmp @@ContinueSecond
 		
-@@Right:		mov dx, [di + 16d]
-				mov es:[bx], dx
+@@Right:		mov bp, [di + 6d]
+				mov es:[bx], bp
 				jmp @@ContinueSecond
 
-@@Exit:			ret
+@@Exit:			pop bp
+				ret
 				endp
 
 	

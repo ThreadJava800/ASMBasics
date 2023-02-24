@@ -54,14 +54,14 @@ Start:
 				mov ah, 05h
 				mov [di], ax
 				inc di
-				inc di
+				inc di					; symb -> aruments && di += 2
 
 @@Loop1:		mov [di], ax
 				inc di
 				inc di
-				loop @@Loop1
+				loop @@Loop1			; symb -> argument x8
 
-				mov di, 0020h				; inside = space
+				mov di, 0020h			; inside = space
 				lea di, arguments
 
 				jmp @@Call
@@ -69,45 +69,65 @@ Start:
 ; MODE = 2 ;
 @@Parse2:		
 				mov cx, 08h				; counter for loop
+				lea di, arguments
 
 				; READING ASCII ;
 				mov byte ptr al, [bx]	; al = ascii code
 				inc bl
 				inc bl					; bl += 2
-				mov ah, 05h
 
-@@Loop2:		push ax
-				loop @@Loop1
-				push 0020h				; inside = space
+				mov ah, 05h
+				mov [di], ax
+				inc di
+				inc di					; symb -> aruments && di += 2
+
+@@Loop2:		mov [di], ax
+				inc di
+				inc di
+				loop @@Loop2			; symb -> argument x8
+
+				mov word ptr [di], 0020h ; inside = space
+				lea di, arguments
 
 				jmp @@Call
 
 ; MODE = 3 ;
 @@Parse3:		mov cx, 08h
-@@Loop3:		push 052ah
+				lea di, arguments
+
+@@Loop3:		mov word ptr [di], 052ah
+				inc di
+				inc di
 				loop @@Loop3
-				push 0020h				; inside = space		
+
+				mov word ptr [di], 0020h			; inside = space	
+				lea di, arguments	
 
 				jmp @@Call
 
 ; MODE = 4 ;
 @@Parse4:		mov cx, 09h
+				lea di, arguments
 
 @@Loop4:		mov byte ptr al, [bx]	; al = ascii code
-				inc bl
-				inc bl					; bl += 2
+				inc bl					; bl++
 				mov ah, 05h
-				push ax					; ax = ascii to draw (color = 05h)
+				
+				mov [di], ax
+				inc di
+				inc di
 
-				loop @@Loop4		
+				loop @@Loop4	
+
+				lea di, arguments	
 
 
-@@Call:			pop cx
-				pop dx
+@@Call:			pop cx					; length
+				pop dx					; height
 
 				mov bx, 0b800h
 				mov es, bx				; es -> 0b800h
-				pop bx
+				pop bx					; coordinates
 
 				call DrawRect
 				int 20h					; exit(0)
