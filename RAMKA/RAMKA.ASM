@@ -86,6 +86,8 @@ Start:
 				pop cx					; length
 				pop dx					; height
 
+				mov si, bx				; address of argument cmd
+
 				mov bx, 0b800h
 				mov es, bx				; es -> 0b800h
 				pop bx					; coordinates
@@ -98,13 +100,20 @@ Start:
 				inc dx
 				inc dx
 				sub bx, 162d
+
+				push si					; address of argument cmd
 				call DrawRect			; draw bigger frame
 
-				pop bx
-				pop cx
+				pop si					; args
+				pop bx					; coords
+				pop cx					; length
 				dec dx
 				dec dx
-				call DrawRect
+				push bx					; coords
+				push dx					; height
+				push cx
+				mov bx, si
+				jmp @@Call
 
 				int 20h					; exit(0)
 
@@ -137,6 +146,7 @@ Start:
 				loop @@Loop4	
 
 				lea di, arguments	
+				inc bl					; move to next symbol
 
 
 @@Call:			pop cx					; length
