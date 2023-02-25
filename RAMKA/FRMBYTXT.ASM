@@ -6,7 +6,7 @@
 
 .code
 
-.386                                    ; how many bytes for jump
+.386
 
 org 100h
 

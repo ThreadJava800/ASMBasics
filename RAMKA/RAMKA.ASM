@@ -2,7 +2,7 @@
 
 .data
 	printText:	db 160d dup('$')
-	arguments:	dw 9 dup(0)
+	arguments:	dw 10d dup(0)
 
 .code
 
@@ -31,6 +31,11 @@ Start:
 				push ax					; length
 
 				call ReadNumber			; type
+				push ax					; type
+
+				call ReadNumber
+				mov dx, ax				; dx = color
+				pop ax 					; ax = type
 
 				cmp ax, 01h
 				je @@Parse1
@@ -51,7 +56,7 @@ Start:
 				inc bl
 				inc bl					; bl += 2
 
-				mov ah, 05h
+				mov ah, dl
 
 @@Loop1:		mov [di], ax
 				inc di
@@ -73,7 +78,7 @@ Start:
 				inc bl
 				inc bl					; bl += 2
 
-				mov ah, 05h
+				mov ah, dl
 
 @@Loop2:		mov [di], ax
 				inc di
@@ -155,22 +160,35 @@ Start:
 				mov byte ptr al, [bx]	; al = ascii code
 				inc bl					
 
-				cmp al, 60h
-				je @@StartRead
-				jmp @@Continue
+				;cmp al, 60h
+				;je @@StartRead
+				;jmp @@Continue
 
-@@StartRead:	push bx
+@@StartRead:	
+				push cx
+				push di
+				push dx
+				dec bl
+				call ReadNumber
+				inc bl
+				pop dx
+				pop di
+				pop cx
+
+				push ax 				; save color
+
 				push cx
 				push di
 				call ReadText
 				pop di
 				pop cx
-				pop bx
+				pop ax
 
 @@Continue:		mov bx, 0b800h
 				mov es, bx				; es -> 0b800h
 				pop bx					; coordinates
 
+				push ax					; text color
 				push bx					; save coords
 				push dx					; save height
 				push cx					; save length
@@ -180,6 +198,7 @@ Start:
 				pop cx
 				pop dx
 				pop bx
+				pop ax
 				lea si, printText
 				call RectText
 

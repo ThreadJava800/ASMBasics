@@ -1,4 +1,4 @@
-Turbo Assembler	 Version 4.1	    02/25/23 20:41:30	    Page 1
+Turbo Assembler	 Version 4.1	    02/25/23 21:05:18	    Page 1
 frmbytxt.asm
 
 
@@ -11,7 +11,7 @@ frmbytxt.asm
       6
       7	    00B2			 .code
       8
-      9					 .386					 ; how many bytes for jump
+      9					 .386
      10
      11					 org 100h
      12
@@ -60,7 +60,7 @@ frmbytxt.asm
      55
      56	    0148  C7 05	0020						 mov word ptr [di], 0020h			 ; inside = +
      57					 space
-Turbo Assembler	 Version 4.1	    02/25/23 20:41:30	    Page 2
+Turbo Assembler	 Version 4.1	    02/25/23 21:05:18	    Page 2
 frmbytxt.asm
 
 
@@ -122,7 +122,7 @@ frmbytxt.asm
     112	    0192  C7 05	052A		 @@Loop3:		 mov word ptr [di], 052ah
     113	    0196  47							 inc di
     114	    0197  47							 inc di
-Turbo Assembler	 Version 4.1	    02/25/23 20:41:30	    Page 3
+Turbo Assembler	 Version 4.1	    02/25/23 21:05:18	    Page 3
 frmbytxt.asm
 
 
@@ -184,7 +184,7 @@ frmbytxt.asm
     169					 ;-----------------------------------------------------------
     170					 ; Entry:		 BX = position in command line (starting 80h)
     171					 ; Exit:		 AX - read value
-Turbo Assembler	 Version 4.1	    02/25/23 20:41:30	    Page 4
+Turbo Assembler	 Version 4.1	    02/25/23 21:05:18	    Page 4
 frmbytxt.asm
 
 
@@ -246,7 +246,7 @@ frmbytxt.asm
     226	    021D  88 05							 mov [di], al
     227	    021F  FE C3							 inc bl						 ; bx++
     228
-Turbo Assembler	 Version 4.1	    02/25/23 20:41:30	    Page 5
+Turbo Assembler	 Version 4.1	    02/25/23 21:05:18	    Page 5
 frmbytxt.asm
 
 
@@ -308,7 +308,7 @@ frmbytxt.asm
 1   281	    0252  EB EA						 jmp @@NewByte
 1   282
 1   283	    0254  C3			 @@Exit:	 ret
-Turbo Assembler	 Version 4.1	    02/25/23 20:41:30	    Page 6
+Turbo Assembler	 Version 4.1	    02/25/23 21:05:18	    Page 6
 frmbytxt.asm
 
 
@@ -370,7 +370,7 @@ frmbytxt.asm
 1   338	    0297  73 07	90 90						 jae @@LetterPrint
 1   339
 1   340	    029B  04 30							 add al, 30h			 ; else: al += 30h -> print +
-Turbo Assembler	 Version 4.1	    02/25/23 20:41:30	    Page 7
+Turbo Assembler	 Version 4.1	    02/25/23 21:05:18	    Page 7
 frmbytxt.asm
 
 
@@ -432,7 +432,7 @@ frmbytxt.asm
 1   395
 1   396
 1   397					 ;------------------------------------------------------------
-Turbo Assembler	 Version 4.1	    02/25/23 20:41:30	    Page 8
+Turbo Assembler	 Version 4.1	    02/25/23 21:05:18	    Page 8
 frmbytxt.asm
 
 
@@ -494,7 +494,7 @@ frmbytxt.asm
 1   452
 1   453
 1   454					 ;-------------------------------------------------------------
-Turbo Assembler	 Version 4.1	    02/25/23 20:41:30	    Page 9
+Turbo Assembler	 Version 4.1	    02/25/23 21:05:18	    Page 9
 frmbytxt.asm
 
 
@@ -556,7 +556,7 @@ frmbytxt.asm
 1   509	    036C  EB D9							 jmp @@SecondCycle
 1   510
 1   511	    036E  8B 6D	02		 @@DrawH:		 mov bp, [di + 2d]
-Turbo Assembler	 Version 4.1	    02/25/23 20:41:30	    Page 10
+Turbo Assembler	 Version 4.1	    02/25/23 21:05:18	    Page 10
 frmbytxt.asm
 
 
@@ -618,7 +618,7 @@ frmbytxt.asm
 1   566					 ;			 CX = length
 1   567					 ;			 SI = pointer to text
 1   568					 ; Exit:	 None
-Turbo Assembler	 Version 4.1	    02/25/23 20:41:30	    Page 11
+Turbo Assembler	 Version 4.1	    02/25/23 21:05:18	    Page 11
 frmbytxt.asm
 
 
@@ -680,7 +680,7 @@ frmbytxt.asm
 1   623	    0413  FC							 cld
 1   624
 1   625									 ; PRINTING STRING ;
-Turbo Assembler	 Version 4.1	    02/25/23 20:41:30	    Page 12
+Turbo Assembler	 Version 4.1	    02/25/23 21:05:18	    Page 12
 frmbytxt.asm
 
 
@@ -742,7 +742,7 @@ frmbytxt.asm
 1   680	    0444  59							 pop cx
 1   681	    0445  5A							 pop dx
 1   682	    0446  5B							 pop bx
-Turbo Assembler	 Version 4.1	    02/25/23 20:41:30	    Page 13
+Turbo Assembler	 Version 4.1	    02/25/23 21:05:18	    Page 13
 frmbytxt.asm
 
 
@@ -804,7 +804,7 @@ frmbytxt.asm
 1   737	    045F  3C 00						 cmp al, 00h		 ; ('\0')
 1   738	    0461  74 0B	90 90					 je  @@Exit
 1   739
-Turbo Assembler	 Version 4.1	    02/25/23 20:41:30	    Page 14
+Turbo Assembler	 Version 4.1	    02/25/23 21:05:18	    Page 14
 frmbytxt.asm
 
 
@@ -866,7 +866,7 @@ frmbytxt.asm
 1   794	    0482						 endp
 1   795
 1   796
-Turbo Assembler	 Version 4.1	    02/25/23 20:41:30	    Page 15
+Turbo Assembler	 Version 4.1	    02/25/23 21:05:18	    Page 15
 frmbytxt.asm
 
 
@@ -928,7 +928,7 @@ frmbytxt.asm
 1   851					 ;		 DS:SI - buf2
 1   852					 ; Exit:	 DX    - 0 if equ, < 0 if buf1 < buf2 && > 0 if	buf1 > buf2
 1   853					 ; Expects:	 None
-Turbo Assembler	 Version 4.1	    02/25/23 20:41:30	    Page 16
+Turbo Assembler	 Version 4.1	    02/25/23 21:05:18	    Page 16
 frmbytxt.asm
 
 
@@ -972,7 +972,7 @@ frmbytxt.asm
 1   890
     891
     892					 end	     Start
-Turbo Assembler	 Version 4.1	    02/25/23 20:41:30	    Page 17
+Turbo Assembler	 Version 4.1	    02/25/23 21:05:18	    Page 17
 Symbol Table
 
 
@@ -982,7 +982,7 @@ Symbol Name			  Type	 Value
 
 ??DATE				  Text	 "02/25/23"
 ??FILENAME			  Text	 "frmbytxt"
-??TIME				  Text	 "20:41:30"
+??TIME				  Text	 "21:05:18"
 ??VERSION			  Number 040A
 @32BIT				  Text	 0
 @@CALL				  Near	 DGROUP:01BF
@@ -1034,7 +1034,7 @@ Symbol Name			  Type	 Value
 @@NEWBYTE			  Near	 DGROUP:023E
 @@NEXT				  Near	 DGROUP:0249
 @@ONERROR			  Near	 DGROUP:02E1
-Turbo Assembler	 Version 4.1	    02/25/23 20:41:30	    Page 18
+Turbo Assembler	 Version 4.1	    02/25/23 21:05:18	    Page 18
 Symbol Table
 
 
@@ -1091,7 +1091,7 @@ Groups & Segments		  Bit Size Align  Combine Class
 DGROUP				  Group
   _DATA				  16  00CF Word	  Public  DATA
   _TEXT				  16  04D0 Word	  Public  CODE
-Turbo Assembler	 Version 4.1	    02/25/23 20:41:30	    Page 19
+Turbo Assembler	 Version 4.1	    02/25/23 21:05:18	    Page 19
 Error Summary
 
 

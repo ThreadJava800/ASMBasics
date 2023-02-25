@@ -318,11 +318,14 @@ DrawRect		proc
 ; 			DX = height
 ; 			CX = length
 ;			SI = pointer to text
+;			AX = text color
 ; Exit:		None
 ; Expects:	ES -> videomem (b800h)
 ; Destroys:	AX, DX, DI
 ;-----------------------------------------------------------
 RectText		proc
+
+				push ax 			; save color
 
 				mov di, dx			; moving for div
 
@@ -374,9 +377,10 @@ RectText		proc
 
 				cld
 				
+				pop ax
+				mov ah, al
 				; PRINTING STRING ;
 @@Loop:			lodsb				; ds:si -> al
-				mov ah, 05h
 				stosw				; ax -> es:di
 				loop @@Loop
 
