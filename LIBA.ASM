@@ -395,6 +395,7 @@ RectText		proc
 ;			BX = coordinates
 ;			SI = pointer to text
 ;			DI - pointer to array with symbols
+;			DX - text color
 ; Exit:		None
 ; Expects:	ES -> videomem (b800h)
 ; Destroys:	AX, BX, CX, DX, SI, DI
@@ -402,10 +403,10 @@ RectText		proc
 FrameByTxt		proc
 
 				push si				; pointer to text
+				push dx 			; save text color
 				push ax
 				call Strlen 		; len(si) -> cx
 				pop ax
-
 
 				push bx 			; where to print text
 
@@ -442,10 +443,11 @@ FrameByTxt		proc
 
 				sub cx, 2d 			; cx - strlen
 				pop di 				; where to print text -> di
+				pop dx				; dx = text color
 				pop si 				; pointer to text
 
+				mov ah, dl
 @@Loop:			lodsb				; ds:si -> al
-				mov ah, 05h
 				stosw				; ax -> es:di
 				loop @@Loop
 

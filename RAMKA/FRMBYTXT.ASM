@@ -25,7 +25,12 @@ Start:
 				add di, ax
 				push di					; coordinates ready
 
-				call ReadNumber			; type
+                call ReadNumber			; type
+				push ax					; type
+
+				call ReadNumber
+				mov dx, ax				; dx = color
+				pop ax 					; ax = type
 
 				cmp ax, 01h
 				je @@Parse1
@@ -46,7 +51,7 @@ Start:
 				inc bl
 				inc bl					; bl += 2
 
-				mov ah, 05h
+				mov ah, dl
 
 @@Loop1:		mov [di], ax
 				inc di
@@ -69,7 +74,7 @@ Start:
 				inc bl
 				inc bl					; bl += 2
 
-				mov ah, 05h
+				mov ah, dl
 
 @@Loop2:		mov [di], ax
 				inc di
@@ -106,7 +111,9 @@ Start:
 @@Parse3:		mov cx, 08h
 				lea di, arguments
 
-@@Loop3:		mov word ptr [di], 052ah
+@@Loop3:		mov ah, dl
+                mov al, 2ah
+                mov word ptr [di], ax
 				inc di
 				inc di
 				loop @@Loop3
@@ -123,7 +130,7 @@ Start:
 
 @@Loop4:		mov byte ptr al, [bx]	; al = ascii code
 				inc bl					; bl++
-				mov ah, 05h
+				mov ah, dl
 				
 				mov [di], ax
 				inc di
@@ -139,11 +146,23 @@ Start:
 				mov byte ptr al, [bx]	; al = ascii code
 				inc bl					
 
-				cmp al, 60h
-				je @@StartRead
-				jmp @@Continue
+				; cmp al, 60h
+				; je @@StartRead
+				; jmp @@Continue
 
-@@StartRead:	push bx
+@@StartRead:	push ax
+                push bx
+                push si
+				dec bl
+                call ReadNumber         ; ax -> text color
+                pop si
+                pop bx
+                mov dx, ax              ; dx = text color
+                pop ax
+
+                push bx
+				inc bl 
+				inc bl
 				call ReadText
 				pop bx
 

@@ -160,10 +160,6 @@ Start:
 				mov byte ptr al, [bx]	; al = ascii code
 				inc bl					
 
-				;cmp al, 60h
-				;je @@StartRead
-				;jmp @@Continue
-
 @@StartRead:	
 				push cx
 				push di
