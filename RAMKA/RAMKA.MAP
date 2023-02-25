@@ -1,7 +1,0 @@
-
- Start  Stop   Length Name               Class
-
- 00000H 0046BH 0046CH _TEXT              CODE
- 0046CH 0053AH 000CFH _DATA              DATA
-
-

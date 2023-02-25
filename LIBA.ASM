@@ -383,6 +383,72 @@ RectText		proc
 @@Exit:			ret
 				endp
 
+
+;-----------------------------------------------------------
+; Put symbol with given ascii to videomem
+;-----------------------------------------------------------
+; Entry:	AX = 0 || 1 if frame is double or not
+;			BX = coordinates
+;			SI = pointer to text
+;			DI - pointer to array with symbols
+; Exit:		None
+; Expects:	ES -> videomem (b800h)
+; Destroys:	AX, BX, CX, DX, SI, DI
+;-----------------------------------------------------------
+FrameByTxt		proc
+
+				push si				; pointer to text
+				push ax
+				call Strlen 		; len(si) -> cx
+				pop ax
+
+
+				push bx 			; where to print text
+
+				sub bx, 320d		; two lines back
+				sub bx, 2d			; two columns back
+
+				mov dx, 5d 			; heght = 5
+
+				add cx, 4d 			; length = strLen + 2
+
+				cmp ax, 01h
+				jne @@DrawUsual		; if ax != 1: draw not double frame
+
+				; DRAWING DOUBLE RAM ;
+				push bx				; coords
+				push dx 			; height
+				push cx 			; length
+
+				sub bx, 162d		; new start
+				inc dx
+				inc dx
+
+				inc cx
+				inc cx				; len += 2; height += 2
+
+				call DrawRect
+
+				pop cx
+				pop dx
+				pop bx
+
+
+@@DrawUsual:	call DrawRect		; drawing frame
+
+				sub cx, 2d 			; cx - strlen
+				pop di 				; where to print text -> di
+				pop si 				; pointer to text
+
+@@Loop:			lodsb				; ds:si -> al
+				mov ah, 05h
+				stosw				; ax -> es:di
+				loop @@Loop
+
+
+@@Exit:			ret
+				endp
+
 	
 ;-----------------------------------------------------------
 ; Put symbol with given ascii to videomem
@@ -412,7 +478,7 @@ PutChar proc
 ; Entry:	DS:SI - pointer to string
 ; Expects:	None
 ; Exit:		CX - amount of symbols in string
-; Destroys:	CX, SI
+; Destroys:	AX, CX, SI
 ;------------------------------------------------------------
 Strlen		proc
 			mov cx, 00h
