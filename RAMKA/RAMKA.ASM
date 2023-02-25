@@ -1,9 +1,8 @@
 .model tiny
 
 .data
-
+	printText:	db 160d dup('$')
 	arguments:	dw 9 dup(0)
-	testText:	db 'Hello, world!$'
 
 .code
 
@@ -143,7 +142,22 @@ Start:
 @@Call:			pop cx					; length
 				pop dx					; height
 
-				mov bx, 0b800h
+				mov byte ptr al, [bx]	; al = ascii code
+				inc bl					
+
+				cmp al, 60h
+				je @@StartRead
+				jmp @@Continue
+
+@@StartRead:	push bx
+				push cx
+				push di
+				call ReadText
+				pop di
+				pop cx
+				pop bx
+
+@@Continue:		mov bx, 0b800h
 				mov es, bx				; es -> 0b800h
 				pop bx					; coordinates
 
@@ -156,7 +170,7 @@ Start:
 				pop cx
 				pop dx
 				pop bx
-				lea si, testText
+				lea si, printText
 				call RectText
 
 				int 20h					; exit(0)
@@ -191,6 +205,36 @@ ReadNumber		proc
 				jmp @@Loop
 
 @@Exit:			inc bl						; bx++
+				ret
+				endp
+
+
+;-----------------------------------------------------------
+; Reads text from command line arguments
+;-----------------------------------------------------------
+; Entry: 		BX = position in command line (starting 80h)
+; Exit:			printText
+; Expects:  	None
+; Destroys: 	BX, CX, DI
+;-----------------------------------------------------------
+ReadText		proc
+				lea di, printText
+
+@@Loop:			mov byte ptr cl, [bx]		; cl = arg symb
+
+				cmp cl, 60h
+				je @@Exit					; if al == ': exit()
+
+				mov [di], cl
+
+				inc di						; di++
+				inc bl						; bx++
+				jmp @@Loop
+
+@@Exit:			mov al, '$'
+				mov [di], al
+				inc bl						; bx++
+
 				ret
 				endp
 

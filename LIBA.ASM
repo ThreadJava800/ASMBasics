@@ -369,15 +369,18 @@ RectText		proc
 @@Continue:		add bx, dx
 				mov di, bx
 
-				cld
+				cmp cx, 00h 
+				je @@Exit
 
+				cld
+				
 				; PRINTING STRING ;
 @@Loop:			lodsb				; ds:si -> al
 				mov ah, 05h
 				stosw				; ax -> es:di
 				loop @@Loop
 
-				ret
+@@Exit:			ret
 				endp
 
 	
