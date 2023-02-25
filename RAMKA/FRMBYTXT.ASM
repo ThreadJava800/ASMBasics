@@ -84,24 +84,6 @@ Start:
 				mov word ptr [di], 0020h ; inside = space
 				lea di, arguments
 
-				mov si, bx				; address of argument cmd
-
-				mov bx, 0b800h
-				mov es, bx				; es -> 0b800h
-				pop bx					; coordinates
-
-				push bx					; save coords
-
-				sub bx, 162d
-
-				push si					; address of argument cmd
-				call DrawRect			; draw bigger frame
-
-				pop si					; args
-				pop bx					; coords
-				push bx					; coords
-				mov bx, si
-
                 push 01h                ; is double
 				jmp @@Call
 
@@ -145,10 +127,6 @@ Start:
 @@Call:	
 				mov byte ptr al, [bx]	; al = ascii code
 				inc bl					
-
-				; cmp al, 60h
-				; je @@StartRead
-				; jmp @@Continue
 
 @@StartRead:	push ax
                 push bx
