@@ -33,40 +33,27 @@ Start:      cli
 
             ret
 
+
 NewInt      proc
-            push ax bx cx di es             ; saving registers that will be killed
+            push ax bx cx dx si di bp sp es ; saving registers
 
             call CodeFromPort
             cmp cl, 1Dh                     ; ctrl
             je @@OnOff
             jmp @@Else                      ; if ctrl pressed read next
 
-@@OnOff:    lea di, status
+@@OnOff:    lea di, cs:status
             mov cl, cs:[di]                 ; di = status
 
             cmp cl, 00h                     ; if isOff: switchOn               
             je @@SwOn                       ; else: SwitchOff
 
-@@SwOff:    mov bx, 0b800h
-            mov es, bx
-            mov bx, 160d * 5d + 80d         ; setting position on screen
-
-            mov ah, 4eh                     ; setting color for print
-            mov al, 21h                     ; '!'
-            mov es:[bx], ax
-
-            mov cl, 00h
-            mov cs:[di], cl                 ; set status = 1
+@@SwOff:    mov cl, 00h
+            mov cs:[di], cl                 ; set status = 0
 
             jmp @@Exit
 
-@@SwOn:     mov bx, 0b800h
-            mov es, bx
-            mov bx, 160d * 5d + 80d         ; setting position on screen
-
-            mov ah, 4eh                     ; setting color for print
-            mov al, 2Bh                     ; '+'
-            mov es:[bx], ax
+@@SwOn:     call DisplayRegs
 
             mov cl, 01h
             mov cs:[di], cl                 ; set status = 1
@@ -79,11 +66,11 @@ NewInt      proc
             mov bx, 160d * 5d + 80d         ; setting position on screen
 
             mov ah, 4eh                     ; setting color for print
-            mov al, cl                     ; space
+            mov al, cl                      ; space
             mov es:[bx], ax
 
 
-@@Exit:     pop es di cx bx ax
+@@Exit:     pop es sp bp di si dx cx bx ax  ; register back
 
             pushf                           ; putting flags to stack for int call immitation
             db 09ah                         ; call far
@@ -119,6 +106,67 @@ CodeFromPort    proc
 
                 ret
                 endp
+;-------------------------------------------------------------------------------
+
+ShowReg macro name, value
+        mov cx, name
+        mov di, bx
+        mov ah, 05h
+        mov al, ch 
+        stosw
+        mov al, cl 
+        stosw
+
+        add bx, 12d
+
+
+        mov si, [value]
+        call ToHex
+        add bx, 160d - 10d * 2d 
+
+        endm
+
+;-------------------------------------------------------------------------------
+; Draws rectangle and shows all registers in screen
+;-------------------------------------------------------------------------------
+; Entry:        None
+; Exit:         None
+; Expects:      None
+; Destroys:     BX, ES
+;-------------------------------------------------------------------------------
+DisplayRegs     proc
+                push bp                 ; saving old base pointer
+                push di                 ; status var address
+                mov bp, sp
+
+                mov bx, 0b800h
+                mov es, bx
+                mov bx, 02h             ; point to left higher point
+
+                ; DRAWING FRAME ;
+                mov di, offset symbols
+                mov cx, 14d
+                mov dx, 12d
+                call DrawRect
+
+                mov bx, 160d + 4d
+
+                ShowReg "AX" bp+11
+                ShowReg "BX" bp+10
+                ShowReg "CX" bp+9
+                ShowReg "DX" bp+8
+                ShowReg "SI" bp+7
+                ShowReg "DI" bp+6
+                ShowReg "BP" bp+5
+                ShowReg "SP" bp+4
+                ShowReg "ES" bp+3
+
+                pop di
+                pop bp
+                ret
+                endp
+
+include SMLIB.ASM
 
 ProgEnd:
 end         Start

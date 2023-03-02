@@ -46,7 +46,7 @@ Start:
 	push si	
 
 	mov ax, si
-	call ToBin
+	;call ToBin
 	add bx, 160d - 20d
 
 	pop si
@@ -55,7 +55,7 @@ Start:
 	add bx, 160d
 
 	pop si
-	call ToDec
+	;call ToDec
 		
 	int 20h
 

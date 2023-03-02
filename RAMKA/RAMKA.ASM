@@ -10,12 +10,11 @@ org 100h
 
 locals @@
 
-
 Start:	
-				mov bx, 0082h
+				mov bx, 0082h			; TODO: constant
 				call ReadNumber			; ax -> line
 
-				mov si, 160d 
+				mov si, 80d * 2d 		
 				mul si					; ax *= 10
 				mov di, ax 				; si = ax
 
@@ -123,10 +122,10 @@ Start:
 				int 20h					; exit(0)
 
 ; MODE = 3 ;
-@@Parse3:		mov cx, 08h
+@@Parse3:		mov cx, 08h				; TODO: describe modes
 				lea di, arguments
-
-@@Loop3:		mov word ptr [di], 052ah
+										; loop can bwithout @@
+@@Loop3:		mov word ptr [di], 052ah; red star
 				inc di
 				inc di
 				loop @@Loop3
@@ -199,7 +198,7 @@ Start:
 				call RectText
 
 				int 20h					; exit(0)
-				ret
+				ret ; base
 
 ;-----------------------------------------------------------
 ; Reads command line int arguments
@@ -232,6 +231,7 @@ ReadNumber		proc
 @@Exit:			inc bl						; bx++
 				ret
 				endp
+;-----------------------------------------------------------
 
 
 ;-----------------------------------------------------------
@@ -262,6 +262,7 @@ ReadText		proc
 
 				ret
 				endp
+;-----------------------------------------------------------
 
 
 include ..\LIBA.ASM

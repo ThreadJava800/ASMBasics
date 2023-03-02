@@ -1,6 +1,8 @@
 .data
 	ErrorMsg: db 0Ah, 'This symbol is not allowed!$'
 
+	symbArr   db "0123456789ABCDEF"
+
 .code
 
 ;-----------------------------------------------------------
@@ -48,66 +50,26 @@ ToBin		proc
 ;-----------------------------------------------------------
 ; Print hex of value
 ;-----------------------------------------------------------
-; Entry: 	SI = value to convert to
-;			BX = coordinates to print in cmd 
-; Exit:		None
+; Entry: 		SI = value to convert to
+;				BX = coordinates to print in cmd 
+; Exit:			None
 ; Expects:  	ES -> videomem (b800h)
-; Destroys: 	AX, BX, CX, DX, DI, BP, SP
+; Destroys: 	BX, CX, DX, SI, DI
 ;----------------------------------------------------------
-ToHex	proc
+ToHex			proc
+				mov cx, 04h				; amount of numbers in hex val
+@@Loop:			mov di, 0Fh 			; byte mask
+				and di, si 				; first num
 
-				mov dx, 8000h		; first byte is 1 others are 0
-				mov cx, 0004h		; cx = 0 
-				mov di, 0000h		
+				mov dl, [cs:[symbArr] + di]
+				mov dh, 05h
+				mov es:[bx], dx
 
-@@ReadBytes:
-				inc ch				; ch++ (byte counter in 4th)
-				cmp ch, 05h			; if ch == 5: exit else: continue
-				je @@Exit
-				jmp @@Proceed4bit
+				dec bx
+				dec bx
 
-@@Proceed4bit:
-				mov ax, si			; ax = si (given value)
-				and ax, dx			; ax && ax
-				
-				cmp ax, 00h			; if ax == 0: SkipMul()
-				je @@SkipMul
-				
-				mov al, 01h			; al = 1 (value to add)
-				mov ah, 00h			; ah = 0 (needed not to brake ax)
-				sub cl, 1			; cl-- (bit num)
-				shl al, cl			; al = 2^cl
-				add cl, 1			; cl++
-				add di, ax			; di += ax (di - result to print)
-
-@@SkipMul:
-				sub cl, 1			; cl--
-				shr dx, 1			; dx /= 2
-				
-				cmp cl, 00h	
-				je @@PrintSymbol
-				jmp @@Proceed4bit	; if cl == 0: Print else continue reading byte
-	
-@@PrintSymbol:
-				mov ax, di			; ax = di
-				mov ah, 05h			; ah = 05h (COLOR)
-
-				cmp al, 10d			; if al >= 10: PrintAsLetter
-				jae @@LetterPrint
-
-				add al, 30h			; else: al += 30h -> print as ASCII
-				jmp @@ContinuePrint
-
-@@LetterPrint:
-				add al, 37h			; al += 37 -> add letter as ASCII
-				jmp @@ContinuePrint	
-
-@@ContinuePrint:
-				mov es:[bx], ax		; put ax to videomem
-				add bx, 2			; bx += 2
-				mov di, 00h			; di = 0
-				mov cl, 04h			; cl = 4 (byte count)
-				jmp @@ReadBytes 
+				shr si, 4
+				loop @@Loop
 
 @@Exit:
 				ret
@@ -304,7 +266,7 @@ DrawRect		proc
 		
 @@Right:		mov bp, [di + 6d]
 				mov es:[bx], bp
-				jmp @@ContinueSecond
+				jmp @@ContinueSecond		; разные функции для границ
 
 @@Exit:			pop bp
 				ret
