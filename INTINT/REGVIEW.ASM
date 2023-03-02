@@ -5,7 +5,7 @@
     status: dw 0                        ; whether on or off
 
 .code
-
+;
 org 100h
 
 locals @@
@@ -49,16 +49,19 @@ Start:      ; KEYBOARD SETUP ;
             inc dx                          ; trunc(dx)
             int 21h
 
+            ; call VidToArr
+            ; call ArrToVid
+
             ret
 
-
+;------------------------------------------------------------------------------------
 NewInt      proc
             push ax bx cx dx si di bp sp es ; saving registers
 
             call CodeFromPort
             cmp cl, 1Dh                     ; ctrl
             je @@OnOff
-            jmp @@Else                      ; if ctrl pressed read next
+            jmp @@Exit                      ; if ctrl pressed read next
 
 @@OnOff:    lea di, cs:status
             mov cl, cs:[di]                 ; di = status
@@ -69,21 +72,16 @@ NewInt      proc
 @@SwOff:    mov cl, 00h
             mov cs:[di], cl                 ; set status = 0
 
+            call ArrToVid
+
             jmp @@Exit
 
 @@SwOn:     mov cl, 01h
             mov cs:[di], cl                 ; set status = 1
 
+            call VidToArr
+
             jmp @@Exit
-
-
-@@Else:     mov bx, 0b800h
-            mov es, bx
-            mov bx, 160d * 5d + 80d         ; setting position on screen
- 
-            mov ah, 4eh                     ; setting color for print
-            mov al, cl                      ; space
-            mov es:[bx], ax
 
 
 @@Exit:     pop es sp bp di si dx cx bx ax  ; register back
@@ -96,8 +94,8 @@ oldIntSeg   dw 0
             iret                            ; return from interruption 
                                             ; (iret does popf automatically)
             endp
-
-
+;------------------------------------------------------------------------------------
+;------------------------------------------------------------------------------------
 NewInt08h       proc
 
                 push ax bx cx dx si di bp sp es
@@ -117,9 +115,9 @@ oldIntAd08      dw 0
 oldIntSeg08     dw 0
 
                 iret                            ; return from interruption 
-                                              ; (iret does popf automatically)
+                                                ; (iret does popf automatically)
                 endp
-
+;------------------------------------------------------------------------------------
 
 ;------------------------------------------------------------------------------
 ; Gets scan code from 61st port and puts it to register
@@ -145,8 +143,94 @@ CodeFromPort    proc
 
                 ret
                 endp
-;-------------------------------------------------------------------------------
 
+
+video: dw 11d * 14d dup (0)
+
+;-------------------------------------------------------------------------------
+; Saves videomem to array
+;-------------------------------------------------------------------------------
+; Entry:        None
+; Exit:         video
+; Expects:      ES -> videomem (0b800h)
+; Destroys:     AX, BX, CX, DX, DI
+;-------------------------------------------------------------------------------
+VidToArr        proc
+
+                mov bx, 0b800h
+                mov es, bx
+
+                xor bx, bx                      ; bx = 0
+                xor ax, ax                      ; i = 0
+                lea di, video
+
+@@ReadRow:      inc ax
+                mov cx, 14d                     ; j = 14 * 2
+
+@@ReadLine:     mov dx, es:[bx]
+                mov cs:[di], dx                 ; put val from arr to vidmem
+                inc bx
+                inc bx                          ; bx += 2
+
+                inc di
+                inc di                          ; di += 2
+
+                loop @@ReadLine
+
+                add bx, 160d - 14d * 2d
+
+                cmp ax, 11d
+                jne @@ReadRow
+
+                ret
+                endp
+
+;-------------------------------------------------------------------------------
+; Build videomem from array
+;-------------------------------------------------------------------------------
+; Entry:        video
+; Exit:         videomem
+; Expects:      ES -> videomem (0b800h)
+; Destroys:     
+;-------------------------------------------------------------------------------
+ArrToVid        proc
+
+                mov bx, 0b800h
+                mov es, bx
+
+                xor bx, bx                      ; bx = 0
+                xor ax, ax                      ; ax = 0
+                lea di, video
+
+@@ReadRow:      inc ax
+                mov cx, 14d                     ; j = 14
+
+@@ReadLine:     mov dx, cs:[di]
+                mov es:[bx], dx
+                inc bx
+                inc bx
+
+                inc di
+                inc di
+
+                loop @@ReadLine
+
+                add bx, 160d - 14d * 2d
+
+                cmp ax, 11d
+                jne @@ReadRow
+
+                ret
+                endp
+
+;-------------------------------------------------------------------------------
+; Videomem to array
+;------------------------------------------------------------------------------
+; Entry:        None
+; Exit:         CL - read symbol
+; Expects:      None
+; Destroys:     AL, CL
+;------------------------------------------------------------------------------
 ShowReg macro name, value
         mov cx, name
         mov di, bx

@@ -1,7 +1,5 @@
-.data
-	symbols: dw 8d dup(042Ah), 0020h
 
-.code
+symbols: dw 8d dup(042Ah), 0020h
 
 ;-----------------------------------------------------------
 ; Print hex of value

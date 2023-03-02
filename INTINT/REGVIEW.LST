@@ -1,4 +1,4 @@
-Turbo Assembler	 Version 4.1	    03/02/23 19:52:28	    Page 1
+Turbo Assembler	 Version 4.1	    03/02/23 23:51:42	    Page 1
 regview.asm
 
 
@@ -9,587 +9,676 @@ regview.asm
       4	0000			     .data
       5	0000  0000			 status: dw 0			     ; whether on or off
       6
-      7	0002			     .code
-      8
-      9				     org 100h
+      7	0002  9A*(0000)			 video:	dw 11d * 14d dup (0)
+      8	0136  9A*(0000)			 image:	dw 11d * 14d dup (0)
+      9	026A  9A*(0000)			 saved:	dw 11d * 14d dup (0)
      10
-     11				     locals @@
+     11	039E			     .code
      12
-     13	0100			     Start:	 ; KEYBOARD SETUP ;
-     14	0100  FA				 cli
-     15	0101  33 DB				 xor bx, bx
-     16	0103  8E C3				 mov es, bx
-     17	0105  BB 0024				 mov bx, 9 * 4
-     18
-     19	0108  26: 8B 07				 mov ax, es:[bx]
-     20	010B  A3 0198r				 mov [oldIntAd], ax
-     21	010E  26: 8B 47	02			 mov ax, es:[bx	+ 2]
-     22	0112  A3 019Ar				 mov [oldIntSeg], ax		 ; saving all data about old interruption
-     23
-     24	0115  26: C7 07	014Fr			 mov es:[bx], offset NewInt
-     25	011A  8C C8				 mov ax, cs
-     26	011C  26: 89 47	02			 mov es:[bx + 2], ax
-     27	0120  FB				 sti				 ; setting our 09h interruption
-     28
-     29						 ; CHRONOMETER SETUP ;
-     30	0121  FA				 cli
-     31	0122  33 DB				 xor bx, bx
-     32	0124  8E C3				 mov es, bx
-     33	0126  BB 0020				 mov bx, 8 * 4
-     34
-     35	0129  26: 8B 07				 mov ax, es:[bx]
-     36	012C  A3 01BFr				 mov [oldIntAd08], ax
-     37	012F  26: 8B 47	02			 mov ax, es:[bx	+ 2]
-     38	0133  A3 01C1r				 mov [oldIntSeg08], ax		   ; saving all	data about old interruption
-     39
-     40	0136  26: C7 07	019Dr			 mov es:[bx], offset NewInt08h
-     41	013B  8C C8				 mov ax, cs
-     42	013D  26: 89 47	02			 mov es:[bx + 2], ax
-     43	0141  FB				 sti				 ; setting our 08h interruption
-     44
-     45						 ; SAVING PROGRAM IN MEMORY ;
-     46	0142  B8 3100				 mov ax, 3100h			 ; code	for exiting program leaving it in memory
-     47	0145  BA 03E5r				 mov dx, offset	ProgEnd		 ; amount of memory to keep resident
-     48	0148  C1 EA 04				 shr dx, 4			 ; dx /= 16 (as	paragraph == 16	byte)
-     49	014B  42				 inc dx				 ; trunc(dx)
-     50	014C  CD 21				 int 21h
-     51
-     52	014E  C3				 ret
-     53
-     54
-     55	014F			     NewInt	 proc
-     56	014F  50 53 51 52 56 57	55+		 push ax bx cx dx si di	bp sp es ; saving registers
-     57	      54 06
-Turbo Assembler	 Version 4.1	    03/02/23 19:52:28	    Page 2
+     13				     org 100h
+     14
+     15				     locals @@
+     16
+     17	0100			     Start:	 ; KEYBOARD SETUP ;
+     18	0100  FA				 cli
+     19	0101  33 DB				 xor bx, bx
+     20	0103  8E C3				 mov es, bx
+     21	0105  BB 0024				 mov bx, 9 * 4
+     22
+     23	0108  26: 8B 07				 mov ax, es:[bx]
+     24	010B  A3 018Fr				 mov [oldIntAd], ax
+     25	010E  26: 8B 47	02			 mov ax, es:[bx	+ 2]
+     26	0112  A3 0191r				 mov [oldIntSeg], ax		 ; saving all data about old interruption
+     27
+     28	0115  26: C7 07	014Fr			 mov es:[bx], offset NewInt
+     29	011A  8C C8				 mov ax, cs
+     30	011C  26: 89 47	02			 mov es:[bx + 2], ax
+     31	0120  FB				 sti				 ; setting our 09h interruption
+     32
+     33						 ; CHRONOMETER SETUP ;
+     34	0121  FA				 cli
+     35	0122  33 DB				 xor bx, bx
+     36	0124  8E C3				 mov es, bx
+     37	0126  BB 0020				 mov bx, 8 * 4
+     38
+     39	0129  26: 8B 07				 mov ax, es:[bx]
+     40	012C  A3 01B6r				 mov [oldIntAd08], ax
+     41	012F  26: 8B 47	02			 mov ax, es:[bx	+ 2]
+     42	0133  A3 01B8r				 mov [oldIntSeg08], ax		   ; saving all	data about old interruption
+     43
+     44	0136  26: C7 07	0194r			 mov es:[bx], offset NewInt08h
+     45	013B  8C C8				 mov ax, cs
+     46	013D  26: 89 47	02			 mov es:[bx + 2], ax
+     47	0141  FB				 sti				 ; setting our 08h interruption
+     48
+     49						 ; SAVING PROGRAM IN MEMORY ;
+     50	0142  B8 3100				 mov ax, 3100h			 ; code	for exiting program leaving it in memory
+     51	0145  BA 042Br				 mov dx, offset	ProgEnd		 ; amount of memory to keep resident
+     52	0148  C1 EA 04				 shr dx, 4			 ; dx /= 16 (as	paragraph == 16	byte)
+     53	014B  42				 inc dx				 ; trunc(dx)
+     54	014C  CD 21				 int 21h
+     55
+     56						 ; call	VidToArr
+     57
+Turbo Assembler	 Version 4.1	    03/02/23 23:51:42	    Page 2
 regview.asm
 
 
 
-     58
-     59	0158  E8 0069				 call CodeFromPort
-     60	015B  80 F9 1D				 cmp cl, 1Dh			 ; ctrl
-     61	015E  74 03				 je @@OnOff
-     62	0160  EB 1C 90				 jmp @@Else			 ; if ctrl pressed read	next
-     63
-     64	0163  BF 0000r		     @@OnOff:	 lea di, cs:status
-     65	0166  2E: 8A 0D				 mov cl, cs:[di]		 ; di =	status
-     66
-     67	0169  80 F9 00				 cmp cl, 00h			 ; if isOff: switchOn
-     68	016C  74 08				 je @@SwOn			 ; else: SwitchOff
+     58	014E  C3				 ret
+     59
+     60				     ;------------------------------------------------------------------------------------
+     61	014F			     NewInt	 proc
+     62	014F  50 53 51 52 56 57	55+		 push ax bx cx dx si di	bp sp es ; saving registers
+     63	      54 06
+     64
+     65	0158  E8 0060				 call CodeFromPort
+     66	015B  80 F9 1D				 cmp cl, 1Dh			 ; ctrl
+     67	015E  74 03				 je @@OnOff
+     68	0160  EB 22 90				 jmp @@Exit			 ; if ctrl pressed read	next
      69
-     70	016E  B1 00		     @@SwOff:	 mov cl, 00h
-     71	0170  2E: 88 0D				 mov cs:[di], cl		 ; set status =	0
+     70	0163  BF 0000r		     @@OnOff:	 lea di, cs:status
+     71	0166  2E: 8A 0D				 mov cl, cs:[di]		 ; di =	status
      72
-     73	0173  EB 18 90				 jmp @@Exit
-     74
-     75	0176  B1 01		     @@SwOn:	 mov cl, 01h
-     76	0178  2E: 88 0D				 mov cs:[di], cl		 ; set status =	1
-     77
-     78	017B  EB 10 90				 jmp @@Exit
-     79
+     73	0169  80 F9 00				 cmp cl, 00h			 ; if isOff: switchOn
+     74	016C  74 0B				 je @@SwOn			 ; else: SwitchOff
+     75
+     76	016E  B1 00		     @@SwOff:	 mov cl, 00h
+     77	0170  2E: 88 0D				 mov cs:[di], cl		 ; set status =	0
+     78
+     79	0173  E8 007E				 call ArrToVid
      80
-     81	017E  BB B800		     @@Else:	 mov bx, 0b800h
-     82	0181  8E C3				 mov es, bx
-     83	0183  BB 0370				 mov bx, 160d *	5d + 80d	 ; setting position on screen
-     84
-     85	0186  B4 4E				 mov ah, 4eh			 ; setting color for print
-     86	0188  8A C1				 mov al, cl			 ; space
-     87	018A  26: 89 07				 mov es:[bx], ax
-     88
+     81	0176  EB 0C 90				 jmp @@Exit
+     82
+     83	0179  B1 01		     @@SwOn:	 mov cl, 01h
+     84	017B  2E: 88 0D				 mov cs:[di], cl		 ; set status =	1
+     85
+     86	017E  E8 004D				 call VidToArr
+     87
+     88	0181  EB 01 90				 jmp @@Exit
      89
-     90	018D  07 5C 5D 5F 5E 5A	59+  @@Exit:	 pop es	sp bp di si dx cx bx ax	 ; register back
-     91	      5B 58
-     92
-     93	0196  9C				 pushf				 ; putting flags to stack for int call immitation
-     94	0197  9A				 db 09ah			 ; call	far
-     95	0198  0000		     oldIntAd	 dw 0
-     96	019A  0000		     oldIntSeg	 dw 0
-     97
-     98	019C  CF				 iret				 ; return from interruption
-     99										 ; (iret does popf automatically)
-    100	019D					 endp
-    101
-    102
-    103	019D			     NewInt08h	     proc
-    104
-    105	019D  50 53 51 52 56 57	55+		     push ax bx	cx dx si di bp sp es
-    106	      54 06
-    107
-    108	01A6  BF 0000r				     lea di, cs:status
-    109	01A9  2E: 8A 0D				     mov cl, cs:[di]		     ; di = status
-    110	01AC  80 F9 00				     cmp cl, 00h
-    111	01AF  74 03				     je	@@Exit
-    112
-    113	01B1  E8 0023				     call DisplayRegs
-    114
-Turbo Assembler	 Version 4.1	    03/02/23 19:52:28	    Page 3
+     90
+     91	0184  07 5C 5D 5F 5E 5A	59+  @@Exit:	 pop es	sp bp di si dx cx bx ax	 ; register back
+     92	      5B 58
+     93
+     94	018D  9C				 pushf				 ; putting flags to stack for int call immitation
+     95	018E  9A				 db 09ah			 ; call	far
+     96	018F  0000		     oldIntAd	 dw 0
+     97	0191  0000		     oldIntSeg	 dw 0
+     98
+     99	0193  CF				 iret				 ; return from interruption
+    100										 ; (iret does popf automatically)
+    101	0194					 endp
+    102				     ;------------------------------------------------------------------------------------
+    103				     ;------------------------------------------------------------------------------------
+    104	0194			     NewInt08h	     proc
+    105
+    106	0194  50 53 51 52 56 57	55+		     push ax bx	cx dx si di bp sp es
+    107	      54 06
+    108
+    109	019D  BF 0000r				     lea di, cs:status
+    110	01A0  2E: 8A 0D				     mov cl, cs:[di]		     ; di = status
+    111	01A3  80 F9 00				     cmp cl, 00h
+    112	01A6  74 03				     je	@@Exit
+    113
+    114	01A8  E8 0072				     call DisplayRegs
+Turbo Assembler	 Version 4.1	    03/02/23 23:51:42	    Page 3
 regview.asm
 
 
 
-    115	01B4  07 5C 5D 5F 5E 5A	59+  @@Exit:	     pop es sp bp di si	dx cx bx ax  ; register	back
-    116	      5B 58
-    117
-    118	01BD  9C				     pushf			     ; putting flags to	stack for int call immitation
-    119	01BE  9A				     db	09ah			     ; call far
-    120	01BF  0000		     oldIntAd08	     dw	0
-    121	01C1  0000		     oldIntSeg08     dw	0
-    122
-    123	01C3  CF				     iret			     ; return from interruption
-    124										   ; (iret does	popf automatically)
-    125	01C4					     endp
-    126
-    127
-    128				     ;------------------------------------------------------------------------------
-    129				     ; Gets scan code from 61st	port and puts it to register
-    130				     ;------------------------------------------------------------------------------
-    131				     ; Entry:	     None
-    132				     ; Exit:	     CL	- read symbol
-    133				     ; Expects:	     None
-    134				     ; Destroys:     AL, CL
-    135				     ;------------------------------------------------------------------------------
-    136	01C4			     CodeFromPort    proc
-    137	01C4  E4 60				     in	al, 60h
-    138	01C6  8A C8				     mov cl, al
-    139
-    140	01C8  E4 61				     in	al, 61h			     ; get data	from 61	port
-    141
-    142	01CA  0C 80				     or	al, 80h			     ; setting first bit = 1
-    143	01CC  E6 61				     out 61h, al
-    144	01CE  24 7F				     and al, not 80h
-    145	01D0  E6 61				     out 61h, al		     ; blinking
-    146
-    147	01D2  B0 20				     mov al, 20h
-    148	01D4  E6 20				     out 20h, al		     ; sending verification to int controller
-    149
-    150	01D6  C3				     ret
-    151	01D7					     endp
-    152				     ;-------------------------------------------------------------------------------
-    153
-    154				     ShowReg macro name, value
-    155					     mov cx, name
-    156					     mov di, bx
-    157					     mov ah, 05h
-    158					     mov al, ch
-    159					     stosw
-    160					     mov al, cl
-    161					     stosw
+    115
+    116	01AB  07 5C 5D 5F 5E 5A	59+  @@Exit:	     pop es sp bp di si	dx cx bx ax  ; register	back
+    117	      5B 58
+    118
+    119	01B4  9C				     pushf			     ; putting flags to	stack for int call immitation
+    120	01B5  9A				     db	09ah			     ; call far
+    121	01B6  0000		     oldIntAd08	     dw	0
+    122	01B8  0000		     oldIntSeg08     dw	0
+    123
+    124	01BA  CF				     iret			     ; return from interruption
+    125										     ; (iret does popf automatically)
+    126	01BB					     endp
+    127				     ;------------------------------------------------------------------------------------
+    128
+    129				     ;------------------------------------------------------------------------------
+    130				     ; Gets scan code from 61st	port and puts it to register
+    131				     ;------------------------------------------------------------------------------
+    132				     ; Entry:	     None
+    133				     ; Exit:	     CL	- read symbol
+    134				     ; Expects:	     None
+    135				     ; Destroys:     AL, CL
+    136				     ;------------------------------------------------------------------------------
+    137	01BB			     CodeFromPort    proc
+    138	01BB  E4 60				     in	al, 60h
+    139	01BD  8A C8				     mov cl, al
+    140
+    141	01BF  E4 61				     in	al, 61h			     ; get data	from 61	port
+    142
+    143	01C1  0C 80				     or	al, 80h			     ; setting first bit = 1
+    144	01C3  E6 61				     out 61h, al
+    145	01C5  24 7F				     and al, not 80h
+    146	01C7  E6 61				     out 61h, al		     ; blinking
+    147
+    148	01C9  B0 20				     mov al, 20h
+    149	01CB  E6 20				     out 20h, al		     ; sending verification to int controller
+    150
+    151	01CD  C3				     ret
+    152	01CE					     endp
+    153				     ;-------------------------------------------------------------------------------
+    154				     ; Saves videomem to array
+    155				     ;-------------------------------------------------------------------------------
+    156				     ; Entry:	     None
+    157				     ; Exit:	     video
+    158				     ; Expects:	     ES	-> videomem (0b800h)
+    159				     ; Destroys:     AX, BX, CX, DX, DI
+    160				     ;-------------------------------------------------------------------------------
+    161	01CE			     VidToArr	     proc
     162
-    163					     add bx, 12d
-    164
+    163	01CE  BB B800				     mov bx, 0b800h
+    164	01D1  8E C3				     mov es, bx
     165
-    166					     mov si, [value]
-    167					     call ToHex
-    168					     add bx, 160d - 10d	* 2d
+    166	01D3  33 DB				     xor bx, bx			     ; bx = 0
+    167	01D5  33 C0				     xor ax, ax			     ; i = 0
+    168	01D7  BF 0002r				     lea di, video
     169
-    170					     endm
-    171
-Turbo Assembler	 Version 4.1	    03/02/23 19:52:28	    Page 4
+    170	01DA  40		     @@ReadRow:	     inc ax
+    171	01DB  B9 000E				     mov cx, 14d		     ; j = 14 *	2
+Turbo Assembler	 Version 4.1	    03/02/23 23:51:42	    Page 4
 regview.asm
 
 
 
-    172				     ;-------------------------------------------------------------------------------
-    173				     ; Draws rectangle and shows all registers in screen
-    174				     ;-------------------------------------------------------------------------------
-    175				     ; Entry:	     None
-    176				     ; Exit:	     None
-    177				     ; Expects:	     None
-    178				     ; Destroys:     BX, ES
-    179				     ;-------------------------------------------------------------------------------
-    180	01D7			     DisplayRegs     proc
-    181	01D7  55				     push bp		     ; saving old base pointer
-    182	01D8  57				     push di		     ; status var address
-    183	01D9  8B EC				     mov bp, sp
+    172
+    173	01DE  26: 8B 17		     @@ReadLine:     mov dx, es:[bx]
+    174	01E1  2E: 89 15				     mov cs:[di], dx		     ; put val from arr	to vidmem
+    175	01E4  43				     inc bx
+    176	01E5  43				     inc bx			     ; bx += 2
+    177
+    178	01E6  47				     inc di
+    179	01E7  47				     inc di			     ; di += 2
+    180
+    181	01E8  E2 F4				     loop @@ReadLine
+    182
+    183	01EA  81 C3 0084			     add bx, 160d - 14d	* 2d
     184
-    185	01DB  BB B800				     mov bx, 0b800h
-    186	01DE  8E C3				     mov es, bx
-    187	01E0  BB 0002				     mov bx, 02h	     ; point to	left higher point
-    188
-    189						     ; DRAWING FRAME ;
-    190	01E3  BF 0002r				     mov di, offset symbols
-    191	01E6  B9 000E				     mov cx, 14d
-    192	01E9  BA 000B				     mov dx, 11d
-    193	01EC  E8 0146				     call DrawRect
-    194
-    195	01EF  BB 00A4				     mov bx, 160d + 4d
-    196
-    197						     ShowReg "AX" bp+11
-1   198	01F2  B9 4158			     mov cx, "AX"
-1   199	01F5  8B FB			     mov di, bx
-1   200	01F7  B4 05			     mov ah, 05h
-1   201	01F9  8A C5			     mov al, ch
-1   202	01FB  AB			     stosw
-1   203	01FC  8A C1			     mov al, cl
-1   204	01FE  AB			     stosw
-1   205
-1   206	01FF  83 C3 0C			     add bx, 12d
-1   207
-1   208
-1   209	0202  8B 76 0B			     mov si, [bp+11]
-1   210	0205  E8 00D7			     call ToHex
-1   211	0208  81 C3 008C		     add bx, 160d - 10d	* 2d
-1   212
-    213						     ShowReg "BX" bp+10
-1   214	020C  B9 4258			     mov cx, "BX"
-1   215	020F  8B FB			     mov di, bx
-1   216	0211  B4 05			     mov ah, 05h
-1   217	0213  8A C5			     mov al, ch
-1   218	0215  AB			     stosw
-1   219	0216  8A C1			     mov al, cl
-1   220	0218  AB			     stosw
-1   221
-1   222	0219  83 C3 0C			     add bx, 12d
-1   223
-1   224
-1   225	021C  8B 76 0A			     mov si, [bp+10]
-1   226	021F  E8 00BD			     call ToHex
-1   227	0222  81 C3 008C		     add bx, 160d - 10d	* 2d
-1   228
-Turbo Assembler	 Version 4.1	    03/02/23 19:52:28	    Page 5
+    185	01EE  3D 000B				     cmp ax, 11d
+    186	01F1  75 E7				     jne @@ReadRow
+    187
+    188	01F3  C3				     ret
+    189	01F4					     endp
+    190
+    191				     ;-------------------------------------------------------------------------------
+    192				     ; Build videomem from array
+    193				     ;-------------------------------------------------------------------------------
+    194				     ; Entry:	     video
+    195				     ; Exit:	     videomem
+    196				     ; Expects:	     ES	-> videomem (0b800h)
+    197				     ; Destroys:
+    198				     ;-------------------------------------------------------------------------------
+    199	01F4			     ArrToVid	     proc
+    200
+    201	01F4  BB B800				     mov bx, 0b800h
+    202	01F7  8E C3				     mov es, bx
+    203
+    204	01F9  33 DB				     xor bx, bx			     ; bx = 0
+    205	01FB  33 C0				     xor ax, ax			     ; ax = 0
+    206	01FD  B9 000E				     mov cx, 14d
+    207	0200  BF 0002r				     lea di, video
+    208
+    209	0203  40		     @@ReadRow:	     inc ax
+    210	0204  B9 000E				     mov cx, 14d		     ; j = 14 *	2
+    211
+    212	0207  2E: 8B 15		     @@ReadLine:     mov dx, cs:[di]
+    213	020A  26: 89 17				     mov es:[bx], dx
+    214	020D  43				     inc bx
+    215	020E  43				     inc bx
+    216
+    217	020F  47				     inc di
+    218	0210  47				     inc di
+    219
+    220	0211  E2 F4				     loop @@ReadLine
+    221
+    222	0213  81 C3 0084			     add bx, 160d - 14d	* 2d
+    223
+    224	0217  3D 000B				     cmp ax, 11d
+    225	021A  75 E7				     jne @@ReadRow
+    226
+    227	021C  C3				     ret
+    228	021D					     endp
+Turbo Assembler	 Version 4.1	    03/02/23 23:51:42	    Page 5
 regview.asm
 
 
 
-    229						     ShowReg "CX" bp+9
-1   230	0226  B9 4358			     mov cx, "CX"
-1   231	0229  8B FB			     mov di, bx
-1   232	022B  B4 05			     mov ah, 05h
-1   233	022D  8A C5			     mov al, ch
-1   234	022F  AB			     stosw
-1   235	0230  8A C1			     mov al, cl
-1   236	0232  AB			     stosw
-1   237
-1   238	0233  83 C3 0C			     add bx, 12d
-1   239
-1   240
-1   241	0236  8B 76 09			     mov si, [bp+9]
-1   242	0239  E8 00A3			     call ToHex
-1   243	023C  81 C3 008C		     add bx, 160d - 10d	* 2d
-1   244
-    245						     ShowReg "DX" bp+8
-1   246	0240  B9 4458			     mov cx, "DX"
-1   247	0243  8B FB			     mov di, bx
-1   248	0245  B4 05			     mov ah, 05h
-1   249	0247  8A C5			     mov al, ch
-1   250	0249  AB			     stosw
-1   251	024A  8A C1			     mov al, cl
-1   252	024C  AB			     stosw
-1   253
-1   254	024D  83 C3 0C			     add bx, 12d
-1   255
-1   256
-1   257	0250  8B 76 08			     mov si, [bp+8]
-1   258	0253  E8 0089			     call ToHex
-1   259	0256  81 C3 008C		     add bx, 160d - 10d	* 2d
-1   260
-    261						     ShowReg "SI" bp+7
-1   262	025A  B9 5349			     mov cx, "SI"
-1   263	025D  8B FB			     mov di, bx
-1   264	025F  B4 05			     mov ah, 05h
-1   265	0261  8A C5			     mov al, ch
-1   266	0263  AB			     stosw
-1   267	0264  8A C1			     mov al, cl
-1   268	0266  AB			     stosw
-1   269
-1   270	0267  83 C3 0C			     add bx, 12d
-1   271
-1   272
-1   273	026A  8B 76 07			     mov si, [bp+7]
-1   274	026D  E8 006F			     call ToHex
-1   275	0270  81 C3 008C		     add bx, 160d - 10d	* 2d
-1   276
-    277						     ShowReg "DI" bp+6
-1   278	0274  B9 4449			     mov cx, "DI"
-1   279	0277  8B FB			     mov di, bx
-1   280	0279  B4 05			     mov ah, 05h
-1   281	027B  8A C5			     mov al, ch
-1   282	027D  AB			     stosw
-1   283	027E  8A C1			     mov al, cl
-1   284	0280  AB			     stosw
-1   285
-Turbo Assembler	 Version 4.1	    03/02/23 19:52:28	    Page 6
+    229
+    230				     ;-------------------------------------------------------------------------------
+    231				     ; Videomem	to array
+    232				     ;------------------------------------------------------------------------------
+    233				     ; Entry:	     None
+    234				     ; Exit:	     CL	- read symbol
+    235				     ; Expects:	     None
+    236				     ; Destroys:     AL, CL
+    237				     ;------------------------------------------------------------------------------
+    238				     ShowReg macro name, value
+    239					     mov cx, name
+    240					     mov di, bx
+    241					     mov ah, 05h
+    242					     mov al, ch
+    243					     stosw
+    244					     mov al, cl
+    245					     stosw
+    246
+    247					     add bx, 12d
+    248
+    249
+    250					     mov si, [value]
+    251					     call ToHex
+    252					     add bx, 160d - 10d	* 2d
+    253
+    254					     endm
+    255
+    256				     ;-------------------------------------------------------------------------------
+    257				     ; Draws rectangle and shows all registers in screen
+    258				     ;-------------------------------------------------------------------------------
+    259				     ; Entry:	     None
+    260				     ; Exit:	     None
+    261				     ; Expects:	     None
+    262				     ; Destroys:     BX, ES
+    263				     ;-------------------------------------------------------------------------------
+    264	021D			     DisplayRegs     proc
+    265	021D  55				     push bp		     ; saving old base pointer
+    266	021E  57				     push di		     ; status var address
+    267	021F  8B EC				     mov bp, sp
+    268
+    269	0221  BB B800				     mov bx, 0b800h
+    270	0224  8E C3				     mov es, bx
+    271	0226  BB 0002				     mov bx, 02h	     ; point to	left higher point
+    272
+    273						     ; DRAWING FRAME ;
+    274	0229  BF 039Er				     mov di, offset symbols
+    275	022C  B9 000E				     mov cx, 14d
+    276	022F  BA 000B				     mov dx, 11d
+    277	0232  E8 0146				     call DrawRect
+    278
+    279	0235  BB 00A4				     mov bx, 160d + 4d
+    280
+    281						     ShowReg "AX" bp+11
+1   282	0238  B9 4158			     mov cx, "AX"
+1   283	023B  8B FB			     mov di, bx
+1   284	023D  B4 05			     mov ah, 05h
+1   285	023F  8A C5			     mov al, ch
+Turbo Assembler	 Version 4.1	    03/02/23 23:51:42	    Page 6
 regview.asm
 
 
 
-1   286	0281  83 C3 0C			     add bx, 12d
-1   287
-1   288
-1   289	0284  8B 76 06			     mov si, [bp+6]
-1   290	0287  E8 0055			     call ToHex
-1   291	028A  81 C3 008C		     add bx, 160d - 10d	* 2d
+1   286	0241  AB			     stosw
+1   287	0242  8A C1			     mov al, cl
+1   288	0244  AB			     stosw
+1   289
+1   290	0245  83 C3 0C			     add bx, 12d
+1   291
 1   292
-    293						     ShowReg "BP" bp+5
-1   294	028E  B9 4250			     mov cx, "BP"
-1   295	0291  8B FB			     mov di, bx
-1   296	0293  B4 05			     mov ah, 05h
-1   297	0295  8A C5			     mov al, ch
-1   298	0297  AB			     stosw
-1   299	0298  8A C1			     mov al, cl
-1   300	029A  AB			     stosw
-1   301
-1   302	029B  83 C3 0C			     add bx, 12d
-1   303
-1   304
-1   305	029E  8B 76 05			     mov si, [bp+5]
-1   306	02A1  E8 003B			     call ToHex
-1   307	02A4  81 C3 008C		     add bx, 160d - 10d	* 2d
+1   293	0248  8B 76 0B			     mov si, [bp+11]
+1   294	024B  E8 00D7			     call ToHex
+1   295	024E  81 C3 008C		     add bx, 160d - 10d	* 2d
+1   296
+    297						     ShowReg "BX" bp+10
+1   298	0252  B9 4258			     mov cx, "BX"
+1   299	0255  8B FB			     mov di, bx
+1   300	0257  B4 05			     mov ah, 05h
+1   301	0259  8A C5			     mov al, ch
+1   302	025B  AB			     stosw
+1   303	025C  8A C1			     mov al, cl
+1   304	025E  AB			     stosw
+1   305
+1   306	025F  83 C3 0C			     add bx, 12d
+1   307
 1   308
-    309						     ShowReg "SP" bp+4
-1   310	02A8  B9 5350			     mov cx, "SP"
-1   311	02AB  8B FB			     mov di, bx
-1   312	02AD  B4 05			     mov ah, 05h
-1   313	02AF  8A C5			     mov al, ch
-1   314	02B1  AB			     stosw
-1   315	02B2  8A C1			     mov al, cl
-1   316	02B4  AB			     stosw
-1   317
-1   318	02B5  83 C3 0C			     add bx, 12d
-1   319
-1   320
-1   321	02B8  8B 76 04			     mov si, [bp+4]
-1   322	02BB  E8 0021			     call ToHex
-1   323	02BE  81 C3 008C		     add bx, 160d - 10d	* 2d
+1   309	0262  8B 76 0A			     mov si, [bp+10]
+1   310	0265  E8 00BD			     call ToHex
+1   311	0268  81 C3 008C		     add bx, 160d - 10d	* 2d
+1   312
+    313						     ShowReg "CX" bp+9
+1   314	026C  B9 4358			     mov cx, "CX"
+1   315	026F  8B FB			     mov di, bx
+1   316	0271  B4 05			     mov ah, 05h
+1   317	0273  8A C5			     mov al, ch
+1   318	0275  AB			     stosw
+1   319	0276  8A C1			     mov al, cl
+1   320	0278  AB			     stosw
+1   321
+1   322	0279  83 C3 0C			     add bx, 12d
+1   323
 1   324
-    325						     ShowReg "ES" bp+3
-1   326	02C2  B9 4553			     mov cx, "ES"
-1   327	02C5  8B FB			     mov di, bx
-1   328	02C7  B4 05			     mov ah, 05h
-1   329	02C9  8A C5			     mov al, ch
-1   330	02CB  AB			     stosw
-1   331	02CC  8A C1			     mov al, cl
-1   332	02CE  AB			     stosw
-1   333
-1   334	02CF  83 C3 0C			     add bx, 12d
-1   335
-1   336
-1   337	02D2  8B 76 03			     mov si, [bp+3]
-1   338	02D5  E8 0007			     call ToHex
-1   339	02D8  81 C3 008C		     add bx, 160d - 10d	* 2d
+1   325	027C  8B 76 09			     mov si, [bp+9]
+1   326	027F  E8 00A3			     call ToHex
+1   327	0282  81 C3 008C		     add bx, 160d - 10d	* 2d
+1   328
+    329						     ShowReg "DX" bp+8
+1   330	0286  B9 4458			     mov cx, "DX"
+1   331	0289  8B FB			     mov di, bx
+1   332	028B  B4 05			     mov ah, 05h
+1   333	028D  8A C5			     mov al, ch
+1   334	028F  AB			     stosw
+1   335	0290  8A C1			     mov al, cl
+1   336	0292  AB			     stosw
+1   337
+1   338	0293  83 C3 0C			     add bx, 12d
+1   339
 1   340
-    341
-    342	02DC  5F				     pop di
-Turbo Assembler	 Version 4.1	    03/02/23 19:52:28	    Page 7
+1   341	0296  8B 76 08			     mov si, [bp+8]
+1   342	0299  E8 0089			     call ToHex
+Turbo Assembler	 Version 4.1	    03/02/23 23:51:42	    Page 7
 regview.asm
 
 
 
-    343	02DD  5D				     pop bp
-    344	02DE  C3				     ret
-    345	02DF					     endp
-    346
-    347				     include SMLIB.ASM
-1   348	02DF			     .data
-1   349	0002  08*(042A)	0020		     symbols: dw 8d dup(042Ah),	0020h
-1   350
-1   351	0014			     .code
-1   352
-1   353				     ;-----------------------------------------------------------
-1   354				     ; Print hex of value
-1   355				     ;-----------------------------------------------------------
-1   356				     ; Entry:	     SI	= value	to convert to
-1   357				     ;			     BX	= coordinates to print in cmd
-1   358				     ; Exit:	     None
-1   359				     ; Expects:	     ES	-> videomem (b800h)
-1   360				     ; Destroys:     AX, BX, CX, DX, DI, BP, SP
-1   361				     ;----------------------------------------------------------
-1   362	02DF			     ToHex   proc
-1   363
-1   364	02DF  BA 8000						     mov dx, 8000h	     ; first byte is 1 others are 0
-1   365	02E2  B9 0004						     mov cx, 0004h	     ; cx = 0
-1   366	02E5  BF 0000						     mov di, 0000h
-1   367
-1   368	02E8			     @@ReadBytes:
-1   369	02E8  FE C5						     inc ch			     ; ch++ (byte counter in 4th)
-1   370	02EA  80 FD 05						     cmp ch, 05h		     ; if ch ==	5: exit	else:	    +
-    371				     continue
-1   372	02ED  74 45						     je	@@Exit
-1   373	02EF  EB 01 90						     jmp @@Proceed4bit
-1   374
-1   375	02F2			     @@Proceed4bit:
-1   376	02F2  8B C6						     mov ax, si			     ; ax = si (given value)
-1   377	02F4  23 C2						     and ax, dx			     ; ax && ax
-1   378
-1   379	02F6  3D 0000						     cmp ax, 00h		     ; if ax ==	0: SkipMul()
-1   380	02F9  74 0E						     je	@@SkipMul
-1   381
-1   382	02FB  B0 01						     mov al, 01h		     ; al = 1 (value to	add)
-1   383	02FD  B4 00						     mov ah, 00h		     ; ah = 0 (needed not to brake  +
-    384				     ax)
-1   385	02FF  80 E9 01						     sub cl, 1			     ; cl-- (bit num)
-1   386	0302  D2 E0						     shl al, cl			     ; al = 2^cl
-1   387	0304  80 C1 01						     add cl, 1			     ; cl++
-1   388	0307  03 F8						     add di, ax			     ; di += ax	(di - result to	    +
-    389				     print)
-1   390
-1   391	0309			     @@SkipMul:
-1   392	0309  80 E9 01						     sub cl, 1			     ; cl--
-1   393	030C  D1 EA						     shr dx, 1			     ; dx /= 2
-1   394
-1   395	030E  80 F9 00						     cmp cl, 00h
-1   396	0311  74 02						     je	@@PrintSymbol
-1   397	0313  EB DD						     jmp @@Proceed4bit	     ; if cl ==	0: Print else continue	    +
-    398				     reading byte
-1   399
-Turbo Assembler	 Version 4.1	    03/02/23 19:52:28	    Page 8
+1   343	029C  81 C3 008C		     add bx, 160d - 10d	* 2d
+1   344
+    345						     ShowReg "SI" bp+7
+1   346	02A0  B9 5349			     mov cx, "SI"
+1   347	02A3  8B FB			     mov di, bx
+1   348	02A5  B4 05			     mov ah, 05h
+1   349	02A7  8A C5			     mov al, ch
+1   350	02A9  AB			     stosw
+1   351	02AA  8A C1			     mov al, cl
+1   352	02AC  AB			     stosw
+1   353
+1   354	02AD  83 C3 0C			     add bx, 12d
+1   355
+1   356
+1   357	02B0  8B 76 07			     mov si, [bp+7]
+1   358	02B3  E8 006F			     call ToHex
+1   359	02B6  81 C3 008C		     add bx, 160d - 10d	* 2d
+1   360
+    361						     ShowReg "DI" bp+6
+1   362	02BA  B9 4449			     mov cx, "DI"
+1   363	02BD  8B FB			     mov di, bx
+1   364	02BF  B4 05			     mov ah, 05h
+1   365	02C1  8A C5			     mov al, ch
+1   366	02C3  AB			     stosw
+1   367	02C4  8A C1			     mov al, cl
+1   368	02C6  AB			     stosw
+1   369
+1   370	02C7  83 C3 0C			     add bx, 12d
+1   371
+1   372
+1   373	02CA  8B 76 06			     mov si, [bp+6]
+1   374	02CD  E8 0055			     call ToHex
+1   375	02D0  81 C3 008C		     add bx, 160d - 10d	* 2d
+1   376
+    377						     ShowReg "BP" bp+5
+1   378	02D4  B9 4250			     mov cx, "BP"
+1   379	02D7  8B FB			     mov di, bx
+1   380	02D9  B4 05			     mov ah, 05h
+1   381	02DB  8A C5			     mov al, ch
+1   382	02DD  AB			     stosw
+1   383	02DE  8A C1			     mov al, cl
+1   384	02E0  AB			     stosw
+1   385
+1   386	02E1  83 C3 0C			     add bx, 12d
+1   387
+1   388
+1   389	02E4  8B 76 05			     mov si, [bp+5]
+1   390	02E7  E8 003B			     call ToHex
+1   391	02EA  81 C3 008C		     add bx, 160d - 10d	* 2d
+1   392
+    393						     ShowReg "SP" bp+4
+1   394	02EE  B9 5350			     mov cx, "SP"
+1   395	02F1  8B FB			     mov di, bx
+1   396	02F3  B4 05			     mov ah, 05h
+1   397	02F5  8A C5			     mov al, ch
+1   398	02F7  AB			     stosw
+1   399	02F8  8A C1			     mov al, cl
+Turbo Assembler	 Version 4.1	    03/02/23 23:51:42	    Page 8
 regview.asm
 
 
 
-1   400	0315			     @@PrintSymbol:
-1   401	0315  8B C7						     mov ax, di			     ; ax = di
-1   402	0317  B4 05						     mov ah, 05h		     ; ah = 05h	(COLOR)
+1   400	02FA  AB			     stosw
+1   401
+1   402	02FB  83 C3 0C			     add bx, 12d
 1   403
-1   404	0319  3C 0A						     cmp al, 10d		     ; if al >=	10: PrintAsLetter
-1   405	031B  73 05						     jae @@LetterPrint
-1   406
-1   407	031D  04 30						     add al, 30h		     ; else: al	+= 30h -> print	as  +
-    408				     ASCII
-1   409	031F  EB 06 90						     jmp @@ContinuePrint
-1   410
-1   411	0322			     @@LetterPrint:
-1   412	0322  04 37						     add al, 37h		     ; al += 37	-> add letter as    +
-    413				     ASCII
-1   414	0324  EB 01 90						     jmp @@ContinuePrint
-1   415
-1   416	0327			     @@ContinuePrint:
-1   417	0327  26: 89 07						     mov es:[bx], ax	     ; put ax to videomem
-1   418	032A  83 C3 02						     add bx, 2			     ; bx += 2
-1   419	032D  BF 0000						     mov di, 00h		     ; di = 0
-1   420	0330  B1 04						     mov cl, 04h		     ; cl = 4 (byte count)
-1   421	0332  EB B4						     jmp @@ReadBytes
-1   422
-1   423	0334			     @@Exit:
-1   424	0334  C3						     ret
-1   425	0335							     endp
-1   426
-1   427
-1   428				     ;-------------------------------------------------------------
-1   429				     ; Draws rectangle on screen with given borders
-1   430				     ;-------------------------------------------------------------
-1   431				     ; Entry:	     DI	- pointer to array with	symbols
-1   432				     ;			     BX	- coordinates where to print
-1   433				     ;			     CX	- horizontal size
-1   434				     ;			     DX	- vertical size
-1   435				     ; Exit:	     None
-1   436				     ; Expects:	     ES	-> videomem (0b800h)
-1   437				     ; Destroys:     AX, BX, CX, SI
-1   438				     ;-------------------------------------------------------------
-1   439	0335			     DrawRect		     proc
-1   440	0335  55						     push bp
-1   441	0336  BF 0002r				     lea di, symbols
-1   442
-1   443	0339  83 E9 02						     sub cx, 2
-1   444	033C  8B F2						     mov si, dx				     ; i = dx
-1   445	033E  EB 0C 90						     jmp @@MainCycle
-1   446
-1   447	0341  83 EE 01		     @@IterateI:	     sub si, 1				     ; i--
-1   448
-1   449	0344  2B D9						     sub bx, cx				     ; start vertically
-1   450	0346  2B D9						     sub bx, cx
-1   451	0348  81 C3 00A0					     add bx, 160d		     ; new line
-1   452
-1   453	034C  8B C1		     @@MainCycle:    mov ax, cx				     ; j = cx
-1   454
-1   455	034E  83 EB 02						     sub bx, 2				     ; bx -= 2 (then i += 2 +
-    456				     to	print)
-Turbo Assembler	 Version 4.1	    03/02/23 19:52:28	    Page 9
+1   404
+1   405	02FE  8B 76 04			     mov si, [bp+4]
+1   406	0301  E8 0021			     call ToHex
+1   407	0304  81 C3 008C		     add bx, 160d - 10d	* 2d
+1   408
+    409						     ShowReg "ES" bp+3
+1   410	0308  B9 4553			     mov cx, "ES"
+1   411	030B  8B FB			     mov di, bx
+1   412	030D  B4 05			     mov ah, 05h
+1   413	030F  8A C5			     mov al, ch
+1   414	0311  AB			     stosw
+1   415	0312  8A C1			     mov al, cl
+1   416	0314  AB			     stosw
+1   417
+1   418	0315  83 C3 0C			     add bx, 12d
+1   419
+1   420
+1   421	0318  8B 76 03			     mov si, [bp+3]
+1   422	031B  E8 0007			     call ToHex
+1   423	031E  81 C3 008C		     add bx, 160d - 10d	* 2d
+1   424
+    425
+    426	0322  5F				     pop di
+    427	0323  5D				     pop bp
+    428	0324  C3				     ret
+    429	0325					     endp
+    430
+    431				     include SMLIB.ASM
+1   432	0325			     .data
+1   433	039E  08*(042A)	0020		     symbols: dw 8d dup(042Ah),	0020h
+1   434
+1   435	03B0			     .code
+1   436
+1   437				     ;-----------------------------------------------------------
+1   438				     ; Print hex of value
+1   439				     ;-----------------------------------------------------------
+1   440				     ; Entry:	     SI	= value	to convert to
+1   441				     ;			     BX	= coordinates to print in cmd
+1   442				     ; Exit:	     None
+1   443				     ; Expects:	     ES	-> videomem (b800h)
+1   444				     ; Destroys:     AX, BX, CX, DX, DI, BP, SP
+1   445				     ;----------------------------------------------------------
+1   446	0325			     ToHex   proc
+1   447
+1   448	0325  BA 8000						     mov dx, 8000h	     ; first byte is 1 others are 0
+1   449	0328  B9 0004						     mov cx, 0004h	     ; cx = 0
+1   450	032B  BF 0000						     mov di, 0000h
+1   451
+1   452	032E			     @@ReadBytes:
+1   453	032E  FE C5						     inc ch			     ; ch++ (byte counter in 4th)
+1   454	0330  80 FD 05						     cmp ch, 05h		     ; if ch ==	5: exit	else:	    +
+    455				     continue
+1   456	0333  74 45						     je	@@Exit
+Turbo Assembler	 Version 4.1	    03/02/23 23:51:42	    Page 9
 regview.asm
 
 
 
-1   457
-1   458	0351  83 FE 00						     cmp si, 00h
-1   459	0354  75 40						     jne @@DrawV
-1   460
-1   461	0356  83 C3 02		     @@ContinueMain: add bx, 2				     ; bx += 2 (watch previous comment)
-1   462	0359  83 FE 00						     cmp si, 00h
-1   463	035C  74 03						     je	@@CExit				     ; if i == 0: exit(0)
-1   464	035E  EB 03 90						     jmp @@SecondCycle
+1   457	0335  EB 01 90						     jmp @@Proceed4bit
+1   458
+1   459	0338			     @@Proceed4bit:
+1   460	0338  8B C6						     mov ax, si			     ; ax = si (given value)
+1   461	033A  23 C2						     and ax, dx			     ; ax && ax
+1   462
+1   463	033C  3D 0000						     cmp ax, 00h		     ; if ax ==	0: SkipMul()
+1   464	033F  74 0E						     je	@@SkipMul
 1   465
-1   466	0361  5D		     @@CExit:		     pop bp
-1   467	0362  C3						     ret
-1   468
-1   469	0363  BD 0020		     @@SecondCycle:  mov bp, 0020h
-1   470	0366  26: 89 2F						     mov es:[bx], bp
-1   471
-1   472	0369  3D 0000						     cmp ax, 00h
-1   473	036C  74 4E						     je	@@DrawRightV		     ; print left border (WORKS!)
+1   466	0341  B0 01						     mov al, 01h		     ; al = 1 (value to	add)
+1   467	0343  B4 00						     mov ah, 00h		     ; ah = 0 (needed not to brake  +
+    468				     ax)
+1   469	0345  80 E9 01						     sub cl, 1			     ; cl-- (bit num)
+1   470	0348  D2 E0						     shl al, cl			     ; al = 2^cl
+1   471	034A  80 C1 01						     add cl, 1			     ; cl++
+1   472	034D  03 F8						     add di, ax			     ; di += ax	(di - result to	    +
+    473				     print)
 1   474
-1   475	036E  3B F2						     cmp si, dx
-1   476	0370  74 12						     je	@@DrawH				     ; draw highest border
-1   477
-1   478	0372  83 FE 01						     cmp si, 01h
-1   479	0375  74 16						     je	@@DrawLower		     ; draw lowest border
-1   480
-1   481	0377			     @@ContinueSecond:
-1   482	0377  3D 0000						     cmp ax, 00h
-1   483	037A  74 C5						     je	@@IterateI		     ; if j == 0: i++
-1   484
-1   485	037C  2D 0001						     sub ax, 1				     ; else: j--
-1   486	037F  83 C3 02						     add bx, 2				     ; bx += 2
-1   487	0382  EB DF						     jmp @@SecondCycle
-1   488
-1   489	0384  2E: 8B 6D	02	     @@DrawH:		     mov bp, cs:[di + 2d]
-1   490	0388  26: 89 2F						     mov es:[bx], bp
-1   491	038B  EB EA						     jmp @@ContinueSecond
-1   492
-1   493	038D  2E: 8B 6D	06	     @@DrawLower:    mov bp, cs:[di + 6d]
-1   494	0391  26: 89 2F						     mov es:[bx], bp
-1   495	0394  EB E1						     jmp @@ContinueSecond
-1   496
-1   497	0396  83 FE 01		     @@DrawV:		     cmp si, 01h
-1   498	0399  74 0F						     je	@@LowLeft
-1   499	039B  3B F2						     cmp si, dx
-1   500	039D  74 03						     je	@@HighLeft
-1   501	039F  EB 12 90						     jmp @@Left				 ; TODO: all labels !!!!! ->+
-    502				     functions
-1   503
-1   504	03A2  2E: 8B 2D		     @@HighLeft:	     mov bp, cs:[di]
-1   505	03A5  26: 89 2F						     mov es:[bx], bp
-1   506	03A8  EB AC						     jmp @@ContinueMain
-1   507
-1   508	03AA  2E: 8B 6D	06	     @@LowLeft:		     mov bp, cs:[di + 6d]
-1   509	03AE  26: 89 2F						     mov es:[bx], bp
-1   510	03B1  EB A3						     jmp @@ContinueMain
+1   475	034F			     @@SkipMul:
+1   476	034F  80 E9 01						     sub cl, 1			     ; cl--
+1   477	0352  D1 EA						     shr dx, 1			     ; dx /= 2
+1   478
+1   479	0354  80 F9 00						     cmp cl, 00h
+1   480	0357  74 02						     je	@@PrintSymbol
+1   481	0359  EB DD						     jmp @@Proceed4bit	     ; if cl ==	0: Print else continue	    +
+    482				     reading byte
+1   483
+1   484	035B			     @@PrintSymbol:
+1   485	035B  8B C7						     mov ax, di			     ; ax = di
+1   486	035D  B4 05						     mov ah, 05h		     ; ah = 05h	(COLOR)
+1   487
+1   488	035F  3C 0A						     cmp al, 10d		     ; if al >=	10: PrintAsLetter
+1   489	0361  73 05						     jae @@LetterPrint
+1   490
+1   491	0363  04 30						     add al, 30h		     ; else: al	+= 30h -> print	as  +
+    492				     ASCII
+1   493	0365  EB 06 90						     jmp @@ContinuePrint
+1   494
+1   495	0368			     @@LetterPrint:
+1   496	0368  04 37						     add al, 37h		     ; al += 37	-> add letter as    +
+    497				     ASCII
+1   498	036A  EB 01 90						     jmp @@ContinuePrint
+1   499
+1   500	036D			     @@ContinuePrint:
+1   501	036D  26: 89 07						     mov es:[bx], ax	     ; put ax to videomem
+1   502	0370  83 C3 02						     add bx, 2			     ; bx += 2
+1   503	0373  BF 0000						     mov di, 00h		     ; di = 0
+1   504	0376  B1 04						     mov cl, 04h		     ; cl = 4 (byte count)
+1   505	0378  EB B4						     jmp @@ReadBytes
+1   506
+1   507	037A			     @@Exit:
+1   508	037A  C3						     ret
+1   509	037B							     endp
+1   510
 1   511
-1   512	03B3  2E: 8B 6D	06	     @@Left:		     mov bp, cs:[di + 6d]
-1   513	03B7  26: 89 2F						     mov es:[bx], bp
-Turbo Assembler	 Version 4.1	    03/02/23 19:52:28	    Page 10
+1   512				     ;-------------------------------------------------------------
+1   513				     ; Draws rectangle on screen with given borders
+Turbo Assembler	 Version 4.1	    03/02/23 23:51:42	    Page 10
 regview.asm
 
 
 
-1   514	03BA  EB 9A						     jmp @@ContinueMain
-1   515
-1   516	03BC  83 FE 01		     @@DrawRightV:   cmp si, 01h
-1   517	03BF  74 07						     je	@@LowRight
-1   518	03C1  3B F2						     cmp si, dx
-1   519	03C3  74 0C						     je	@@HighRight
-1   520	03C5  EB 13 90						     jmp @@Right
-1   521
-1   522	03C8  2E: 8B 6D	04	     @@LowRight:	     mov bp, cs:[di + 4d]
-1   523	03CC  26: 89 2F						     mov es:[bx], bp
-1   524	03CF  EB A6						     jmp @@ContinueSecond
-1   525
-1   526	03D1  2E: 8B 6D	02	     @@HighRight:    mov bp, cs:[di + 2d]
-1   527	03D5  26: 89 2F						     mov es:[bx], bp
-1   528	03D8  EB 9D						     jmp @@ContinueSecond
-1   529
-1   530	03DA  2E: 8B 6D	02	     @@Right:		     mov bp, cs:[di + 2d]
-1   531	03DE  26: 89 2F						     mov es:[bx], bp
-1   532	03E1  EB 94						     jmp @@ContinueSecond	     ; разные функции  +
-    533				     для границ
-1   534
-1   535	03E3  5D		     @@Exit:		     pop bp
-1   536	03E4  C3						     ret
-1   537	03E5							     endp
+1   514				     ;-------------------------------------------------------------
+1   515				     ; Entry:	     DI	- pointer to array with	symbols
+1   516				     ;			     BX	- coordinates where to print
+1   517				     ;			     CX	- horizontal size
+1   518				     ;			     DX	- vertical size
+1   519				     ; Exit:	     None
+1   520				     ; Expects:	     ES	-> videomem (0b800h)
+1   521				     ; Destroys:     AX, BX, CX, SI
+1   522				     ;-------------------------------------------------------------
+1   523	037B			     DrawRect		     proc
+1   524	037B  55						     push bp
+1   525	037C  BF 039Er				     lea di, symbols
+1   526
+1   527	037F  83 E9 02						     sub cx, 2
+1   528	0382  8B F2						     mov si, dx				     ; i = dx
+1   529	0384  EB 0C 90						     jmp @@MainCycle
+1   530
+1   531	0387  83 EE 01		     @@IterateI:	     sub si, 1				     ; i--
+1   532
+1   533	038A  2B D9						     sub bx, cx				     ; start vertically
+1   534	038C  2B D9						     sub bx, cx
+1   535	038E  81 C3 00A0					     add bx, 160d		     ; new line
+1   536
+1   537	0392  8B C1		     @@MainCycle:    mov ax, cx				     ; j = cx
 1   538
-    539
-    540	03E5			     ProgEnd:
-    541				     end	 Start
-Turbo Assembler	 Version 4.1	    03/02/23 19:52:28	    Page 11
+1   539	0394  83 EB 02						     sub bx, 2				     ; bx -= 2 (then i += 2 +
+    540				     to	print)
+1   541
+1   542	0397  83 FE 00						     cmp si, 00h
+1   543	039A  75 40						     jne @@DrawV
+1   544
+1   545	039C  83 C3 02		     @@ContinueMain: add bx, 2				     ; bx += 2 (watch previous comment)
+1   546	039F  83 FE 00						     cmp si, 00h
+1   547	03A2  74 03						     je	@@CExit				     ; if i == 0: exit(0)
+1   548	03A4  EB 03 90						     jmp @@SecondCycle
+1   549
+1   550	03A7  5D		     @@CExit:		     pop bp
+1   551	03A8  C3						     ret
+1   552
+1   553	03A9  BD 0020		     @@SecondCycle:  mov bp, 0020h
+1   554	03AC  26: 89 2F						     mov es:[bx], bp
+1   555
+1   556	03AF  3D 0000						     cmp ax, 00h
+1   557	03B2  74 4E						     je	@@DrawRightV		     ; print left border (WORKS!)
+1   558
+1   559	03B4  3B F2						     cmp si, dx
+1   560	03B6  74 12						     je	@@DrawH				     ; draw highest border
+1   561
+1   562	03B8  83 FE 01						     cmp si, 01h
+1   563	03BB  74 16						     je	@@DrawLower		     ; draw lowest border
+1   564
+1   565	03BD			     @@ContinueSecond:
+1   566	03BD  3D 0000						     cmp ax, 00h
+1   567	03C0  74 C5						     je	@@IterateI		     ; if j == 0: i++
+1   568
+1   569	03C2  2D 0001						     sub ax, 1				     ; else: j--
+1   570	03C5  83 C3 02						     add bx, 2				     ; bx += 2
+Turbo Assembler	 Version 4.1	    03/02/23 23:51:42	    Page 11
+regview.asm
+
+
+
+1   571	03C8  EB DF						     jmp @@SecondCycle
+1   572
+1   573	03CA  2E: 8B 6D	02	     @@DrawH:		     mov bp, cs:[di + 2d]
+1   574	03CE  26: 89 2F						     mov es:[bx], bp
+1   575	03D1  EB EA						     jmp @@ContinueSecond
+1   576
+1   577	03D3  2E: 8B 6D	06	     @@DrawLower:    mov bp, cs:[di + 6d]
+1   578	03D7  26: 89 2F						     mov es:[bx], bp
+1   579	03DA  EB E1						     jmp @@ContinueSecond
+1   580
+1   581	03DC  83 FE 01		     @@DrawV:		     cmp si, 01h
+1   582	03DF  74 0F						     je	@@LowLeft
+1   583	03E1  3B F2						     cmp si, dx
+1   584	03E3  74 03						     je	@@HighLeft
+1   585	03E5  EB 12 90						     jmp @@Left				 ; TODO: all labels !!!!! ->+
+    586				     functions
+1   587
+1   588	03E8  2E: 8B 2D		     @@HighLeft:	     mov bp, cs:[di]
+1   589	03EB  26: 89 2F						     mov es:[bx], bp
+1   590	03EE  EB AC						     jmp @@ContinueMain
+1   591
+1   592	03F0  2E: 8B 6D	06	     @@LowLeft:		     mov bp, cs:[di + 6d]
+1   593	03F4  26: 89 2F						     mov es:[bx], bp
+1   594	03F7  EB A3						     jmp @@ContinueMain
+1   595
+1   596	03F9  2E: 8B 6D	06	     @@Left:		     mov bp, cs:[di + 6d]
+1   597	03FD  26: 89 2F						     mov es:[bx], bp
+1   598	0400  EB 9A						     jmp @@ContinueMain
+1   599
+1   600	0402  83 FE 01		     @@DrawRightV:   cmp si, 01h
+1   601	0405  74 07						     je	@@LowRight
+1   602	0407  3B F2						     cmp si, dx
+1   603	0409  74 0C						     je	@@HighRight
+1   604	040B  EB 13 90						     jmp @@Right
+1   605
+1   606	040E  2E: 8B 6D	04	     @@LowRight:	     mov bp, cs:[di + 4d]
+1   607	0412  26: 89 2F						     mov es:[bx], bp
+1   608	0415  EB A6						     jmp @@ContinueSecond
+1   609
+1   610	0417  2E: 8B 6D	02	     @@HighRight:    mov bp, cs:[di + 2d]
+1   611	041B  26: 89 2F						     mov es:[bx], bp
+1   612	041E  EB 9D						     jmp @@ContinueSecond
+1   613
+1   614	0420  2E: 8B 6D	02	     @@Right:		     mov bp, cs:[di + 2d]
+1   615	0424  26: 89 2F						     mov es:[bx], bp
+1   616	0427  EB 94						     jmp @@ContinueSecond	     ; разные функции  +
+    617				     для границ
+1   618
+1   619	0429  5D		     @@Exit:		     pop bp
+1   620	042A  C3						     ret
+1   621	042B							     endp
+1   622
+    623
+    624	042B			     ProgEnd:
+    625				     end	 Start
+Turbo Assembler	 Version 4.1	    03/02/23 23:51:42	    Page 12
 Symbol Table
 
 
@@ -599,39 +688,42 @@ Symbol Name			  Type	 Value
 
 ??DATE				  Text	 "03/02/23"
 ??FILENAME			  Text	 "regview "
-??TIME				  Text	 "19:52:28"
+??TIME				  Text	 "23:51:42"
 ??VERSION			  Number 040A
 @32BIT				  Text	 0
-@@CEXIT				  Near	 DGROUP:0361
-@@CONTINUEMAIN			  Near	 DGROUP:0356
-@@CONTINUEPRINT			  Near	 DGROUP:0327
-@@CONTINUESECOND		  Near	 DGROUP:0377
-@@DRAWH				  Near	 DGROUP:0384
-@@DRAWLOWER			  Near	 DGROUP:038D
-@@DRAWRIGHTV			  Near	 DGROUP:03BC
-@@DRAWV				  Near	 DGROUP:0396
-@@ELSE				  Near	 DGROUP:017E
-@@EXIT				  Near	 DGROUP:018D
-@@EXIT				  Near	 DGROUP:01B4
-@@EXIT				  Near	 DGROUP:0334
-@@EXIT				  Near	 DGROUP:03E3
-@@HIGHLEFT			  Near	 DGROUP:03A2
-@@HIGHRIGHT			  Near	 DGROUP:03D1
-@@ITERATEI			  Near	 DGROUP:0341
-@@LEFT				  Near	 DGROUP:03B3
-@@LETTERPRINT			  Near	 DGROUP:0322
-@@LOWLEFT			  Near	 DGROUP:03AA
-@@LOWRIGHT			  Near	 DGROUP:03C8
-@@MAINCYCLE			  Near	 DGROUP:034C
+@@CEXIT				  Near	 DGROUP:03A7
+@@CONTINUEMAIN			  Near	 DGROUP:039C
+@@CONTINUEPRINT			  Near	 DGROUP:036D
+@@CONTINUESECOND		  Near	 DGROUP:03BD
+@@DRAWH				  Near	 DGROUP:03CA
+@@DRAWLOWER			  Near	 DGROUP:03D3
+@@DRAWRIGHTV			  Near	 DGROUP:0402
+@@DRAWV				  Near	 DGROUP:03DC
+@@EXIT				  Near	 DGROUP:0184
+@@EXIT				  Near	 DGROUP:01AB
+@@EXIT				  Near	 DGROUP:037A
+@@EXIT				  Near	 DGROUP:0429
+@@HIGHLEFT			  Near	 DGROUP:03E8
+@@HIGHRIGHT			  Near	 DGROUP:0417
+@@ITERATEI			  Near	 DGROUP:0387
+@@LEFT				  Near	 DGROUP:03F9
+@@LETTERPRINT			  Near	 DGROUP:0368
+@@LOWLEFT			  Near	 DGROUP:03F0
+@@LOWRIGHT			  Near	 DGROUP:040E
+@@MAINCYCLE			  Near	 DGROUP:0392
 @@ONOFF				  Near	 DGROUP:0163
-@@PRINTSYMBOL			  Near	 DGROUP:0315
-@@PROCEED4BIT			  Near	 DGROUP:02F2
-@@READBYTES			  Near	 DGROUP:02E8
-@@RIGHT				  Near	 DGROUP:03DA
-@@SECONDCYCLE			  Near	 DGROUP:0363
-@@SKIPMUL			  Near	 DGROUP:0309
+@@PRINTSYMBOL			  Near	 DGROUP:035B
+@@PROCEED4BIT			  Near	 DGROUP:0338
+@@READBYTES			  Near	 DGROUP:032E
+@@READLINE			  Near	 DGROUP:01DE
+@@READLINE			  Near	 DGROUP:0207
+@@READROW			  Near	 DGROUP:01DA
+@@READROW			  Near	 DGROUP:0203
+@@RIGHT				  Near	 DGROUP:0420
+@@SECONDCYCLE			  Near	 DGROUP:03A9
+@@SKIPMUL			  Near	 DGROUP:034F
 @@SWOFF				  Near	 DGROUP:016E
-@@SWON				  Near	 DGROUP:0176
+@@SWON				  Near	 DGROUP:0179
 @CODE				  Text	 DGROUP
 @CODESIZE			  Text	 0
 @CPU				  Text	 0707H
@@ -643,25 +735,30 @@ Symbol Name			  Type	 Value
 @MODEL				  Text	 1
 @STACK				  Text	 DGROUP
 @WORDSIZE			  Text	 2
-CODEFROMPORT			  Near	 DGROUP:01C4
-DISPLAYREGS			  Near	 DGROUP:01D7
-DRAWRECT			  Near	 DGROUP:0335
-NEWINT				  Near	 DGROUP:014F
-NEWINT08H			  Near	 DGROUP:019D
-OLDINTAD			  Word	 DGROUP:0198
-OLDINTAD08			  Word	 DGROUP:01BF
-OLDINTSEG			  Word	 DGROUP:019A
-Turbo Assembler	 Version 4.1	    03/02/23 19:52:28	    Page 12
+ARRTOVID			  Near	 DGROUP:01F4
+CODEFROMPORT			  Near	 DGROUP:01BB
+DISPLAYREGS			  Near	 DGROUP:021D
+DRAWRECT			  Near	 DGROUP:037B
+IMAGE				  Near	 DGROUP:0136
+Turbo Assembler	 Version 4.1	    03/02/23 23:51:42	    Page 13
 Symbol Table
 
 
 
-OLDINTSEG08			  Word	 DGROUP:01C1
-PROGEND				  Near	 DGROUP:03E5
+NEWINT				  Near	 DGROUP:014F
+NEWINT08H			  Near	 DGROUP:0194
+OLDINTAD			  Word	 DGROUP:018F
+OLDINTAD08			  Word	 DGROUP:01B6
+OLDINTSEG			  Word	 DGROUP:0191
+OLDINTSEG08			  Word	 DGROUP:01B8
+PROGEND				  Near	 DGROUP:042B
+SAVED				  Near	 DGROUP:026A
 START				  Near	 DGROUP:0100
 STATUS				  Near	 DGROUP:0000
-SYMBOLS				  Near	 DGROUP:0002
-TOHEX				  Near	 DGROUP:02DF
+SYMBOLS				  Near	 DGROUP:039E
+TOHEX				  Near	 DGROUP:0325
+VIDEO				  Near	 DGROUP:0002
+VIDTOARR			  Near	 DGROUP:01CE
 
 Macro Name
 
@@ -670,6 +767,6 @@ SHOWREG
 Groups & Segments		  Bit Size Align  Combine Class
 
 DGROUP				  Group
-  _DATA				  16  0014 Word	  Public  DATA
-  _TEXT				  16  03E5 Word	  Public  CODE
+  _DATA				  16  03B0 Word	  Public  DATA
+  _TEXT				  16  042B Word	  Public  CODE
 
