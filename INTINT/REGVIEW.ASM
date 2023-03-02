@@ -10,7 +10,8 @@ org 100h
 
 locals @@
 
-Start:      cli
+Start:      ; KEYBOARD SETUP ;
+            cli
             xor bx, bx
             mov es, bx
             mov bx, 9 * 4
@@ -23,8 +24,25 @@ Start:      cli
             mov es:[bx], offset NewInt
             mov ax, cs
             mov es:[bx + 2], ax
-            sti
+            sti                             ; setting our 09h interruption
 
+            ; CHRONOMETER SETUP ;
+            cli
+            xor bx, bx
+            mov es, bx
+            mov bx, 8 * 4
+
+            mov ax, es:[bx]
+            mov [oldIntAd08], ax
+            mov ax, es:[bx + 2]
+            mov [oldIntSeg08], ax             ; saving all data about old interruption
+
+            mov es:[bx], offset NewInt08h
+            mov ax, cs
+            mov es:[bx + 2], ax
+            sti                             ; setting our 08h interruption
+
+            ; SAVING PROGRAM IN MEMORY ;
             mov ax, 3100h                   ; code for exiting program leaving it in memory
             mov dx, offset ProgEnd          ; amount of memory to keep resident
             shr dx, 4                       ; dx /= 16 (as paragraph == 16 byte)
@@ -53,9 +71,7 @@ NewInt      proc
 
             jmp @@Exit
 
-@@SwOn:     call DisplayRegs
-
-            mov cl, 01h
+@@SwOn:     mov cl, 01h
             mov cs:[di], cl                 ; set status = 1
 
             jmp @@Exit
@@ -64,7 +80,7 @@ NewInt      proc
 @@Else:     mov bx, 0b800h
             mov es, bx
             mov bx, 160d * 5d + 80d         ; setting position on screen
-
+ 
             mov ah, 4eh                     ; setting color for print
             mov al, cl                      ; space
             mov es:[bx], ax
@@ -80,6 +96,29 @@ oldIntSeg   dw 0
             iret                            ; return from interruption 
                                             ; (iret does popf automatically)
             endp
+
+
+NewInt08h       proc
+
+                push ax bx cx dx si di bp sp es
+
+                lea di, cs:status
+                mov cl, cs:[di]                 ; di = status
+                cmp cl, 00h 
+                je @@Exit
+
+                call DisplayRegs
+
+@@Exit:         pop es sp bp di si dx cx bx ax  ; register back
+
+                pushf                           ; putting flags to stack for int call immitation
+                db 09ah                         ; call far
+oldIntAd08      dw 0
+oldIntSeg08     dw 0
+
+                iret                            ; return from interruption 
+                                              ; (iret does popf automatically)
+                endp
 
 
 ;------------------------------------------------------------------------------
@@ -146,7 +185,7 @@ DisplayRegs     proc
                 ; DRAWING FRAME ;
                 mov di, offset symbols
                 mov cx, 14d
-                mov dx, 12d
+                mov dx, 11d
                 call DrawRect
 
                 mov bx, 160d + 4d
