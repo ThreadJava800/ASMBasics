@@ -56,7 +56,7 @@ Start:      ; KEYBOARD SETUP ;
 
 ;------------------------------------------------------------------------------------
 NewInt      proc
-            push ax bx cx dx si di bp sp es ; saving registers
+            push ax bx cx dx si di bp sp ds es ss ; saving registers
 
             call CodeFromPort
             cmp cl, 1Dh                     ; ctrl
@@ -84,7 +84,7 @@ NewInt      proc
             jmp @@Exit
 
 
-@@Exit:     pop es sp bp di si dx cx bx ax  ; register back
+@@Exit:     pop ss es ds sp bp di si dx cx bx ax  ; register back
 
             pushf                           ; putting flags to stack for int call immitation
             db 09ah                         ; call far
@@ -98,7 +98,7 @@ oldIntSeg   dw 0
 ;------------------------------------------------------------------------------------
 NewInt08h       proc
 
-                push ax bx cx dx si di bp sp es
+                push ax bx cx dx si di bp sp ds es ss
 
                 lea di, cs:status
                 mov cl, cs:[di]                 ; di = status
@@ -107,7 +107,7 @@ NewInt08h       proc
 
                 call DisplayRegs
 
-@@Exit:         pop es sp bp di si dx cx bx ax  ; register back
+@@Exit:         pop ss es ds sp bp di si dx cx bx ax  ; register back
 
                 pushf                           ; putting flags to stack for int call immitation
                 db 09ah                         ; call far
@@ -145,7 +145,7 @@ CodeFromPort    proc
                 endp
 
 
-video: dw 11d * 14d dup (0)
+video: dw 13d * 14d dup (0)
 
 ;-------------------------------------------------------------------------------
 ; Saves videomem to array
@@ -179,7 +179,7 @@ VidToArr        proc
 
                 add bx, 160d - 14d * 2d
 
-                cmp ax, 11d
+                cmp ax, 13d
                 jne @@ReadRow
 
                 ret
@@ -217,7 +217,7 @@ ArrToVid        proc
 
                 add bx, 160d - 14d * 2d
 
-                cmp ax, 11d
+                cmp ax, 13d
                 jne @@ReadRow
 
                 ret
@@ -269,20 +269,22 @@ DisplayRegs     proc
                 ; DRAWING FRAME ;
                 mov di, offset symbols
                 mov cx, 14d
-                mov dx, 11d
+                mov dx, 13d
                 call DrawRect
 
                 mov bx, 160d + 4d
 
-                ShowReg "AX" bp+11
-                ShowReg "BX" bp+10
-                ShowReg "CX" bp+9
-                ShowReg "DX" bp+8
-                ShowReg "SI" bp+7
-                ShowReg "DI" bp+6
-                ShowReg "BP" bp+5
-                ShowReg "SP" bp+4
-                ShowReg "ES" bp+3
+                ShowReg "AX" bp+26
+                ShowReg "BX" bp+24
+                ShowReg "CX" bp+22
+                ShowReg "DX" bp+20
+                ShowReg "SI" bp+18
+                ShowReg "DI" bp+16
+                ShowReg "BP" bp+14
+                ShowReg "SP" bp+12
+                ShowReg "DS" bp+10
+                ShowReg "ES" bp+8
+                ShowReg "SS" bp+6
 
                 pop di
                 pop bp
