@@ -1,0 +1,56 @@
+Turbo Assembler	 Version 4.1	    03/03/23 10:25:44	    Page 1
+check.asm
+
+
+
+      1	0000			     .model tiny
+      2
+      3	0000			     .code
+      4
+      5				     org 100h
+      6
+      7	0100  B8 1111		     Start:	 mov ax, 1111h
+      8	0103  BB 2222				 mov bx, 2222h
+      9	0106  B9 3333				 mov cx, 3333h
+     10	0109  BA 5555				 mov dx, 5555h
+     11
+     12	010C  E4 60		     @@Test:	 in al,	60h
+     13	010E  3C 01				 cmp al, 01h
+     14	0110  75 EE				 jne Start
+     15
+     16	0112  C3				 ret
+     17
+     18				     end Start
+Turbo Assembler	 Version 4.1	    03/03/23 10:25:44	    Page 2
+Symbol Table
+
+
+
+
+Symbol Name			  Type	 Value
+
+??DATE				  Text	 "03/03/23"
+??FILENAME			  Text	 "check	  "
+??TIME				  Text	 "10:25:44"
+??VERSION			  Number 040A
+@32BIT				  Text	 0
+@@TEST				  Near	 DGROUP:010C
+@CODE				  Text	 DGROUP
+@CODESIZE			  Text	 0
+@CPU				  Text	 0101H
+@CURSEG				  Text	 _TEXT
+@DATA				  Text	 DGROUP
+@DATASIZE			  Text	 0
+@FILENAME			  Text	 CHECK
+@INTERFACE			  Text	 000H
+@MODEL				  Text	 1
+@STACK				  Text	 DGROUP
+@WORDSIZE			  Text	 2
+START				  Near	 DGROUP:0100
+
+Groups & Segments		  Bit Size Align  Combine Class
+
+DGROUP				  Group
+  _DATA				  16  0000 Word	  Public  DATA
+  _TEXT				  16  0113 Word	  Public  CODE
+

@@ -1,46 +1,45 @@
 .286                                    ; so shr(4) do not takes 4 commands
 .model tiny
 
-.data
-    status: dw 0                        ; whether on or off
+; DEFINING CONSTANTS ;
+HOT_KEY      equ 2bh                         ; '\'
+FRAME_HEIGHT equ 13d
+FRAME_LENGTH equ 14d
+; CONSTANTS END ;
 
 .code
-;
+
 org 100h
 
 locals @@
 
+;----------------------------------------------------------------------------------
+; Macro that saves old interruption and fills it with own
+;----------------------------------------------------------------------------------
+ReplInt macro oldIntAddr, oldIntSegment, newAddress
+        mov ax, es:[bx]
+        mov [oldIntAddr], ax
+        mov ax, es:[bx + 2]
+        mov [oldIntSegment], ax             ; saving all data about old interruption
+
+        mov es:[bx], offset newAddress
+        mov ax, cs
+        mov es:[bx + 2], ax
+
+        endm
+
 Start:      ; KEYBOARD SETUP ;
-            cli
+            cli                                         ; disable interruptions
             xor bx, bx
             mov es, bx
-            mov bx, 9 * 4
 
-            mov ax, es:[bx]
-            mov [oldIntAd], ax
-            mov ax, es:[bx + 2]
-            mov [oldIntSeg], ax             ; saving all data about old interruption
-
-            mov es:[bx], offset NewInt
-            mov ax, cs
-            mov es:[bx + 2], ax
-            sti                             ; setting our 09h interruption
+            mov bx, 9 * 4                                ; 09 int (keyboard)
+            ReplInt oldIntAd oldIntSeg NewInt
 
             ; CHRONOMETER SETUP ;
-            cli
-            xor bx, bx
-            mov es, bx
             mov bx, 8 * 4
-
-            mov ax, es:[bx]
-            mov [oldIntAd08], ax
-            mov ax, es:[bx + 2]
-            mov [oldIntSeg08], ax             ; saving all data about old interruption
-
-            mov es:[bx], offset NewInt08h
-            mov ax, cs
-            mov es:[bx + 2], ax
-            sti                             ; setting our 08h interruption
+            ReplInt oldIntAd08 oldIntSeg08 NewInt08h    ; 08 int (chronometer)
+            sti                                         ; enable interruption
 
             ; SAVING PROGRAM IN MEMORY ;
             mov ax, 3100h                   ; code for exiting program leaving it in memory
@@ -55,13 +54,15 @@ Start:      ; KEYBOARD SETUP ;
             ret
 
 ;------------------------------------------------------------------------------------
+status: dw 0                        ; whether on or off
+;------------------------------------------------------------------------------------
 NewInt      proc
-            push ax bx cx dx si di bp sp ds es ss ; saving registers
+            push ax bx cx dx si di bp sp ds es ss ; saving regs
 
             call CodeFromPort
-            cmp cl, 1Dh                     ; ctrl
+            cmp cl, HOT_KEY                 ; '\'
             je @@OnOff
-            jmp @@Exit                      ; if ctrl pressed read next
+            jmp @@Exit                      ; if '\' pressed read next
 
 @@OnOff:    lea di, cs:status
             mov cl, cs:[di]                 ; di = status
@@ -84,15 +85,15 @@ NewInt      proc
             jmp @@Exit
 
 
-@@Exit:     pop ss es ds sp bp di si dx cx bx ax  ; register back
+@@Exit:     mov al, 20h
+            out 20h, al                     ; sending verification to int controller
 
-            pushf                           ; putting flags to stack for int call immitation
-            db 09ah                         ; call far
+            pop ss es ds sp bp di si dx cx bx ax  ; register back
+
+            db 0eah                         ; call far
 oldIntAd    dw 0
 oldIntSeg   dw 0
 
-            iret                            ; return from interruption 
-                                            ; (iret does popf automatically)
             endp
 ;------------------------------------------------------------------------------------
 ;------------------------------------------------------------------------------------
@@ -109,13 +110,10 @@ NewInt08h       proc
 
 @@Exit:         pop ss es ds sp bp di si dx cx bx ax  ; register back
 
-                pushf                           ; putting flags to stack for int call immitation
-                db 09ah                         ; call far
+                db 0eah                         ; call far
 oldIntAd08      dw 0
 oldIntSeg08     dw 0
 
-                iret                            ; return from interruption 
-                                                ; (iret does popf automatically)
                 endp
 ;------------------------------------------------------------------------------------
 
@@ -137,9 +135,6 @@ CodeFromPort    proc
                 out 61h, al
                 and al, not 80h
                 out 61h, al                     ; blinking
-
-                mov al, 20h
-                out 20h, al                     ; sending verification to int controller
 
                 ret
                 endp
@@ -165,7 +160,7 @@ VidToArr        proc
                 lea di, video
 
 @@ReadRow:      inc ax
-                mov cx, 14d                     ; j = 14 * 2
+                mov cx, FRAME_LENGTH            ; j = frame.length
 
 @@ReadLine:     mov dx, es:[bx]
                 mov cs:[di], dx                 ; put val from arr to vidmem
@@ -177,9 +172,9 @@ VidToArr        proc
 
                 loop @@ReadLine
 
-                add bx, 160d - 14d * 2d
+                add bx, 160d - 2 * FRAME_LENGTH ; put bx to the beginning of new line
 
-                cmp ax, 13d
+                cmp ax, FRAME_HEIGHT
                 jne @@ReadRow
 
                 ret
@@ -203,7 +198,7 @@ ArrToVid        proc
                 lea di, video
 
 @@ReadRow:      inc ax
-                mov cx, 14d                     ; j = 14
+                mov cx, FRAME_LENGTH            ; j = frame.length
 
 @@ReadLine:     mov dx, cs:[di]
                 mov es:[bx], dx
@@ -215,16 +210,16 @@ ArrToVid        proc
 
                 loop @@ReadLine
 
-                add bx, 160d - 14d * 2d
+                add bx, 160d - 2 * FRAME_LENGTH
 
-                cmp ax, 13d
+                cmp ax, FRAME_HEIGHT            ; put bx to the beginning of new line
                 jne @@ReadRow
 
                 ret
                 endp
 
 ;-------------------------------------------------------------------------------
-; Videomem to array
+; Macros that prints registers on screen
 ;------------------------------------------------------------------------------
 ; Entry:        None
 ; Exit:         CL - read symbol
@@ -233,19 +228,18 @@ ArrToVid        proc
 ;------------------------------------------------------------------------------
 ShowReg macro name, value
         mov cx, name
-        mov di, bx
-        mov ah, 05h
-        mov al, ch 
-        stosw
-        mov al, cl 
+        mov di, bx                  ; di = pos on screen
+        mov ah, 05h                 ; text color
+        mov al, ch                  ; al = first symbol
+        stosw       
+        mov al, cl                  ; al = second symbol
         stosw
 
-        add bx, 12d
-
+        add bx, 6 * 2               ; moving bx for 6 to print hex value backwards
 
         mov si, [value]
         call ToHex
-        add bx, 160d - 10d * 2d 
+        add bx, 160d - 10d * 2d     ; moving to the start of line where to print next reg
 
         endm
 
@@ -268,11 +262,11 @@ DisplayRegs     proc
 
                 ; DRAWING FRAME ;
                 mov di, offset symbols
-                mov cx, 14d
-                mov dx, 13d
+                mov cx, FRAME_LENGTH
+                mov dx, FRAME_HEIGHT
                 call DrawRect
 
-                mov bx, 160d + 4d
+                mov bx, 160d + 4d       ; put bx to the begining of print tex
 
                 ShowReg "AX" bp+26
                 ShowReg "BX" bp+24
@@ -291,7 +285,13 @@ DisplayRegs     proc
                 ret
                 endp
 
+;--------------------------------------------------------
+
 include SMLIB.ASM
 
+;========================================================
 ProgEnd:
+;========================================================
+
 end         Start
+
