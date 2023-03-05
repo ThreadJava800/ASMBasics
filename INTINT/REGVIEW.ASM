@@ -2,7 +2,7 @@
 .model tiny
 
 ; DEFINING CONSTANTS ;
-HOT_KEY      equ 2bh                         ; '\'
+HOT_KEY      equ 36h                         ; right shift
 FRAME_HEIGHT equ 13d
 FRAME_LENGTH equ 14d
 
@@ -51,9 +51,6 @@ Start:      ; KEYBOARD SETUP ;
             inc dx                          ; trunc(dx)
             int 21h
 
-            ; call VidToArr
-            ; call ArrToVid
-
             ret
 
 ;------------------------------------------------------------------------------------
@@ -89,7 +86,7 @@ NewInt      proc
 
             jmp @@Exit
 
-
+ 
 @@Exit:     mov al, 20h
             out 20h, al                           ; sending verification to int controller
 
