@@ -5,6 +5,9 @@
 HOT_KEY      equ 2bh                         ; '\'
 FRAME_HEIGHT equ 13d
 FRAME_LENGTH equ 14d
+
+SCREEN_WIDTH  equ 160d
+SCREEN_HEIGHT equ 25d
 ; CONSTANTS END ;
 
 .code
@@ -24,7 +27,7 @@ ReplInt macro oldIntAddr, oldIntSegment, newAddress
 
         mov es:[bx], offset newAddress
         mov ax, cs
-        mov es:[bx + 2], ax
+        mov es:[bx + 2], ax                 ; pushing addr to our func to int table
 
         endm
 
@@ -73,12 +76,13 @@ NewInt      proc
 @@SwOff:    mov cl, 00h
             mov cs:[di], cl                 ; set status = 0
 
+            lea di, saved
             call ArrToVid
 
             jmp @@Exit
 
 @@SwOn:     mov cl, 01h
-            mov cs:[di], cl                 ; set status = 1
+            mov cs:[di], cl                       ; set status = 1
 
             call VidToArr
 
@@ -86,11 +90,11 @@ NewInt      proc
 
 
 @@Exit:     mov al, 20h
-            out 20h, al                     ; sending verification to int controller
+            out 20h, al                           ; sending verification to int controller
 
             pop ss es ds sp bp di si dx cx bx ax  ; register back
 
-            db 0eah                         ; call far
+            db 0eah                               ; jmp far
 oldIntAd    dw 0
 oldIntSeg   dw 0
 
@@ -102,7 +106,7 @@ NewInt08h       proc
                 push ax bx cx dx si di bp sp ds es ss
 
                 lea di, cs:status
-                mov cl, cs:[di]                 ; di = status
+                mov cl, cs:[di]                       ; di = status
                 cmp cl, 00h 
                 je @@Exit
 
@@ -110,7 +114,7 @@ NewInt08h       proc
 
 @@Exit:         pop ss es ds sp bp di si dx cx bx ax  ; register back
 
-                db 0eah                         ; call far
+                db 0eah                               ; jmp far
 oldIntAd08      dw 0
 oldIntSeg08     dw 0
 
@@ -140,13 +144,15 @@ CodeFromPort    proc
                 endp
 
 
-video: dw 13d * 14d dup (0)
+video: dw FRAME_LENGTH  * FRAME_HEIGHT * 2  dup (0)
+image: dw FRAME_LENGTH  * FRAME_HEIGHT * 2  dup (0)
+saved: dw FRAME_LENGTH  * FRAME_HEIGHT * 2  dup (0)
 
 ;-------------------------------------------------------------------------------
 ; Saves videomem to array
 ;-------------------------------------------------------------------------------
 ; Entry:        None
-; Exit:         video
+; Exit:         saved
 ; Expects:      ES -> videomem (0b800h)
 ; Destroys:     AX, BX, CX, DX, DI
 ;-------------------------------------------------------------------------------
@@ -157,7 +163,7 @@ VidToArr        proc
 
                 xor bx, bx                      ; bx = 0
                 xor ax, ax                      ; i = 0
-                lea di, video
+                lea di, saved
 
 @@ReadRow:      inc ax
                 mov cx, FRAME_LENGTH            ; j = frame.length
@@ -172,7 +178,7 @@ VidToArr        proc
 
                 loop @@ReadLine
 
-                add bx, 160d - 2 * FRAME_LENGTH ; put bx to the beginning of new line
+                add bx, 160d - 2 * FRAME_LENGTH
 
                 cmp ax, FRAME_HEIGHT
                 jne @@ReadRow
@@ -183,7 +189,7 @@ VidToArr        proc
 ;-------------------------------------------------------------------------------
 ; Build videomem from array
 ;-------------------------------------------------------------------------------
-; Entry:        video
+; Entry:        di - pointer to arr
 ; Exit:         videomem
 ; Expects:      ES -> videomem (0b800h)
 ; Destroys:     
@@ -195,7 +201,6 @@ ArrToVid        proc
 
                 xor bx, bx                      ; bx = 0
                 xor ax, ax                      ; ax = 0
-                lea di, video
 
 @@ReadRow:      inc ax
                 mov cx, FRAME_LENGTH            ; j = frame.length
@@ -239,7 +244,7 @@ ShowReg macro name, value
 
         mov si, [value]
         call ToHex
-        add bx, 160d - 10d * 2d     ; moving to the start of line where to print next reg
+        add bx, FRAME_LENGTH * 2d - 10d * 2d     ; moving to the start of line where to print next reg
 
         endm
 
@@ -256,17 +261,19 @@ DisplayRegs     proc
                 push di                 ; status var address
                 mov bp, sp
 
-                mov bx, 0b800h
+                mov bx, cs
                 mov es, bx
-                mov bx, 02h             ; point to left higher point
+                mov bx, offset image             ; point to left higher point
+                add bx, 2
 
                 ; DRAWING FRAME ;
                 mov di, offset symbols
-                mov cx, FRAME_LENGTH
+                mov cx, FRAME_LENGTH * 2
                 mov dx, FRAME_HEIGHT
                 call DrawRect
 
-                mov bx, 160d + 4d       ; put bx to the begining of print tex
+                mov bx, offset image       ; put bx to the begining of print tex
+                add bx, FRAME_LENGTH * 2 + 4
 
                 ShowReg "AX" bp+26
                 ShowReg "BX" bp+24
@@ -279,6 +286,9 @@ DisplayRegs     proc
                 ShowReg "DS" bp+10
                 ShowReg "ES" bp+8
                 ShowReg "SS" bp+6
+
+                lea di, image
+                call ArrToVid
 
                 pop di
                 pop bp

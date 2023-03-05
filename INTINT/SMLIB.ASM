@@ -85,15 +85,17 @@ DrawRect		proc
 				push bp	
                 lea di, symbols
 		
-				sub cx, 2
+				; sub cx, 2
 				mov si, dx				; i = dx
 				jmp @@MainCycle			
 
 @@IterateI:		sub si, 1				; i--
 	
-				sub bx, cx				; start vertically
-				sub bx, cx
-				add bx, 160d			; new line
+				; sub bx, cx				; start vertically
+				; sub bx, cx
+				; inc bx
+				; inc bx
+				; add bx, 160d			; new line
 
 @@MainCycle:	mov ax, cx				; j = cx
 
@@ -110,7 +112,7 @@ DrawRect		proc
 @@CExit:		pop bp
 				ret
 
-@@SecondCycle:	mov bp, 0020h
+@@SecondCycle:	mov bp, 052Ah
 				mov es:[bx], bp
 
 				cmp ax, 00h
@@ -126,15 +128,15 @@ DrawRect		proc
 				cmp ax, 00h
 				je @@IterateI			; if j == 0: i++
 
-				sub ax, 1				; else: j--
+				sub ax, 2				; else: j--
 				add bx, 2				; bx += 2
 				jmp @@SecondCycle
 
-@@DrawH:		mov bp, cs:[di + 2d]
+@@DrawH:		mov bp, cs:[di + 14d]
 				mov es:[bx], bp
 				jmp @@ContinueSecond
 
-@@DrawLower:	mov bp, cs:[di + 6d]
+@@DrawLower:	mov bp, cs:[di + 12d]
 				mov es:[bx], bp
 				jmp @@ContinueSecond
 
@@ -148,11 +150,11 @@ DrawRect		proc
 				mov es:[bx], bp
 				jmp @@ContinueMain
 			
-@@LowLeft:		mov bp, cs:[di + 6d]
+@@LowLeft:		mov bp, cs:[di + 10d]
 				mov es:[bx], bp
 				jmp @@ContinueMain
 
-@@Left:			mov bp, cs:[di + 6d]
+@@Left:			mov bp, cs:[di + 8d]
 				mov es:[bx], bp
 				jmp @@ContinueMain
 
@@ -162,16 +164,18 @@ DrawRect		proc
 				je @@HighRight
 				jmp @@Right
 		
-@@LowRight:		mov bp, cs:[di + 4d]
+@@LowRight:		mov bp, cs:[di + 6d]
 				mov es:[bx], bp
 				jmp @@ContinueSecond
 
-@@HighRight:	mov bp, cs:[di + 2d]
+@@HighRight:	mov bp, cs:[di + 4d]
 				mov es:[bx], bp
 				jmp @@ContinueSecond
 		
 @@Right:		mov bp, cs:[di + 2d]
+				sub bx, 4
 				mov es:[bx], bp
+				add bx, 4
 				jmp @@ContinueSecond		; разные функции для границ
 
 @@Exit:			pop bp
