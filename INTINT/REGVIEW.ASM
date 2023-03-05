@@ -84,6 +84,7 @@ NewInt      proc
 @@SwOn:     mov cl, 01h
             mov cs:[di], cl                       ; set status = 1
 
+            lea di, saved
             call VidToArr
 
             jmp @@Exit
@@ -110,6 +111,7 @@ NewInt08h       proc
                 cmp cl, 00h 
                 je @@Exit
 
+                call CmpArrs
                 call DisplayRegs
 
 @@Exit:         pop ss es ds sp bp di si dx cx bx ax  ; register back
@@ -151,7 +153,7 @@ saved: dw FRAME_LENGTH  * FRAME_HEIGHT * 2  dup (0)
 ;-------------------------------------------------------------------------------
 ; Saves videomem to array
 ;-------------------------------------------------------------------------------
-; Entry:        None
+; Entry:        di
 ; Exit:         saved
 ; Expects:      ES -> videomem (0b800h)
 ; Destroys:     AX, BX, CX, DX, DI
@@ -163,7 +165,6 @@ VidToArr        proc
 
                 xor bx, bx                      ; bx = 0
                 xor ax, ax                      ; i = 0
-                lea di, saved
 
 @@ReadRow:      inc ax
                 mov cx, FRAME_LENGTH            ; j = frame.length
@@ -220,6 +221,57 @@ ArrToVid        proc
                 cmp ax, FRAME_HEIGHT            ; put bx to the beginning of new line
                 jne @@ReadRow
 
+                ret
+                endp
+
+
+;-------------------------------------------------------------------------------
+; Compare image and video, and write difference to saved
+;-------------------------------------------------------------------------------
+; Entry:        None
+; Exit:         saved
+; Expects:      video, image, saved
+; Destroys:     AX, BX, CX, DX, DI, SI, 
+;-------------------------------------------------------------------------------
+CmpArrs         proc
+                push bp
+
+                lea di, video
+                call VidToArr                   ; save current video mem to video
+                xor ax, ax                      ; ax = 0 (will be j)
+
+                lea di, video
+                lea bx, image
+                lea si, saved
+
+@@ReadRow:      inc ax
+                mov cx, FRAME_LENGTH            ; j = frame.length
+
+@@ReadLine:     mov dx, cs:[di]                 ; dx = val from vmem
+                mov bp, cs:[bx]                 ; bp = val from image
+
+                cmp bp, dx
+                jne @@Replace
+                jmp @@Skip                      ; if cx != dx, replace saved
+
+@@Replace:      mov cs:[si], dx                 ; mov symbol from vmem to saved
+
+
+@@Skip:         inc si
+                inc si
+
+                inc bx
+                inc bx
+
+                inc di
+                inc di                          ; moving all pointer by2 forw
+
+                loop @@ReadLine
+
+                cmp ax, FRAME_HEIGHT            ; put bx to the beginning of new line
+                jne @@ReadRow
+
+                pop bp
                 ret
                 endp
 

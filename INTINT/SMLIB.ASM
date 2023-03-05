@@ -91,11 +91,6 @@ DrawRect		proc
 
 @@IterateI:		sub si, 1				; i--
 	
-				; sub bx, cx				; start vertically
-				; sub bx, cx
-				; inc bx
-				; inc bx
-				; add bx, 160d			; new line
 
 @@MainCycle:	mov ax, cx				; j = cx
 
@@ -112,7 +107,7 @@ DrawRect		proc
 @@CExit:		pop bp
 				ret
 
-@@SecondCycle:	mov bp, 052Ah
+@@SecondCycle:	mov bp, cs:[di + 18d]
 				mov es:[bx], bp
 
 				cmp ax, 00h
