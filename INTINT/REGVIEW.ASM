@@ -213,7 +213,7 @@ ArrToVid        proc
 
                 loop @@ReadLine
 
-                add bx, 160d - 2 * FRAME_LENGTH
+                add bx, 160d - 2 * FRAME_LENGTH ; move to start of next line
 
                 cmp ax, FRAME_HEIGHT            ; put bx to the beginning of new line
                 jne @@ReadRow
@@ -242,31 +242,26 @@ CmpArrs         proc
                 lea si, saved
 
 @@ReadRow:      inc ax
-                mov cx, FRAME_LENGTH            ; j = frame.length
+                mov cx, FRAME_LENGTH * 2            ; j = frame.length * 2
 
-@@ReadLine:     mov dx, cs:[di]                 ; dx = val from vmem
-                mov bp, cs:[bx]                 ; bp = val from image
+@@ReadLine:     mov dl, cs:[di]                 ; dx = val from vmem
+                mov dh, cs:[bx]                 ; bp = val from image
 
-                cmp bp, dx
+                cmp dh, dl
                 jne @@Replace
                 jmp @@Skip                      ; if cx != dx, replace saved
 
-@@Replace:      mov cs:[si], dx                 ; mov symbol from vmem to saved
+@@Replace:      mov cs:[si], dl                 ; mov symbol from vmem to saved
 
 
 @@Skip:         inc si
-                inc si
-
                 inc bx
-                inc bx
-
-                inc di
-                inc di                          ; moving all pointer by2 forw
+                inc di                          ; moving all pointer by1 forw
 
                 loop @@ReadLine
 
-                cmp ax, FRAME_HEIGHT            ; put bx to the beginning of new line
-                jne @@ReadRow
+                cmp ax, FRAME_HEIGHT 
+                jne @@ReadRow                   ; if j == frame.height -> newIteration
 
                 pop bp
                 ret
