@@ -12,8 +12,8 @@ err7TxtLen      equ 47d
 err8TxtLen      equ 58d
 
 .data
-    pass:       db '1118H?ZHH81?$'
     userPass:   db MAX_PASS_LEN + 2 dup(0)
+    pass:       db '3476JDF17$'
 
     akiTxt:     db 'ACCESS GRANTED$'
     nopeTxt:    db 'ACCESS DENIED$'
@@ -104,20 +104,20 @@ ComparePass     proc
                 div bl                      ; ah = %
 
                 cmp ah, 00h 
-                jne @@Nope                  ; if % != 0: leave
+                jne @@Continue                  ; if % != 0: leave
 
                 inc bp 
                 cmp bp, 3d
                 je @@Aki                   ; if everythin is ok then aki
+                jmp @@SkipCheck
 
-                pop bx
+@@Continue:     pop bx
                 pop ax
-
 
                 cmp bh, al
                 jne @@Nope                  ; if symbols are not the same: nope
 
-                inc di
+@@SkipCheck:    inc di
                 inc si                      ; etalon++, userInput++
                 loop @@Loop                 ; iterate
 

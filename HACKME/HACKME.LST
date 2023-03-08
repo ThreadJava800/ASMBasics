@@ -1,4 +1,4 @@
-Turbo Assembler	 Version 4.1	    03/09/23 00:23:28	    Page 1
+Turbo Assembler	 Version 4.1	    03/09/23 00:45:21	    Page 1
 hackme.asm
 
 
@@ -17,33 +17,33 @@ hackme.asm
      12	      =003A		     err8TxtLen	     equ 58d
      13
      14	0000			     .data
-     15	0000  31 31 31 38 48 3F	5A+	 pass:	     db	'1118H?ZHH81?$'
-     16	      48 48 38 31 3F 24
-     17	000D  16*(00)			 userPass:   db	MAX_PASS_LEN + 2 dup(0)
+     15	0000  16*(00)			 userPass:   db	MAX_PASS_LEN + 2 dup(0)
+     16	0016  33 34 37 36 4A 44	46+	 pass:	     db	'3476JDF17$'
+     17	      31 37 24
      18
-     19	0023  41 43 43 45 53 53	20+	 akiTxt:     db	'ACCESS	GRANTED$'
+     19	0020  41 43 43 45 53 53	20+	 akiTxt:     db	'ACCESS	GRANTED$'
      20	      47 52 41 4E 54 45	44+
      21	      24
-     22	0032  41 43 43 45 53 53	20+	 nopeTxt:    db	'ACCESS	DENIED$'
+     22	002F  41 43 43 45 53 53	20+	 nopeTxt:    db	'ACCESS	DENIED$'
      23	      44 45 4E 49 45 44	24
      24
-     25	0040  8157 8149	814E 8144 +	 winTxt:     dw	8157h, 8149h, 814eh, 8144h, 814fh, 8157h, 8153h
+     25	003D  8157 8149	814E 8144 +	 winTxt:     dw	8157h, 8149h, 814eh, 8144h, 814fh, 8157h, 8153h
      26	      814F 8157	8153
-     27	004E  41 20 31 36 2D 62	69+	 err1Txt:    db	'A 16-bit device driver	has corrupted critical'
+     27	004B  41 20 31 36 2D 62	69+	 err1Txt:    db	'A 16-bit device driver	has corrupted critical'
      28	      74 20 64 65 76 69	63+
      29	      65 20 64 72 69 76	65+
      30	      72 20 68 61 73 20	63+
      31	      6F 72 72 75 70 74	65+
      32	      64 20 63 72 69 74	69+
      33	      63 61 6C
-     34	007B  73 79 73 74 65 6D	20+	 err2Txt:    db	'system	memory,	resulting in an	exception 0D at'
+     34	0078  73 79 73 74 65 6D	20+	 err2Txt:    db	'system	memory,	resulting in an	exception 0D at'
      35	      6D 65 6D 6F 72 79	2C+
      36	      20 72 65 73 75 6C	74+
      37	      69 6E 67 20 69 6E	20+
      38	      61 6E 20 65 78 63	65+
      39	      70 74 69 6F 6E 20	30+
      40	      44 20 61 74
-     41	00A9  30 30 32 38 3A 38	30+	 err3Txt:    db	'0028:80001812 in VxD VMM(01) +	00001812. This was '
+     41	00A6  30 30 32 38 3A 38	30+	 err3Txt:    db	'0028:80001812 in VxD VMM(01) +	00001812. This was '
      42	      30 30 31 38 31 32	20+
      43	      69 6E 20 56 78 44	20+
      44	      56 4D 4D 28 30 31	29+
@@ -51,34 +51,34 @@ hackme.asm
      46	      31 38 31 32 2E 20	54+
      47	      68 69 73 20 77 61	73+
      48	      20
-     49	00DB  63 61 6C 6C 65 64	20+	 err4Txt:    db	'called	from 0028:80014C34 in VxD CONTOSO(03) +	'
+     49	00D8  63 61 6C 6C 65 64	20+	 err4Txt:    db	'called	from 0028:80014C34 in VxD CONTOSO(03) +	'
      50	      66 72 6F 6D 20 30	30+
      51	      32 38 3A 38 30 30	31+
      52	      34 43 33 34 20 69	6E+
      53	      20 56 78 44 20 43	4F+
      54	      4E 54 4F 53 4F 28	30+
      55	      33 29 20 2B 20
-     56	010A  30 30 30 30 30 35	37+	 err5Txt:    db	'00000575.'
+     56	0107  30 30 30 30 30 35	37+	 err5Txt:    db	'00000575.'
      57	      35 2E
-Turbo Assembler	 Version 4.1	    03/09/23 00:23:28	    Page 2
+Turbo Assembler	 Version 4.1	    03/09/23 00:45:21	    Page 2
 hackme.asm
 
 
 
-     58	0113  2A 20 50 72 65 73	73+	 err6Txt:    db	'* Press any key to attempt to continue.'
+     58	0110  2A 20 50 72 65 73	73+	 err6Txt:    db	'* Press any key to attempt to continue.'
      59	      20 61 6E 79 20 6B	65+
      60	      79 20 74 6F 20 61	74+
      61	      74 65 6D 70 74 20	74+
      62	      6F 20 63 6F 6E 74	69+
      63	      6E 75 65 2E
-     64	013A  2A 20 50 72 65 73	73+	 err7Txt:    db	'* Press CTRL+ALT+DEL to restart your computer.	'
+     64	0137  2A 20 50 72 65 73	73+	 err7Txt:    db	'* Press CTRL+ALT+DEL to restart your computer.	'
      65	      20 43 54 52 4C 2B	41+
      66	      4C 54 2B 44 45 4C	20+
      67	      74 6F 20 72 65 73	74+
      68	      61 72 74 20 79 6F	75+
      69	      72 20 63 6F 6D 70	75+
      70	      74 65 72 2E 20
-     71	0169  59 6F 75 20 77 69	6C+	 err8Txt:    db	'You will lose any unsaved information in all applications.'
+     71	0166  59 6F 75 20 77 69	6C+	 err8Txt:    db	'You will lose any unsaved information in all applications.'
      72	      6C 20 6C 6F 73 65	20+
      73	      61 6E 79 20 75 6E	73+
      74	      61 76 65 64 20 69	6E+
@@ -87,7 +87,7 @@ hackme.asm
      77	      6C 6C 20 61 70 70	6C+
      78	      69 63 61 74 69 6F	6E+
      79	      73 2E
-     80	01A3			     .code
+     80	01A0			     .code
      81
      82				     org 100h
      83
@@ -109,7 +109,7 @@ hackme.asm
      99				     ;-------------------------------------------------------------------------------
     100	0107			     ReadPass	     proc
     101	0107  B9 0014				     mov cx, MAX_PASS_LEN
-    102	010A  BF 000Dr				     lea di, userPass
+    102	010A  BF 0000r				     lea di, userPass
     103
     104	010D  B4 01		     @@Loop:	     mov ah, 01h
     105	010F  CD 21				     int 21h		     ; char -> al
@@ -122,7 +122,7 @@ hackme.asm
     112
     113	0119  88 05				     mov [di], al
     114	011B  47				     inc di
-Turbo Assembler	 Version 4.1	    03/09/23 00:23:28	    Page 3
+Turbo Assembler	 Version 4.1	    03/09/23 00:45:21	    Page 3
 hackme.asm
 
 
@@ -146,8 +146,8 @@ hackme.asm
     131	0122			     ComparePass     proc
     132	0122  55				     push bp
     133
-    134	0123  BF 0000r				     lea di, pass
-    135	0126  BE 000Dr				     lea si, userPass
+    134	0123  BF 0016r				     lea di, pass
+    135	0126  BE 0000r				     lea si, userPass
     136
     137	0129  B9 0016				     mov cx, MAX_PASS_LEN + 2	 ; setting up iterator
     138	012C  33 ED				     xor bp, bp			 ; bp =	0 (7th counter)
@@ -156,10 +156,10 @@ hackme.asm
     141	0130  8A 04				     mov al, [si]		 ; user	input
     142
     143	0132  80 FF 24				     cmp bh, '$'
-    144	0135  74 21				     je	@@EtalonEnd		 ; if etalon ended: check user input
+    144	0135  74 24				     je	@@EtalonEnd		 ; if etalon ended: check user input
     145
     146	0137  3C 24				     cmp al, '$'
-    147	0139  74 2E				     je	@@Nope			 ; if userInput	ended: nope
+    147	0139  74 31				     je	@@Nope			 ; if userInput	ended: nope
     148
     149	013B  50				     push ax
     150	013C  53				     push bx
@@ -169,132 +169,132 @@ hackme.asm
     154	0141  F6 F3				     div bl			 ; ah =	%
     155
     156	0143  80 FC 00				     cmp ah, 00h
-    157	0146  75 21				     jne @@Nope			 ; if %	!= 0: leave
+    157	0146  75 09				     jne @@Continue		     ; if % != 0: leave
     158
     159	0148  45				     inc bp
     160	0149  83 FD 03				     cmp bp, 3d
-    161	014C  74 11				     je	@@Aki			; if everythin is ok then aki
-    162
-    163	014E  5B				     pop bx
-    164	014F  58				     pop ax
-    165
+    161	014C  74 14				     je	@@Aki			; if everythin is ok then aki
+    162	014E  EB 07 90				     jmp @@SkipCheck
+    163
+    164	0151  5B		     @@Continue:     pop bx
+    165	0152  58				     pop ax
     166
-    167	0150  3A F8				     cmp bh, al
-    168	0152  75 15				     jne @@Nope			 ; if symbols are not the same:	nope
+    167	0153  3A F8				     cmp bh, al
+    168	0155  75 15				     jne @@Nope			 ; if symbols are not the same:	nope
     169
-    170	0154  47				     inc di
-    171	0155  46				     inc si			 ; etalon++, userInput++
-Turbo Assembler	 Version 4.1	    03/09/23 00:23:28	    Page 4
+    170	0157  47		     @@SkipCheck:    inc di
+    171	0158  46				     inc si			 ; etalon++, userInput++
+Turbo Assembler	 Version 4.1	    03/09/23 00:45:21	    Page 4
 hackme.asm
 
 
 
-    172	0156  E2 D6				     loop @@Loop		 ; iterate
+    172	0159  E2 D3				     loop @@Loop		 ; iterate
     173
-    174	0158  3C 24		     @@EtalonEnd:    cmp al, '$'
-    175	015A  74 03				     je	 @@Aki
-    176	015C  EB 0B 90				     jmp @@Nope			 ; if userInput	end: aki else nope
+    174	015B  3C 24		     @@EtalonEnd:    cmp al, '$'
+    175	015D  74 03				     je	 @@Aki
+    176	015F  EB 0B 90				     jmp @@Nope			 ; if userInput	end: aki else nope
     177
-    178	015F  B4 09		     @@Aki:	     mov ah, 09h
-    179	0161  BA 0023r				     lea dx, akiTxt
-    180	0164  CD 21				     int 21h			 ; print access	granted
+    178	0162  B4 09		     @@Aki:	     mov ah, 09h
+    179	0164  BA 0020r				     lea dx, akiTxt
+    180	0167  CD 21				     int 21h			 ; print access	granted
     181
-    182	0166  5D				     pop bp
-    183	0167  CD 20				     int 20h
+    182	0169  5D				     pop bp
+    183	016A  CD 20				     int 20h
     184
-    185	0169  5D		     @@Nope:	     pop bp
+    185	016C  5D		     @@Nope:	     pop bp
     186
-    187	016A  E8 0002				     call DrawBsod		    ; print access denied
-    188	016D  CD 20				     int 20h
-    189	016F					     endp
+    187	016D  E8 0002				     call DrawBsod		    ; print access denied
+    188	0170  CD 20				     int 20h
+    189	0172					     endp
     190				     ;-------------------------------------------------------------------------------
     191
-    192	016F			     DrawBsod	     proc
+    192	0172			     DrawBsod	     proc
     193
-    194	016F  B4 06				     mov ah, 06h
-    195	0171  32 C0				     xor al, al	    ; clean all	screen
-    196	0173  33 C9				     xor cx, cx	    ; left higher
-    197	0175  BA 184F				     mov dx, 184fh  ; right lower (dh =	row, dl	= column)
-    198	0178  B7 1E				     mov bh, 1Eh    ; how to replace
-    199	017A  CD 10				     int 10h
+    194	0172  B4 06				     mov ah, 06h
+    195	0174  32 C0				     xor al, al	    ; clean all	screen
+    196	0176  33 C9				     xor cx, cx	    ; left higher
+    197	0178  BA 184F				     mov dx, 184fh  ; right lower (dh =	row, dl	= column)
+    198	017B  B7 1E				     mov bh, 1Eh    ; how to replace
+    199	017D  CD 10				     int 10h
     200
-    201	017C  B8 1003				     mov ax, 1003h
-    202	017F  B3 00				     mov bl, 00h
-    203	0181  CD 10				     int 10h	     ; switch off blinking
+    201	017F  B8 1003				     mov ax, 1003h
+    202	0182  B3 00				     mov bl, 00h
+    203	0184  CD 10				     int 10h	     ; switch off blinking
     204
-    205	0183  BF B800				     mov di, 0b800h
-    206	0186  8E C7				     mov es, di
+    205	0186  BF B800				     mov di, 0b800h
+    206	0189  8E C7				     mov es, di
     207
-    208	0188  B9 0007				     mov cx, winTxtLen
-    209	018B  BE 0040r				     lea si, winTxt
-    210	018E  BF 04A8				     mov di, 7d	* 160d + 72d	     ; printing	windows	in center
+    208	018B  B9 0007				     mov cx, winTxtLen
+    209	018E  BE 003Dr				     lea si, winTxt
+    210	0191  BF 04A8				     mov di, 7d	* 160d + 72d	     ; printing	windows	in center
     211
-    212	0191  AD		     @@Loop:	     lodsw
-    213	0192  AB				     stosw
-    214	0193  E2 FC				     loop @@Loop
+    212	0194  AD		     @@Loop:	     lodsw
+    213	0195  AB				     stosw
+    214	0196  E2 FC				     loop @@Loop
     215
-    216	0195  B9 002D				     mov cx, err1TxtLen
-    217	0198  BE 004Er				     lea si, err1Txt
-    218	019B  BF 064A				     mov di, 10d * 160d	+ 10d
-    219	019E  E8 0055				     call PrintText
+    216	0198  B9 002D				     mov cx, err1TxtLen
+    217	019B  BE 004Br				     lea si, err1Txt
+    218	019E  BF 064A				     mov di, 10d * 160d	+ 10d
+    219	01A1  E8 0055				     call PrintText
     220
-    221	01A1  B9 002E				     mov cx, err2TxtLen
-    222	01A4  BE 007Br				     lea si, err2Txt
-    223	01A7  BF 06EA				     mov di, 11d * 160d	+ 10d
-    224	01AA  E8 0049				     call PrintText
+    221	01A4  B9 002E				     mov cx, err2TxtLen
+    222	01A7  BE 0078r				     lea si, err2Txt
+    223	01AA  BF 06EA				     mov di, 11d * 160d	+ 10d
+    224	01AD  E8 0049				     call PrintText
     225
-    226	01AD  B9 0032				     mov cx, err3TxtLen
-    227	01B0  BE 00A9r				     lea si, err3Txt
-    228	01B3  BF 078A				     mov di, 12d * 160d	+ 10d
-Turbo Assembler	 Version 4.1	    03/09/23 00:23:28	    Page 5
+    226	01B0  B9 0032				     mov cx, err3TxtLen
+    227	01B3  BE 00A6r				     lea si, err3Txt
+    228	01B6  BF 078A				     mov di, 12d * 160d	+ 10d
+Turbo Assembler	 Version 4.1	    03/09/23 00:45:21	    Page 5
 hackme.asm
 
 
 
-    229	01B6  E8 003D				     call PrintText
+    229	01B9  E8 003D				     call PrintText
     230
-    231	01B9  B9 002F				     mov cx, err4TxtLen
-    232	01BC  BE 00DBr				     lea si, err4Txt
-    233	01BF  BF 082A				     mov di, 13d * 160d	+ 10d
-    234	01C2  E8 0031				     call PrintText
+    231	01BC  B9 002F				     mov cx, err4TxtLen
+    232	01BF  BE 00D8r				     lea si, err4Txt
+    233	01C2  BF 082A				     mov di, 13d * 160d	+ 10d
+    234	01C5  E8 0031				     call PrintText
     235
-    236	01C5  B9 0009				     mov cx, err5TxtLen
-    237	01C8  BE 010Ar				     lea si, err5Txt
-    238	01CB  BF 08CA				     mov di, 14d * 160d	+ 10d
-    239	01CE  E8 0025				     call PrintText
+    236	01C8  B9 0009				     mov cx, err5TxtLen
+    237	01CB  BE 0107r				     lea si, err5Txt
+    238	01CE  BF 08CA				     mov di, 14d * 160d	+ 10d
+    239	01D1  E8 0025				     call PrintText
     240
-    241	01D1  B9 0027				     mov cx, err6TxtLen
-    242	01D4  BE 0113r				     lea si, err6Txt
-    243	01D7  BF 0A0A				     mov di, 16d * 160d	+ 10d
-    244	01DA  E8 0019				     call PrintText
+    241	01D4  B9 0027				     mov cx, err6TxtLen
+    242	01D7  BE 0110r				     lea si, err6Txt
+    243	01DA  BF 0A0A				     mov di, 16d * 160d	+ 10d
+    244	01DD  E8 0019				     call PrintText
     245
-    246	01DD  B9 002F				     mov cx, err7TxtLen
-    247	01E0  BE 013Ar				     lea si, err7Txt
-    248	01E3  BF 0AAA				     mov di, 17d * 160d	+ 10d
-    249	01E6  E8 000D				     call PrintText
+    246	01E0  B9 002F				     mov cx, err7TxtLen
+    247	01E3  BE 0137r				     lea si, err7Txt
+    248	01E6  BF 0AAA				     mov di, 17d * 160d	+ 10d
+    249	01E9  E8 000D				     call PrintText
     250
-    251	01E9  B9 003A				     mov cx, err8TxtLen
-    252	01EC  BE 0169r				     lea si, err8Txt
-    253	01EF  BF 0B4A				     mov di, 18d * 160d	+ 10d
-    254	01F2  E8 0001				     call PrintText
+    251	01EC  B9 003A				     mov cx, err8TxtLen
+    252	01EF  BE 0166r				     lea si, err8Txt
+    253	01F2  BF 0B4A				     mov di, 18d * 160d	+ 10d
+    254	01F5  E8 0001				     call PrintText
     255
-    256	01F5  C3				     ret
-    257	01F6					     endp
+    256	01F8  C3				     ret
+    257	01F9					     endp
     258
     259
-    260	01F6			     PrintText	     proc
+    260	01F9			     PrintText	     proc
     261
-    262	01F6  B4 17				     mov ah, 00010111b		    ; ah = white
+    262	01F9  B4 17				     mov ah, 00010111b		    ; ah = white
     263
-    264	01F8  AC		     @@Loop:	     lodsb	     ; ds:si ->	al
-    265	01F9  AB				     stosw
-    266	01FA  E2 FC				     loop @@Loop
+    264	01FB  AC		     @@Loop:	     lodsb	     ; ds:si ->	al
+    265	01FC  AB				     stosw
+    266	01FD  E2 FC				     loop @@Loop
     267
-    268	01FC  C3				     ret
-    269	01FD					     endp
+    268	01FF  C3				     ret
+    269	0200					     endp
     270
     271				     end     Start
-Turbo Assembler	 Version 4.1	    03/09/23 00:23:28	    Page 6
+Turbo Assembler	 Version 4.1	    03/09/23 00:45:21	    Page 6
 Symbol Table
 
 
@@ -304,17 +304,19 @@ Symbol Name			  Type	 Value
 
 ??DATE				  Text	 "03/09/23"
 ??FILENAME			  Text	 "hackme  "
-??TIME				  Text	 "00:23:28"
+??TIME				  Text	 "00:45:21"
 ??VERSION			  Number 040A
 @32BIT				  Text	 0
-@@AKI				  Near	 DGROUP:015F
-@@ETALONEND			  Near	 DGROUP:0158
+@@AKI				  Near	 DGROUP:0162
+@@CONTINUE			  Near	 DGROUP:0151
+@@ETALONEND			  Near	 DGROUP:015B
 @@EXIT				  Near	 DGROUP:011E
 @@LOOP				  Near	 DGROUP:010D
 @@LOOP				  Near	 DGROUP:012E
-@@LOOP				  Near	 DGROUP:0191
-@@LOOP				  Near	 DGROUP:01F8
-@@NOPE				  Near	 DGROUP:0169
+@@LOOP				  Near	 DGROUP:0194
+@@LOOP				  Near	 DGROUP:01FB
+@@NOPE				  Near	 DGROUP:016C
+@@SKIPCHECK			  Near	 DGROUP:0157
 @CODE				  Text	 DGROUP
 @CODESIZE			  Text	 0
 @CPU				  Text	 0101H
@@ -326,35 +328,35 @@ Symbol Name			  Type	 Value
 @MODEL				  Text	 1
 @STACK				  Text	 DGROUP
 @WORDSIZE			  Text	 2
-AKITXT				  Near	 DGROUP:0023
+AKITXT				  Near	 DGROUP:0020
 COMPAREPASS			  Near	 DGROUP:0122
-DRAWBSOD			  Near	 DGROUP:016F
-ERR1TXT				  Near	 DGROUP:004E
+DRAWBSOD			  Near	 DGROUP:0172
+ERR1TXT				  Near	 DGROUP:004B
 ERR1TXTLEN			  Number 002D
-ERR2TXT				  Near	 DGROUP:007B
+ERR2TXT				  Near	 DGROUP:0078
 ERR2TXTLEN			  Number 002E
-ERR3TXT				  Near	 DGROUP:00A9
+ERR3TXT				  Near	 DGROUP:00A6
 ERR3TXTLEN			  Number 0032
-ERR4TXT				  Near	 DGROUP:00DB
+ERR4TXT				  Near	 DGROUP:00D8
 ERR4TXTLEN			  Number 002F
-ERR5TXT				  Near	 DGROUP:010A
+ERR5TXT				  Near	 DGROUP:0107
 ERR5TXTLEN			  Number 0009
-ERR6TXT				  Near	 DGROUP:0113
+ERR6TXT				  Near	 DGROUP:0110
 ERR6TXTLEN			  Number 0027
-ERR7TXT				  Near	 DGROUP:013A
+ERR7TXT				  Near	 DGROUP:0137
 ERR7TXTLEN			  Number 002F
-ERR8TXT				  Near	 DGROUP:0169
+ERR8TXT				  Near	 DGROUP:0166
 ERR8TXTLEN			  Number 003A
 MAX_PASS_LEN			  Number 0014
-NOPETXT				  Near	 DGROUP:0032
-PASS				  Near	 DGROUP:0000
-PRINTTEXT			  Near	 DGROUP:01F6
+NOPETXT				  Near	 DGROUP:002F
+PASS				  Near	 DGROUP:0016
+PRINTTEXT			  Near	 DGROUP:01F9
 READPASS			  Near	 DGROUP:0107
 START				  Near	 DGROUP:0100
-USERPASS			  Near	 DGROUP:000D
-WINTXT				  Near	 DGROUP:0040
+USERPASS			  Near	 DGROUP:0000
+WINTXT				  Near	 DGROUP:003D
 WINTXTLEN			  Number 0007
-Turbo Assembler	 Version 4.1	    03/09/23 00:23:28	    Page 7
+Turbo Assembler	 Version 4.1	    03/09/23 00:45:21	    Page 7
 Symbol Table
 
 
@@ -363,6 +365,6 @@ Symbol Table
 Groups & Segments		  Bit Size Align  Combine Class
 
 DGROUP				  Group
-  _DATA				  16  01A3 Word	  Public  DATA
-  _TEXT				  16  01FD Word	  Public  CODE
+  _DATA				  16  01A0 Word	  Public  DATA
+  _TEXT				  16  0200 Word	  Public  CODE
 
