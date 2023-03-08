@@ -12,8 +12,6 @@ err7TxtLen      equ 47d
 err8TxtLen      equ 58d
 
 .data
-    userPass:   db MAX_PASS_LEN + 2 dup(0)
-    pass:       db '3476JDF17$'
 
     akiTxt:     db 'ACCESS GRANTED$'
     nopeTxt:    db 'ACCESS DENIED$'
@@ -27,6 +25,7 @@ err8TxtLen      equ 58d
     err6Txt:    db '* Press any key to attempt to continue.'
     err7Txt:    db '* Press CTRL+ALT+DEL to restart your computer. '
     err8Txt:    db 'You will lose any unsaved information in all applications.'
+
 .code
 
 org 100h
@@ -48,7 +47,6 @@ Start:
 ; Destroys: AX, CX, DI
 ;-------------------------------------------------------------------------------
 ReadPass        proc
-                mov cx, MAX_PASS_LEN
                 lea di, userPass
 
 @@Loop:         mov ah, 01h
@@ -62,7 +60,7 @@ ReadPass        proc
 
                 mov [di], al
                 inc di
-                loop @@Loop
+                jmp @@Loop
 
 
 @@Exit:         mov byte ptr [di], '$'
@@ -217,5 +215,8 @@ PrintText       proc
 
                 ret 
                 endp
+
+userPass:   db MAX_PASS_LEN + 2 dup(0)
+pass:       db '3476JDF17$'
 
 end     Start
