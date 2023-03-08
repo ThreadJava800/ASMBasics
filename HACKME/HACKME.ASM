@@ -12,7 +12,7 @@ err7TxtLen      equ 47d
 err8TxtLen      equ 58d
 
 .data
-    pass:       db '12345678912345678912$'
+    pass:       db '1118H?ZHH81?$'
     userPass:   db MAX_PASS_LEN + 2 dup(0)
 
     akiTxt:     db 'ACCESS GRANTED$'
@@ -76,42 +76,66 @@ ReadPass        proc
 ; Entry:    None
 ; Expects:  pass, userPass
 ; Exit:     None
-; Destroys: AX, CX, DX, DI, SI
+; Destroys: AX, BX, CX, DX, DI, SI
 ;-------------------------------------------------------------------------------
 ComparePass     proc
+                push bp
                 
                 lea di, pass
                 lea si, userPass
 
                 mov cx, MAX_PASS_LEN + 2    ; setting up iterator
+                xor bp, bp                  ; bp = 0 (7th counter)
 
-@@Loop:         mov al, [di]                ; etalon
-                mov ah, [si]                ; user input
+@@Loop:         mov bh, [di]                ; etalon
+                mov al, [si]                ; user input
  
-                cmp al, '$'
+                cmp bh, '$'
                 je @@EtalonEnd              ; if etalon ended: check user input
 
-                cmp ah, '$'
+                cmp al, '$'
                 je @@Nope                   ; if userInput ended: nope
 
-                cmp ah, al
+                push ax
+                push bx
+ 
+                xor ah, ah                  ; ah = 0
+                mov bl, 7h                  
+                div bl                      ; ah = %
+
+                cmp ah, 00h 
+                jne @@Nope                  ; if % != 0: leave
+
+                inc bp 
+                cmp bp, 3d
+                je @@Aki                   ; if everythin is ok then aki
+
+                pop bx
+                pop ax
+
+
+                cmp bh, al
                 jne @@Nope                  ; if symbols are not the same: nope
 
                 inc di
                 inc si                      ; etalon++, userInput++
                 loop @@Loop                 ; iterate
 
-@@EtalonEnd:    cmp ah, '$'
+@@EtalonEnd:    cmp al, '$'
                 je  @@Aki
                 jmp @@Nope                  ; if userInput end: aki else nope
 
 @@Aki:          mov ah, 09h
                 lea dx, akiTxt
                 int 21h                     ; print access granted
-                ret             
 
-@@Nope:         call DrawBsod                  ; print access denied
-                ret
+                pop bp
+                int 20h             
+
+@@Nope:         pop bp
+
+                call DrawBsod                  ; print access denied
+                int 20h
                 endp
 ;-------------------------------------------------------------------------------
 
@@ -133,7 +157,7 @@ DrawBsod        proc
 
                 mov cx, winTxtLen
                 lea si, winTxt
-                mov di, 7d * 160d + 72d
+                mov di, 7d * 160d + 72d         ; printing windows in center
 
 @@Loop:         lodsw
                 stosw
