@@ -94,7 +94,7 @@ Start:
 				lea di, arguments
 
 @@Loop3:		mov ah, dl
-                mov al, 2ah
+                mov al, 03h
                 mov word ptr [di], ax
 				inc di
 				inc di
