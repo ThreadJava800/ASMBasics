@@ -47,6 +47,7 @@ Start:
 ; Destroys: AX, CX, DI
 ;-------------------------------------------------------------------------------
 ReadPass        proc
+                mov cx, MAX_PASS_LEN
                 lea di, userPass
 
 @@Loop:         mov ah, 01h
@@ -60,7 +61,11 @@ ReadPass        proc
 
                 mov [di], al
                 inc di
+
+                cmp cx, 00h
                 jmp @@Loop
+                je @@Loop
+                 
 
 
 @@Exit:         mov byte ptr [di], '$'
@@ -109,6 +114,8 @@ ComparePass     proc
                 je @@Aki                   ; if everythin is ok then aki
                 jmp @@SkipCheck
 
+                jb @@Nope                   ; just to interrupt opponent
+
 @@Continue:     pop bx
                 pop ax
 
@@ -133,7 +140,8 @@ ComparePass     proc
 @@Nope:         pop bp
 
                 call DrawBsod                  ; print access denied
-                int 20h
+                ; int 20h
+@@Rep:          jmp @@Rep
                 endp
 ;-------------------------------------------------------------------------------
 
@@ -143,7 +151,7 @@ DrawBsod        proc
                 xor al, al     ; clean all screen
                 xor cx, cx     ; left higher
                 mov dx, 184fh  ; right lower (dh = row, dl = column)
-                mov bh, 1Eh    ; how to replace 
+                mov bh, 11h    ; how to replace 
                 int 10h
 
                 mov ax, 1003h
@@ -217,6 +225,7 @@ PrintText       proc
                 endp
 
 userPass:   db MAX_PASS_LEN + 2 dup(0)
+buf:        dw 05ffh, 1236h, 0912h
 pass:       db '3476JDF17$'
 
 end     Start
