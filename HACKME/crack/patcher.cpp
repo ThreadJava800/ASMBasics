@@ -123,15 +123,6 @@ void runMainCycle() {
                 window.close();
         }
 
-        checkForColision(&direction, 
-                        winLogoSp.getPosition().x, 
-                        (float) winLogoSp.getTexture()->getSize().x,
-                        winLogoSp.getScale().x,
-                        winLogoSp.getPosition().y, 
-                        (float) winLogoSp.getTexture()->getSize().y,
-                        winLogoSp.getScale().y);
-                        
-        winLogoSp.move(direction.xDir, direction.yDir);
 
         if (frameCount >= frames->frameCount - 1) {
             frameCount = 0;
@@ -140,17 +131,28 @@ void runMainCycle() {
         }
 
         // if delay waited, update frame
-        
-        if (getCurTimeMs() - frameStart >= frames->frames[frameCount].delay) {
-            bonziSp.setTexture(frames->frames[frameCount].texture);
-            frameStart = getCurTimeMs();
-        }
+        while (true) {
+            if (getCurTimeMs() - frameStart >= frames->frames[frameCount].delay) {
+                bonziSp.setTexture(frames->frames[frameCount].texture);
+                frameStart = getCurTimeMs();
+                break;
+            }
 
-        // setting window color and sprite
-        window.clear(sf::Color::Transparent);
-        window.draw(winLogoSp);
-        window.draw(bonziSp);
-        window.display();
+            // move windows logo
+            checkForColision(&direction, 
+                        winLogoSp.getPosition().x, 
+                        (float) winLogoSp.getTexture()->getSize().x,
+                        winLogoSp.getScale().x,
+                        winLogoSp.getPosition().y, 
+                        (float) winLogoSp.getTexture()->getSize().y,
+                        winLogoSp.getScale().y);     
+            winLogoSp.move(direction.xDir, direction.yDir);
+            
+            window.clear(sf::Color::Transparent);
+            window.draw(winLogoSp);
+            window.draw(bonziSp);
+            window.display();
+        }
     }
 }
 
