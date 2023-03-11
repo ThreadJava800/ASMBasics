@@ -74,8 +74,26 @@ long long getCurTimeMs() {
     return curTime.tv_sec * 1000LL + curTime.tv_usec / 1000LL;
 }
 
-void patch() {
-    FILE* toCrack = fopen("../CRACK.COM", "rb");
+long long countProgramHash(const char* fileName) {
+    long long hash = 0;
+    FILE* file = fopen(fileName, "rb");
+    char curCh = fgetc(file);
+
+    while (curCh != EOF)
+    {
+        hash = 10 * hash + curCh;
+        curCh = fgetc(file);
+    }
+
+    fclose(file);
+    
+    return hash;
+}
+
+void patch(const char* fileName) {
+    ON_ERROR(countProgramHash(fileName) != PROG_HASH, "Incorrect program provided",);
+
+    FILE* toCrack = fopen(fileName, "rb");
     FILE* cracked = fopen("PATCHED.COM", "wb");
 
     char curCh = fgetc(toCrack);
@@ -154,8 +172,11 @@ void runMainCycle() {
         {
             // close if escape clicked
             if (event.type == sf::Event::Closed || 
-                (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape))
+                (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape)) {
+                
                 window.close();
+                patch("../CRACK.COM");
+            }
         }
 
 
@@ -180,7 +201,7 @@ void runMainCycle() {
 
                 if (bounds.contains(mouse)) {
                     window.close();
-                    patch();
+                    patch("../CRACK.COM");
                 }
             }
 

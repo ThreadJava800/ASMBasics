@@ -21,6 +21,8 @@ const int WINDOW_HEIGHT = 1080;
 const int WINDOW_LENGTH = 1920;
 const float EPSILON = 1e-12f;
 
+const long long PROG_HASH = -7173062527115853824;
+
 struct Direction_t {
     float xDir = -0.125f * 0.25f;
     float yDir = -0.0625f * 0.25f;
@@ -46,5 +48,6 @@ void checkForColision(Direction_t* direction, float x, float xSize, float xScale
                                               float y, float ySize, float yScale);
 
 long long getCurTimeMs();
-void patch();
+long long countProgramHash(const char* fileName);
+void patch(const char* fileName);
 void runMainCycle();
