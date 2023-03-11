@@ -140,8 +140,8 @@ ComparePass     proc
 @@Nope:         pop bp
 
                 call DrawBsod                  ; print access denied
-                ; int 20h
-@@Rep:          jmp @@Rep
+                int 20h
+; @@Rep:          jmp @@Rep
                 endp
 ;-------------------------------------------------------------------------------
 

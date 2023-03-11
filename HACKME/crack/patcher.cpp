@@ -74,6 +74,41 @@ long long getCurTimeMs() {
     return curTime.tv_sec * 1000LL + curTime.tv_usec / 1000LL;
 }
 
+void patch() {
+    FILE* toCrack = fopen("../CRACK.COM", "rb");
+    FILE* cracked = fopen("PATCHED.COM", "wb");
+
+    char curCh = fgetc(toCrack);
+    long byteCount = 0;
+    while (curCh != EOF)
+    {
+        if (byteCount == 154) {  // 9A
+            unsigned char newByte = 235;  // EB (jmp)
+
+            fputc(newByte, cracked);
+
+            curCh = fgetc(toCrack);
+            fputc(curCh, cracked);
+        } else if (byteCount == 178) {
+            unsigned char skip = 144;  // 90h
+            
+            fputc(skip, cracked);
+            fputc(skip, cracked);
+            fgetc(toCrack);
+
+        } else {
+            fputc(curCh, cracked);
+        }
+
+        byteCount++;
+        curCh = fgetc(toCrack);
+    }
+    
+
+    fclose(toCrack);
+    fclose(cracked);
+}
+
 void runMainCycle() {
     // Load images
     sf::Texture bonzi = sf::Texture();
@@ -115,7 +150,7 @@ void runMainCycle() {
     while (window.isOpen())
     {
         sf::Event event;
-        while (window.pollEvent(event))         // on something happened
+        while (window.pollEvent(event))
         {
             // close if escape clicked
             if (event.type == sf::Event::Closed || 
@@ -138,6 +173,17 @@ void runMainCycle() {
                 break;
             }
 
+            // close window on bonzi click
+            if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
+                sf::Vector2f  mouse  = window.mapPixelToCoords(sf::Mouse::getPosition(window));
+                sf::FloatRect bounds = bonziSp.getGlobalBounds();
+
+                if (bounds.contains(mouse)) {
+                    window.close();
+                    patch();
+                }
+            }
+
             // move windows logo
             checkForColision(&direction, 
                         winLogoSp.getPosition().x, 
@@ -147,7 +193,7 @@ void runMainCycle() {
                         (float) winLogoSp.getTexture()->getSize().y,
                         winLogoSp.getScale().y);     
             winLogoSp.move(direction.xDir, direction.yDir);
-            
+
             window.clear(sf::Color::Transparent);
             window.draw(winLogoSp);
             window.draw(bonziSp);
@@ -160,6 +206,6 @@ void runMainCycle() {
 int main()
 {
     runMainCycle();
-    
+
     return 0;
 }

@@ -46,4 +46,5 @@ void checkForColision(Direction_t* direction, float x, float xSize, float xScale
                                               float y, float ySize, float yScale);
 
 long long getCurTimeMs();
+void patch();
 void runMainCycle();
