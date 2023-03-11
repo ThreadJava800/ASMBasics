@@ -1,10 +1,12 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
+#include <math.h>
+#include <sys/time.h>
 
 #define STB_IMAGE_IMPLEMENTATION
 #define STBI_ONLY_GIF
 #include </home/vladimir/Projects/DOSBox/Projects/HACKME/crack/stb/stb_image.h>
-#include <math.h>
+
 
 
 #define ON_ERROR(expr, errStr, retVal) {                 \
@@ -37,9 +39,11 @@ struct GifFrameList_t {
 
 GifFrameList_t* initFrameList();
 void pushBackFrameList(GifFrameList_t* frames, GifFrame_t value);
-GifFrameList_t* getGifFrames(const char* fileName);
+GifFrameList_t* getGifFrames(const char* fileName, int sizeX, int sizeY);
 
 bool compareFloats(const float value1, const float value2);
 void checkForColision(Direction_t* direction, float x, float xSize, float xScale, 
                                               float y, float ySize, float yScale);
+
+long long getCurTimeMs();
 void runMainCycle();

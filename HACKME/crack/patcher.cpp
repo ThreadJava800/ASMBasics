@@ -3,23 +3,54 @@
 GifFrameList_t* initFrameList() {
     GifFrameList_t* frameList = (GifFrameList_t*) calloc(1, sizeof(GifFrameList_t));
     frameList->frames         = (GifFrame_t*)     calloc(1, sizeof(GifFrame_t));
+    ON_ERROR(!frameList->frames, "NO MEM", nullptr);
+
+    frameList->frameCount     = 0;
+    frameList->frameCapacity  = 1;
+
+    return frameList;
 }
 
 void pushBackFrameList(GifFrameList_t* frames, GifFrame_t value) {
+    ON_ERROR(!frames, "NULLPTR", );
 
+    if (frames->frameCount >= frames->frameCapacity - 1) {
+        frames->frameCapacity *= 2;
+        frames->frames = (GifFrame_t*) realloc(frames->frames, frames->frameCapacity * sizeof(GifFrame_t));
+    }
+
+    frames->frames[frames->frameCount++] = value;
 }
 
-GifFrameList_t* getGifFrames(const char* fileName) {
+GifFrameList_t* getGifFrames(const char* fileName, int sizeX, int sizeY) {
     int* delayList = 0;
-    int _z = 0, _comp = 0;
+    int frameCount = 0, _comp = 0, step = sizeX * sizeY * 4;
     GifFrameList_t* frames = initFrameList();
+    ON_ERROR(!frames, "NULLPTR", nullptr);
 
     // loading file to stb
     FILE* file = stbi__fopen(fileName, "rb");
     stbi__context context = {};
     stbi__start_file(&context, file);
 
+    void* pixelArr = stbi__load_gif_main(&context, &delayList, &sizeX, &sizeY, 
+                                                   &frameCount, &_comp, STBI_rgb_alpha);
 
+    for (int i = 0; i < frameCount; i++) {
+        sf::Image image = sf::Image();
+        image.create(sizeX, sizeY, (const sf::Uint8*) pixelArr + step * i);
+
+        sf::Texture imgTexture = sf::Texture();
+        imgTexture.loadFromImage(image);
+
+        GifFrame_t gifFrame = {.delay = delayList[i], .texture = imgTexture};
+        pushBackFrameList(frames, gifFrame);
+    }
+
+    fclose(file);
+    free(pixelArr);
+
+    return frames;
 }
 
 
@@ -35,6 +66,12 @@ void checkForColision(Direction_t* direction, float x, float xSize, float xScale
     if (compareFloats(y, 0) || compareFloats(y, WINDOW_HEIGHT - ySize * yScale)) {
         direction->yDir *= -1;
     }
+}
+
+long long getCurTimeMs() {
+    timeval curTime = {};
+    gettimeofday(&curTime, NULL);
+    return curTime.tv_sec * 1000LL + curTime.tv_usec / 1000LL;
 }
 
 void runMainCycle() {
@@ -69,6 +106,10 @@ void runMainCycle() {
     window.setPosition(sf::Vector2i(0, 0));
 
     Direction_t direction = {};
+    int frameCount = 0;
+    long long frameStart = getCurTimeMs();
+
+    GifFrameList_t* frames = getGifFrames("bonzi.gif", bonzi.getSize().x, bonzi.getSize().y);
 
     // Main program cycle
     while (window.isOpen())
@@ -91,7 +132,20 @@ void runMainCycle() {
                         winLogoSp.getScale().y);
                         
         winLogoSp.move(direction.xDir, direction.yDir);
+
+        if (frameCount >= frames->frameCount - 1) {
+            frameCount = 0;
+        } else {
+            frameCount++;
+        }
+
+        // if delay waited, update frame
         
+        if (getCurTimeMs() - frameStart >= frames->frames[frameCount].delay) {
+            bonziSp.setTexture(frames->frames[frameCount].texture);
+            frameStart = getCurTimeMs();
+        }
+
         // setting window color and sprite
         window.clear(sf::Color::Transparent);
         window.draw(winLogoSp);
