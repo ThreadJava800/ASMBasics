@@ -17,6 +17,6 @@ In [RAMKA.ASM](https://github.com/ThreadJava800/ASMBasics/blob/main/RAMKA/RAMKA.
 In [FRMBYTXT.ASM](https://github.com/ThreadJava800/ASMBasics/blob/main/RAMKA/FRMBYTXT.ASM) you can see a call of a function that prints rectangle on screen based on text (declared in [LIBA.ASM](https://github.com/ThreadJava800/ASMBasics/blob/main/LIBA.ASM)).
 
 In [INTINT](https://github.com/ThreadJava800/ASMBasics/tree/main/INTINT) you can see my experiments with DOS interruptions. 
-The climax of it you can see in [REGVIEW.ASM](https://github.com/ThreadJava800/ASMBasics/blob/main/INTINT/REGVIEW.ASM) - it prints your register in live time (you can switch off/on it with hot key). Specifically I worked with 9th (keyboard) and 8th (chronometer) DOS interruption
+The climax of it you can see in [REGVIEW.ASM](https://github.com/ThreadJava800/ASMBasics/blob/main/INTINT/REGVIEW.ASM) - it prints your register in live time (you can switch off/on it with hot key). Specifically I worked with 9th (keyboard) and 8th (chronometer) DOS interruption.
 
-Updates coming!
+In [HACKME](https://github.com/ThreadJava800/ASMBasics/blob/main/HACKME/HACKME.ASM) you can see my program with password authentication, where I left vulnerabilities, so my opponent could be able to hack me. I, in turn, hacked my classmate program and wrote [patcher](https://github.com/ThreadJava800/ASMBasics/blob/main/HACKME/crack/patcher.cpp) for it, which prints some garbage on screen while working, like real patchers do.
