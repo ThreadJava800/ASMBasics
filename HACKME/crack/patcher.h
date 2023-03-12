@@ -21,7 +21,11 @@ const int WINDOW_HEIGHT = 1080;
 const int WINDOW_LENGTH = 1920;
 const float EPSILON = 1e-12f;
 
-const long long PROG_HASH = -7173062527115853824;
+const char* BONZI_GIF = "assets/bonzi.gif";
+const char* WIN_LOGO  = "assets/newxp.png";
+const char* ELEV_MUS  = "assets/elev.wav";
+
+const long long PROG_HASH = 3793272948517436912;
 
 struct Direction_t {
     float xDir = -0.125f * 0.25f;
@@ -50,4 +54,4 @@ void checkForColision(Direction_t* direction, float x, float xSize, float xScale
 long long getCurTimeMs();
 long long countProgramHash(const char* fileName);
 void patch(const char* fileName);
-void runMainCycle();
+void runMainCycle(const char* fileName);

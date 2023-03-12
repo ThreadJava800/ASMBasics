@@ -77,6 +77,8 @@ long long getCurTimeMs() {
 long long countProgramHash(const char* fileName) {
     long long hash = 0;
     FILE* file = fopen(fileName, "rb");
+    ON_ERROR(!file, "File not found", -1);
+
     char curCh = fgetc(file);
 
     while (curCh != EOF)
@@ -95,25 +97,23 @@ void patch(const char* fileName) {
 
     FILE* toCrack = fopen(fileName, "rb");
     FILE* cracked = fopen("PATCHED.COM", "wb");
+    ON_ERROR(!toCrack || !cracked, "Files not found", );
 
     char curCh = fgetc(toCrack);
     long byteCount = 0;
     while (curCh != EOF)
     {
-        if (byteCount == 154) {  // 9A
-            unsigned char newByte = 235;  // EB (jmp)
+        if (byteCount == 1340) {  // 53Ch
+            unsigned char ah = 107;  // 6Bh
+            unsigned char al = 253;  // FD 
 
-            fputc(newByte, cracked);
+            fputc(curCh, cracked);   // call id
 
-            curCh = fgetc(toCrack);
-            fputc(curCh, cracked);
-        } else if (byteCount == 178) {
-            unsigned char skip = 144;  // 90h
-            
-            fputc(skip, cracked);
-            fputc(skip, cracked);
             fgetc(toCrack);
+            fputc(ah, cracked);     // ah
 
+            fputc(al, cracked);
+            fgetc(toCrack);         // al
         } else {
             fputc(curCh, cracked);
         }
@@ -127,16 +127,16 @@ void patch(const char* fileName) {
     fclose(cracked);
 }
 
-void runMainCycle() {
+void runMainCycle(const char* fileName) {
     // Load images
     sf::Texture bonzi = sf::Texture();
-    ON_ERROR(!bonzi.loadFromFile("bonzi.gif"), "FILE NOT FOUND",);
+    ON_ERROR(!bonzi.loadFromFile(BONZI_GIF), "FILE NOT FOUND",);
 
     sf::Texture winLogo = sf::Texture();
-    ON_ERROR(!winLogo.loadFromFile("newxp.png"), "FILE NOT FOUND",);
+    ON_ERROR(!winLogo.loadFromFile(WIN_LOGO), "FILE NOT FOUND",);
 
     sf::SoundBuffer music = sf::SoundBuffer();
-    ON_ERROR(!music.loadFromFile("elev.wav"), "FILE NOT FOUND",);
+    ON_ERROR(!music.loadFromFile(ELEV_MUS), "FILE NOT FOUND",);
 
     // play music
     sf::Sound sound = sf::Sound();
@@ -162,7 +162,7 @@ void runMainCycle() {
     int frameCount = 0;
     long long frameStart = getCurTimeMs();
 
-    GifFrameList_t* frames = getGifFrames("bonzi.gif", bonzi.getSize().x, bonzi.getSize().y);
+    GifFrameList_t* frames = getGifFrames(BONZI_GIF, bonzi.getSize().x, bonzi.getSize().y);
 
     // Main program cycle
     while (window.isOpen())
@@ -175,7 +175,7 @@ void runMainCycle() {
                 (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape)) {
                 
                 window.close();
-                patch("../CRACK.COM");
+                patch(fileName);
             }
         }
 
@@ -201,7 +201,7 @@ void runMainCycle() {
 
                 if (bounds.contains(mouse)) {
                     window.close();
-                    patch("../CRACK.COM");
+                    patch(fileName);
                 }
             }
 
@@ -224,9 +224,13 @@ void runMainCycle() {
 }
 
 
-int main()
+int main(int argc, char *argv[])
 {
-    runMainCycle();
+    if (argc == 2) {
+        runMainCycle(argv[1]);
+    } else {
+        fprintf(stderr, "Incorrect arguments provided");
+    }
 
     return 0;
 }
